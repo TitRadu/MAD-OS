@@ -1,0 +1,29 @@
+<---<Help Page for MAD OS Command Line>--->
+--help-- display the help page.
+--clear-- open a new command line window and close window where this command was called.
+--cpath-- display the current path.
+--chpath--arg1-- change the current path by adding arg1.arg1 must be a directory in current path,not in a directory from current path.
+	      -- arg1 must be without "".
+--nwpath--arg1-- change the current path with path arg1.arg1 must be a absolute path.
+	      -- arg1 must be without "".
+---path-- turn back in path.
+--list-- display te content of the current path non-recursive.
+--cdir--arg1-- create a directory with name arg1 in the current path.
+	    -- arg1 must be without "",even in situation we have space in argument.
+--rdir--arg1-- remove a directory with name arg1 in the current path.
+	    -- arg1 must be without "",even in situation we have space in argument.
+--cfile--arg1-- create a file with name arg1 in the current path.
+	     -- arg1 must be without "",even in situation we have space in argument.
+--rfile--arg1-- remove a file with name arg1 in the current path.
+	     -- arg1 must be without "",even in situation we have space in argument.
+--ipc-- display information about network devices.
+--ipc-a-- display information about network devices(detailed).
+--start--arg1--arg2 --start a program or a file with a specified program.
+		    --args must be without "" and space or spaces.
+		    --with 2 args:arg1 must be a program(ex:notepad) and arg2 must be a file,a relative path.
+		    --(if not exist some programs create file).
+		    --with 1 arg:arg1 must be a program(ex:notepad). 	
+--opath--arg1--	open a path in window mode or a file with standard program.
+	     -- arg1 must be a absolute path without "".	    	
+--sort--arg1--sort path arg1 following file extensions.
+	    --arg1 must be a absolute path with "".

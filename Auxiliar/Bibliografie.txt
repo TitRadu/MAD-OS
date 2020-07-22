@@ -1,0 +1,9 @@
+https://docs.microsoft.com/ro-ro/
+https://linux.die.net/man/
+https://www.codeproject.com/Questions/429009/Netapi32-lib-Linking-application-with-library-Cplu --> link cu netapi32.lib
+http://www.cplusplus.com/reference/cwchar/wscanf/ --> wscanf,wprintf.
+https://man.cx/wcslen(3)
+https://stackoverflow.com/questions/27356706/create-windows-user-profile-with-netuseradd-function --> adaugarea in grup a noului utilizator(addUser).
+https://stackoverflow.com/questions/43791666/access-denied-on-waitforsingleobject-on-an-event-created-from-managed-code -> SYNCRHONIZE for OpenProcess(killProcess).
+https://stackoverflow.com/questions/7956519/how-to-kill-processes-by-name-win32-api -> PROCESS_TERMINATE for OpenProcess(killProcess).
+stackoverflow.com/questions/1855956/how-do-you-concatenate-two-wchar-t-together -> wcsncat -> wcscat. 
