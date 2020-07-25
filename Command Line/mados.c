@@ -1,4 +1,3 @@
-//Test Commit
 #include "mados.h"
 #define CMD L"C:\\Windows\\System32\\cmd.exe"
 
@@ -1548,9 +1547,6 @@ void addUser(wchar_t* userName,wchar_t* userPassword){
 
     DWORD level = 1;
     DWORD error = -1;
-
-    memset(&content,0,sizeof(content));
-    memset(&account,0,sizeof(account));
 
     if((content.usri1_name = (LPWSTR)HeapAlloc(processHeap,HEAP_ZERO_MEMORY,100)) == NULL){
         printf("AddUserHeapAllocError!\n");
