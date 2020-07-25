@@ -7,6 +7,25 @@ void pause(){
 
 }
 
+int pathType(wchar_t* path){
+    if(wcslen(path) >= 2){
+        if(IsCharAlphaW(path[0]) != 0){
+            if(path[1] == ':'){
+                if(path[2] == '\\' || path[2] == '\0'){
+                    return 0;
+
+                }
+
+            }
+
+        }
+
+    }
+
+    return 1;
+
+}
+
 void wStringInQuatationMarks(wchar_t* string){
     wchar_t newString[wcslen(string)+3];
     newString[0] = '\0';
@@ -159,6 +178,17 @@ void newPath(wchar_t *oldpath){
     wchar_t newpath[PATH];
     _getws(newpath);
 
+    if(wStringCheck(newpath) == 1){
+        return;
+
+    }
+
+    if(pathType(newpath) == 1){
+        printf("You need a absolute path!\n");
+        return;
+
+    }
+
     int pathCheck = 0;
     if((pathCheck=wExist(newpath,L"")) == 0){
         printf("This path doesn't exist as file!\n");
@@ -186,6 +216,17 @@ void newPath(wchar_t *oldpath){
 void changePath(wchar_t *path){
     wchar_t name[OH];
     _getws(name);
+
+    if(wStringCheck(name) == 1){
+        return;
+
+    }
+
+    if(pathType(name) == 0){
+        printf("You need a relative path!\n");
+        return;
+
+    }
 
     int pathCheck = 0;
     if((pathCheck=wExist(path,name)) == 0){
