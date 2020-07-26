@@ -73,7 +73,7 @@ int wExist(wchar_t* path,wchar_t *name){
     if( (fileType=GetFileAttributesW(newpath)) == INVALID_FILE_ATTRIBUTES){
         error = GetLastError();
 
-        if(error == ERROR_FILE_NOT_FOUND || error == ERROR_PATH_NOT_FOUND){
+        if(error == ERROR_FILE_NOT_FOUND || error == ERROR_PATH_NOT_FOUND || error == ERROR_INVALID_NAME){
             return 0;
 
         }
@@ -275,6 +275,12 @@ void createDirectoryWraper(wchar_t* path){
 
     }
 
+    if(pathType(name) == 0){
+        printf("You need a relative path!\n");
+        return;
+
+    }
+
     wchar_t fullPath[wcslen(path)+wcslen(name)+1];
     fullPath[0] = '\0';
     wcscat(fullPath,path);
@@ -329,6 +335,12 @@ void removeDirectoryWraper(wchar_t* path){
 
      if(wStringCheck(name) == 1){
             return;
+
+    }
+
+    if(pathType(name) == 0){
+        printf("You need a relative path!\n");
+        return;
 
     }
 
@@ -388,17 +400,10 @@ void removeDirectoryRecursiveWraper(wchar_t* path){
 
     }
 
-    int pathCheck = 0;
-    if((pathCheck=wExist(path,name)) == 0){
-        printf("This path doesn't exist as file!\n");
+    if(pathType(name) == 0){
+        printf("You need a relative path!\n");
         return;
 
-    }else{
-        if(pathCheck != 2){
-            printf("This path isn't a directory!\n");
-            return;
-
-        }
     }
 
     wchar_t removeDirectoryName[wcslen(path)+wcslen(name)+1];
@@ -411,6 +416,19 @@ void removeDirectoryRecursiveWraper(wchar_t* path){
 }
 
 void removeDirectoryRecursive(wchar_t* absolutePath){
+    int pathCheck = 0;
+    if((pathCheck=wExist(absolutePath,L"")) == 0){
+        printf("This path doesn't exist as file!\n");
+        return;
+
+    }else{
+        if(pathCheck != 2){
+            printf("This path isn't a directory!\n");
+            return;
+
+        }
+    }
+
     printf("\nList of deleted files:\n");
     parse(absolutePath,'R');
     printf("\n");
@@ -430,6 +448,12 @@ void createFileWraper(wchar_t* path){
 
     }
 
+    if(pathType(name) == 0){
+        printf("You need a relative path!\n");
+        return;
+
+    }
+
     wchar_t fullPath[wcslen(path)+wcslen(name)+1];
     fullPath[0] = '\0';
     wcscat(fullPath,path);
@@ -444,6 +468,12 @@ void createFile(wchar_t* absolutePath){
     HANDLE createFileHandler = NULL;
     if((createFileHandler = CreateFileW(absolutePath,GENERIC_WRITE,0,NULL,CREATE_NEW,FILE_ATTRIBUTE_NORMAL,NULL)) == INVALID_HANDLE_VALUE){
         error = GetLastError();
+        if(error == ERROR_INVALID_NAME){
+            printf("Invalid argument!\n");
+            return;
+
+        }
+
         if(error == 80){
             printf("The file exists.\n");
             return;
@@ -477,6 +507,12 @@ void removeFileWraper(wchar_t* path){
     _getws(name);
 
     if(wStringCheck(name) == 1){
+        return;
+
+    }
+
+    if(pathType(name) == 0){
+        printf("You need a relative path!\n");
         return;
 
     }
