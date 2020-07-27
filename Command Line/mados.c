@@ -440,8 +440,12 @@ void removeDirectoryRecursive(wchar_t* absolutePath){
 }
 
 void createFileWraper(wchar_t* path){
-    wchar_t name[OH];
-    _getws(name);
+    wchar_t name[PATH];
+    fgetws(name,PATH,stdin);
+    if(name[wcslen(name)-1] == '\n'){
+        name[wcslen(name)-1] = '\0';
+
+    }
 
     if(wStringCheck(name) == 1){
         return;
@@ -454,7 +458,7 @@ void createFileWraper(wchar_t* path){
 
     }
 
-    wchar_t fullPath[wcslen(path)+wcslen(name)+1];
+    wchar_t fullPath[wcslen(path)+wcslen(name)+1+10];
     fullPath[0] = '\0';
     wcscat(fullPath,path);
     wcscat(fullPath,name);
@@ -566,6 +570,13 @@ void renameFileWraper(){
                 return;
 
             }
+
+            if(pathType(oldName) == 1){
+                printf("You need a absolute path!\n");
+                return;
+
+            }
+
             int existCheck = 0;
             if((existCheck=wExist(oldName,L"")) == 0){
                 printf("OldName doesn't exist as file!\n");
@@ -576,6 +587,12 @@ void renameFileWraper(){
             wchar_t newName[PATH];
             printf("NewName:");_getws(newName);
             if(wStringCheck(newName) == 1){
+                return;
+
+            }
+
+            if(pathType(newName) == 1){
+                printf("You need a absolute path!\n");
                 return;
 
             }
