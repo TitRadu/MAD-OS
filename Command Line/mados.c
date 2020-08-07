@@ -267,24 +267,27 @@ void parse(wchar_t* path,wchar_t control){
 }
 
 void createDirectoryWraper(wchar_t* path){
-    wchar_t name[OH];
-    _getws(name);
+    wchar_t directoryShortPath[MAX_PATH];
+    fgetws(directoryShortPath,MAX_PATH,stdin);
+    if(directoryShortPath[wcslen(directoryShortPath)-1] == '\n'){
+        directoryShortPath[wcslen(directoryShortPath)-1] = '\0';
+    }
 
-    if(wStringCheck(name) == 1){
+    if(wStringCheck(directoryShortPath) == 1){
         return;
 
     }
 
-    if(pathType(name) == 0){
+    if(pathType(directoryShortPath) == 0){
         printf("You need a relative path!\n");
         return;
 
     }
 
-    wchar_t fullPath[wcslen(path)+wcslen(name)+1];
+    wchar_t fullPath[wcslen(path)+wcslen(directoryShortPath)+1];
     fullPath[0] = '\0';
     wcscat(fullPath,path);
-    wcscat(fullPath,name);
+    wcscat(fullPath,directoryShortPath);
 
     createDirectory(fullPath);
 
@@ -319,6 +322,12 @@ void createDirectory(wchar_t* absolutePath){
 
         }
 
+        if(error == ERROR_FILENAME_EXCED_RANGE){
+            printf("File name is too long!\n");
+            return;
+
+        }
+
         printf("CreateDirectoryCreateDirectoryError:%lu\n",error);
         return;
 
@@ -330,24 +339,27 @@ void createDirectory(wchar_t* absolutePath){
 
 
 void removeDirectoryWraper(wchar_t* path){
-    wchar_t name[OH];
-    _getws(name);
+    wchar_t directoryShortPath[MAX_PATH];
+    fgetws(directoryShortPath,MAX_PATH,stdin);
+    if(directoryShortPath[wcslen(directoryShortPath)-1] == '\n'){
+        directoryShortPath[wcslen(directoryShortPath)-1] = '\0';
+    }
 
-     if(wStringCheck(name) == 1){
+     if(wStringCheck(directoryShortPath) == 1){
             return;
 
     }
 
-    if(pathType(name) == 0){
+    if(pathType(directoryShortPath) == 0){
         printf("You need a relative path!\n");
         return;
 
     }
 
-    wchar_t fullPath[wcslen(path)+wcslen(name)+1];
+    wchar_t fullPath[wcslen(path)+wcslen(directoryShortPath)+1];
     fullPath[0] = '\0';
     wcscat(fullPath,path);
-    wcscat(fullPath,name);
+    wcscat(fullPath,directoryShortPath);
 
     removeDirectory(fullPath);
 
@@ -355,6 +367,12 @@ void removeDirectoryWraper(wchar_t* path){
 
 int removeDirectory(wchar_t* absolutePath){
     DWORD error = 0;
+    if(wcslen(absolutePath) >= MAX_PATH){
+        printf("File name is too long!\n");
+        return -1;
+
+    }
+
     if(RemoveDirectoryW(absolutePath) == 0){
         error = GetLastError();
 
@@ -381,6 +399,12 @@ int removeDirectory(wchar_t* absolutePath){
 
         }
 
+        if(error == ERROR_FILENAME_EXCED_RANGE){
+            printf("File name is too long!\n");
+            return error;
+
+        }
+
         printf("RemoveDirectoryRemoveDirectoryError:%lu\n",error);
         return error;
 
@@ -390,10 +414,11 @@ int removeDirectory(wchar_t* absolutePath){
 }
 
 void removeDirectoryRecursiveWraper(wchar_t* path){
-    wchar_t name[OH];
-    fgetws(name,50,stdin);
-    if(name[wcslen(name)-1] == '\n')
+    wchar_t name[MAX_PATH];
+    fgetws(name,MAX_PATH,stdin);
+    if(name[wcslen(name)-1] == '\n'){
         name[wcslen(name)-1] = '\0';
+    }
 
     if(wStringCheck(name) == 1){
         return;

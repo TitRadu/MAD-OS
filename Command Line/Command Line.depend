@@ -1,24 +1,16 @@
 # depslib dependency file v1.0
-1595767303 source:c:\users\radut\desktop\aplicatii in c\aplicatii\mad os command line\command line\cline.c
+1596492640 source:c:\users\radut\desktop\aplicatii in c\aplicatii\mad os command line\command line\cline.c
 	"mados.h"
 
-1595165471 c:\users\radut\desktop\aplicatii in c\aplicatii\mad os command line\command line\mados.h
+1596143373 c:\users\radut\desktop\aplicatii in c\aplicatii\mad os command line\command line\mados.h
 	<stdio.h>
 	<stdlib.h>
 	<Windows.h>
-	<sys/types.h>
-	<sys/stat.h>
-	<fcntl.h>
-	<unistd.h>
-	<direct.h>
-	<dirent.h>
-	<errno.h>
-	<shellapi.h>
 	<time.h>
 	<ctype.h>
 	<lm.h>
 	<psapi.h>
 
-1595807426 source:c:\users\radut\desktop\aplicatii in c\aplicatii\mad os command line\command line\mados.c
+1596760168 source:c:\users\radut\desktop\aplicatii in c\aplicatii\mad os command line\command line\mados.c
 	"mados.h"
 
