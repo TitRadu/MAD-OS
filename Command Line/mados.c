@@ -267,8 +267,8 @@ void parse(wchar_t* path,wchar_t control){
 }
 
 void createDirectoryWraper(wchar_t* path){
-    wchar_t directoryShortPath[MAX_PATH];
-    fgetws(directoryShortPath,MAX_PATH,stdin);
+    wchar_t directoryShortPath[PATH];
+    fgetws(directoryShortPath,PATH,stdin);
     if(directoryShortPath[wcslen(directoryShortPath)-1] == '\n'){
         directoryShortPath[wcslen(directoryShortPath)-1] = '\0';
     }
@@ -295,6 +295,12 @@ void createDirectoryWraper(wchar_t* path){
 
 
 void createDirectory(wchar_t* absolutePath){
+    if(wcslen(absolutePath) > 247){
+        printf("File name is too long!\n");
+        return;
+
+    }
+
     DWORD error = 0;
     if(CreateDirectoryW(absolutePath,NULL) == 0){
         error = GetLastError();
@@ -367,7 +373,7 @@ void removeDirectoryWraper(wchar_t* path){
 
 int removeDirectory(wchar_t* absolutePath){
     DWORD error = 0;
-    if(wcslen(absolutePath) >= MAX_PATH){
+    if(wcslen(absolutePath) > 247){
         printf("File name is too long!\n");
         return -1;
 
@@ -391,6 +397,12 @@ int removeDirectory(wchar_t* absolutePath){
         if(error == ERROR_FILE_NOT_FOUND){
             printf("This path doesn't exist as file!\n");
             return error;
+        }
+
+        if(error == ERROR_PATH_NOT_FOUND){
+            printf("A component from argument doesn't exist!\n");
+            return error;
+
         }
 
         if(error == ERROR_DIRECTORY){
@@ -465,8 +477,8 @@ void removeDirectoryRecursive(wchar_t* absolutePath){
 }
 
 void createFileWraper(wchar_t* path){
-    wchar_t name[PATH];
-    fgetws(name,PATH,stdin);
+    wchar_t name[MAX_PATH];
+    fgetws(name,MAX_PATH,stdin);
     if(name[wcslen(name)-1] == '\n'){
         name[wcslen(name)-1] = '\0';
 
@@ -493,12 +505,18 @@ void createFileWraper(wchar_t* path){
 }
 
 void createFile(wchar_t* absolutePath){
+    if(wcslen(absolutePath) >= MAX_PATH -1){
+        printf("File name is too long!\n");
+        return;
+
+    }
+
     DWORD error = 0;
     HANDLE createFileHandler = NULL;
     if((createFileHandler = CreateFileW(absolutePath,GENERIC_WRITE,0,NULL,CREATE_NEW,FILE_ATTRIBUTE_NORMAL,NULL)) == INVALID_HANDLE_VALUE){
         error = GetLastError();
         if(error == ERROR_INVALID_NAME){
-            printf("Invalid argument!\n");
+            printf("Invalid argument or file name is too long!\n");
             return;
 
         }
@@ -509,7 +527,7 @@ void createFile(wchar_t* absolutePath){
 
         }
         if(error == 3){
-            printf("A part from creation path isn't a directory!\n");
+            printf("A component from argument doesn't exist or file name is too long!\n");
             return;
 
         }
@@ -532,8 +550,12 @@ void createFile(wchar_t* absolutePath){
 }
 
 void removeFileWraper(wchar_t* path){
-    wchar_t name[OH];
-    _getws(name);
+    wchar_t name[MAX_PATH];
+    fgetws(name,MAX_PATH,stdin);
+    if(name[wcslen(name)-1] == '\n'){
+        name[wcslen(name)-1] = '\0';
+
+    }
 
     if(wStringCheck(name) == 1){
         return;
@@ -556,6 +578,12 @@ void removeFileWraper(wchar_t* path){
 }
 
 void removeFile(wchar_t* absolutePath){
+    if(wcslen(absolutePath) >= MAX_PATH -1){
+        printf("File name is too long!\n");
+        return;
+
+   }
+
     DWORD error = 0;
     if(DeleteFileW(absolutePath) == 0){
         error = GetLastError();
@@ -589,49 +617,54 @@ void removeFile(wchar_t* absolutePath){
 }
 
 void renameFileWraper(){
-            wchar_t oldName[PATH];
-            printf("OldName:");_getws(oldName);
-            if(wStringCheck(oldName) == 1){
-                return;
+    wchar_t oldName[PATH];
+    printf("OldName:");
+    fgetws(oldName,MAX_PATH,stdin);
+    if(oldName[wcslen(oldName)-1] == '\n'){
+        oldName[wcslen(oldName)-1] = '\0';
 
-            }
+    }
 
-            if(pathType(oldName) == 1){
-                printf("You need a absolute path!\n");
-                return;
+    if(wStringCheck(oldName) == 1){
+        return;
 
-            }
+    }
 
-            int existCheck = 0;
-            if((existCheck=wExist(oldName,L"")) == 0){
-                printf("OldName doesn't exist as file!\n");
-                return;
+    if(pathType(oldName) == 1){
+        printf("You need a absolute path!\n");
+        return;
 
-            }
+    }
 
-            wchar_t newName[PATH];
-            printf("NewName:");_getws(newName);
-            if(wStringCheck(newName) == 1){
-                return;
+    int existCheck = 0;
+    if((existCheck=wExist(oldName,L"")) == 0){
+        printf("OldName doesn't exist as file!\n");
+        return;
 
-            }
+    }
 
-            if(pathType(newName) == 1){
-                printf("You need a absolute path!\n");
-                return;
+    wchar_t newName[PATH];
+    printf("NewName:");_getws(newName);
+    if(wStringCheck(newName) == 1){
+        return;
+    }
 
-            }
+    if(pathType(newName) == 1){
+        printf("You need a absolute path!\n");
+    return;
 
-            existCheck = wExist(newName,L"");
+    }
 
-            if(existCheck == 1 || existCheck == 2){
-                printf("The NewName already exists!\n");
-                return;
+    existCheck = wExist(newName,L"");
 
-            }
+    if(existCheck == 1 || existCheck == 2){
+        printf("The NewName already exists!\n");
+        return;
 
-            renameFile(oldName,newName);
-            return;
+    }
+
+    renameFile(oldName,newName);
+    return;
 
 }
 
