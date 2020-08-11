@@ -174,23 +174,32 @@ NULL,
 
 }
 
-void newPath(wchar_t *oldpath){
-    wchar_t newpath[PATH];
-    _getws(newpath);
+void newPath(wchar_t *oldPath){
+    wchar_t newPath[MAX_PATH];
+    fgetws(newPath,MAX_PATH,stdin);
+    if(newPath[wcslen(newPath)-1] == '\n'){
+        newPath[wcslen(newPath)-1] = '\0';
+    }
 
-    if(wStringCheck(newpath) == 1){
+    if(wStringCheck(newPath) == 1){
         return;
 
     }
 
-    if(pathType(newpath) == 1){
+    if(pathType(newPath) == 1){
         printf("You need a absolute path!\n");
         return;
 
     }
 
+    if(wcslen(newPath) > 247){
+        printf("File name is too long!\n");
+        return;
+
+    }
+
     int pathCheck = 0;
-    if((pathCheck=wExist(newpath,L"")) == 0){
+    if((pathCheck=wExist(newPath,L"")) == 0){
         printf("This path doesn't exist as file!\n");
         return;
 
@@ -202,34 +211,43 @@ void newPath(wchar_t *oldpath){
         }
     }
 
-    if(wcslen(newpath) == 3){
+    if(wcslen(newPath) == 3){
 
     }else{
-        wcscat(newpath,L"\\");
+        wcscat(newPath,L"\\");
 
     }
 
-    wcscpy(oldpath,newpath);
+    wcscpy(oldPath,newPath);
 
 }
 
 void changePath(wchar_t *path){
-    wchar_t name[OH];
-    _getws(name);
+    wchar_t relativeChangePath[MAX_PATH];
+    fgetws(relativeChangePath,MAX_PATH,stdin);
+    if(relativeChangePath[wcslen(relativeChangePath)-1] == '\n'){
+        relativeChangePath[wcslen(relativeChangePath)-1] = '\0';
+    }
 
-    if(wStringCheck(name) == 1){
+    if(wStringCheck(relativeChangePath) == 1){
         return;
 
     }
 
-    if(pathType(name) == 0){
+    if(pathType(relativeChangePath) == 0){
         printf("You need a relative path!\n");
         return;
 
     }
 
+    if((wcslen(path)+wcslen(relativeChangePath)) > 247){
+        printf("File name is too long!\n");
+        return;
+
+    }
+
     int pathCheck = 0;
-    if((pathCheck=wExist(path,name)) == 0){
+    if((pathCheck=wExist(path,relativeChangePath)) == 0){
         printf("This path doesn't exist as file!\n");
         return;
 
@@ -241,7 +259,7 @@ void changePath(wchar_t *path){
         }
     }
 
-    wcscat(path,name);
+    wcscat(path,relativeChangePath);
     wcscat(path,L"\\");
 
 
@@ -617,7 +635,7 @@ void removeFile(wchar_t* absolutePath){
 }
 
 void renameFileWraper(){
-    wchar_t oldName[PATH];
+    wchar_t oldName[MAX_PATH];
     printf("OldName:");
     fgetws(oldName,MAX_PATH,stdin);
     if(oldName[wcslen(oldName)-1] == '\n'){
@@ -636,27 +654,44 @@ void renameFileWraper(){
 
     }
 
-    int existCheck = 0;
-    if((existCheck=wExist(oldName,L"")) == 0){
+    if(wcslen(oldName) >= MAX_PATH -1){
+        printf("File name is too long!\n");
+        return;
+
+   }
+
+    if(wExist(oldName,L"") == 0){
         printf("OldName doesn't exist as file!\n");
         return;
 
     }
 
     wchar_t newName[PATH];
-    printf("NewName:");_getws(newName);
+    printf("NewName:");
+    fgetws(newName,MAX_PATH,stdin);
+    if(newName[wcslen(newName)-1] == '\n'){
+        newName[wcslen(newName)-1] = '\0';
+
+    }
+
     if(wStringCheck(newName) == 1){
         return;
     }
 
     if(pathType(newName) == 1){
         printf("You need a absolute path!\n");
-    return;
+        return;
 
     }
 
-    existCheck = wExist(newName,L"");
 
+    if(wcslen(newName) >= MAX_PATH -1){
+        printf("File name is too long!\n");
+        return;
+
+    }
+
+    int existCheck = wExist(newName,L"");
     if(existCheck == 1 || existCheck == 2){
         printf("The NewName already exists!\n");
         return;
@@ -720,8 +755,13 @@ void renameFile(wchar_t* oldName,wchar_t* newName){
 }
 
 void start1(){
-    wchar_t program[OH];
-    printf("Program:");_getws(program);
+    wchar_t program[MAX_PATH];
+    printf("Program:");
+    fgetws(program,MAX_PATH,stdin);
+    if(program[wcslen(program)-1] == '\n'){
+        program[wcslen(program)-1] = '\0';
+
+    }
 
     if(wStringCheck(program) == 1){
         return;
@@ -754,16 +794,33 @@ void start2(wchar_t* path){
 
     }
 
-    wchar_t program[OH];
-    printf("Program:");_getws(program);
+    wchar_t program[MAX_PATH];
+    printf("Program:");
+    fgetws(program,MAX_PATH,stdin);
+    if(program[wcslen(program)-1] == '\n'){
+        program[wcslen(program)-1] = '\0';
+
+    }
+
 
     if(wStringCheck(program) == 1){
         return;
 
     }
 
+    if(wcslen(program) >= MAX_PATH -1){
+        printf("Program name is too long!\n");
+        return;
+    }
+
+    if(pathType(program) == 0){
+        printf("You need a relative path!\n");
+        return;
+
+    }
+
     int exeCheck = 0;
-    if(wExist(path,program)!= 0){
+    if(wExist(path,program) == 1){
         if(wcscmp(program+wcslen(program)-4,L".exe") == 0){
             exeCheck =1 ;
 
@@ -788,17 +845,36 @@ void start2(wchar_t* path){
         wcscat(args,L"\"");
         wcscat(args,path);
 
-        wchar_t name[OH];
-        printf("FileName:");_getws(name);
-        if(wStringCheck(name) == 1){
+        wchar_t openFileRelativeName[MAX_PATH];
+        printf("FileName:");
+        fgetws(openFileRelativeName,MAX_PATH,stdin);
+        if(openFileRelativeName[wcslen(openFileRelativeName)-1] == '\n'){
+            openFileRelativeName[wcslen(openFileRelativeName)-1] = '\0';
+
+        }
+
+        if(wStringCheck(openFileRelativeName) == 1){
             return;
 
         }
 
-        wcscat(args,name);
+        if(pathType(openFileRelativeName) == 0){
+            printf("You need a relative path!\n");
+            return;
+
+        }
+
+        wcscat(args,openFileRelativeName);
         wcscat(args,L"\"");
+
+        if(wcslen(args) >= MAX_PATH -3){
+            printf("File name is too long!\n");
+            return;
+        }
+
+
         int existCheck = 0;
-        if((existCheck=wExist(path,name)) == 0){
+        if((existCheck=wExist(path,openFileRelativeName)) == 0){
             printf("Second argument doesn't exist as file!\n");
             return;
 
@@ -973,10 +1049,15 @@ void ipca(){
 }
 
 void openPathWraper(){
-    wchar_t name[PATH];
-    _getws(name);
+    wchar_t openFileAbsoluteName[MAX_PATH];
+    fgetws(openFileAbsoluteName,MAX_PATH,stdin);
+    if(openFileAbsoluteName[wcslen(openFileAbsoluteName)-1] == '\n'){
+        openFileAbsoluteName[wcslen(openFileAbsoluteName)-1] = '\0';
 
-    openPath(name);
+    }
+
+    openPath(openFileAbsoluteName);
+
 }
 
 void openPath(wchar_t *absolutePath){
@@ -984,6 +1065,18 @@ void openPath(wchar_t *absolutePath){
         return;
 
     }
+
+    if(pathType(absolutePath) == 1){
+        printf("You need a absolute path!\n");
+        return;
+
+    }
+
+    if(wcslen(absolutePath) >= MAX_PATH -1){
+        printf("File name is too long!\n");
+        return;
+
+   }
 
     int pathCheck = 0;
     if((pathCheck=wExist(absolutePath,L"")) == 0){
@@ -1057,13 +1150,18 @@ void generateFile(){
 }
 
 void connectToURLWraper(){
-    wchar_t name[PATH];
-    printf("URL:");_getws(name);
+    wchar_t domainName[MAX_PATH];
+    printf("URL:");
+    fgetws(domainName,MAX_PATH,stdin);
+    if(domainName[wcslen(domainName)-1] == '\n'){
+        domainName[wcslen(domainName)-1] = '\0';
 
-    wchar_t command[9+wcslen(name)];
+    }
+
+    wchar_t command[9+wcslen(domainName)];
     command[0] = '\0';
     wcscat(command,L"https://");
-    wcscat(command,name);
+    wcscat(command,domainName);
 
     connectToURL(command);
 
@@ -1108,8 +1206,30 @@ void displayTime(){
 }
 
 void copyDirectoryWraper(char* control){
-    wchar_t sourcePath[PATH];
-    printf("SourceDirectory:");_getws(sourcePath);
+    wchar_t sourcePath[MAX_PATH];
+    printf("SourceDirectory:");
+    fgetws(sourcePath,MAX_PATH,stdin);
+    if(sourcePath[wcslen(sourcePath)-1] == '\n'){
+        sourcePath[wcslen(sourcePath)-1] = '\0';
+
+    }
+
+    if(wStringCheck(sourcePath) == 1){
+        return;
+
+    }
+
+    if(pathType(sourcePath) == 1){
+        printf("You need a absolute path!\n");
+        return;
+
+    }
+
+    if(wcslen(sourcePath) > 247){
+        printf("File name is too long!\n");
+        return;
+
+   }
 
     int existCheck = 0;
     if((existCheck=wExist(sourcePath,L"")) == 0){
@@ -1125,8 +1245,31 @@ void copyDirectoryWraper(char* control){
 
     }
 
-    wchar_t destinationPath[PATH];
-    printf("DestinationDirectory:");_getws(destinationPath);
+    wchar_t destinationPath[MAX_PATH];
+    printf("DestinationDirectory:");
+
+    fgetws(destinationPath,MAX_PATH,stdin);
+    if(destinationPath[wcslen(destinationPath)-1] == '\n'){
+        destinationPath[wcslen(destinationPath)-1] = '\0';
+
+    }
+
+    if(wStringCheck(destinationPath) == 1){
+        return;
+
+    }
+
+    if(pathType(destinationPath) == 1){
+        printf("You need a absolute path!\n\n");
+        return;
+
+    }
+
+    if(wcslen(destinationPath) > 247){
+        printf("File name is too long!\n\n");
+        return;
+
+   }
 
     copyDirectory(sourcePath,destinationPath);
 
@@ -1156,10 +1299,21 @@ void copyDirectory(wchar_t* sourcePath,wchar_t* destinationPath){
 }
 
 void backupWraper(wchar_t* path){
-    wchar_t name[OH];
-    printf("File to backup:");_getws(name);
+    wchar_t backUpFileRelativeName[MAX_PATH];
+    printf("File to backup:");
+    fgetws(backUpFileRelativeName,MAX_PATH,stdin);
+    if(backUpFileRelativeName[wcslen(backUpFileRelativeName)-1] == '\n'){
+        backUpFileRelativeName[wcslen(backUpFileRelativeName)-1] = '\0';
 
-    if(wStringCheck(name) == 1){
+    }
+
+    if(wStringCheck(backUpFileRelativeName) == 1){
+        return;
+
+    }
+
+    if(pathType(backUpFileRelativeName) == 0){
+        printf("You need a relative path!\n\n");
         return;
 
     }
@@ -1167,13 +1321,19 @@ void backupWraper(wchar_t* path){
     wchar_t fullPath[PATH];
     fullPath[0] = '\0';
     wcscat(fullPath,path);
-    wcscat(fullPath,name);
+    wcscat(fullPath,backUpFileRelativeName);
 
-    backup(fullPath,name);
+    backup(fullPath,backUpFileRelativeName);
 
 }
 
 void backup(wchar_t* absolutePath,wchar_t* name){
+    if(wcslen(absolutePath) >= MAX_PATH - 1){
+        printf("File name is too long!\n\n");
+        return;
+
+   }
+
     HANDLE processHeap = NULL;
     if((processHeap = getProcessHeapChecker()) == NULL){
         return;
