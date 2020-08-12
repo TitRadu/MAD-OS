@@ -257,18 +257,25 @@ void changePath(wchar_t *path){
 
     }
 
-    int pathCheck = 0;
-    if((pathCheck=wExist(path,relativeChangePath)) == 0){
+    int existCheck = 0;
+    if((existCheck=wExist(path,relativeChangePath)) == 0){
         printf("This path doesn't exist as file!\n");
         return;
 
-    }else{
-        if(pathCheck != 2){
-            printf("This path isn't a directory!\n");
-            return;
-
-        }
     }
+
+    if(existCheck == 3){
+        printf("Invalid argument!\n");
+        return;
+
+    }
+
+    if(existCheck != 2){
+        printf("This path isn't a directory!\n");
+        return;
+
+    }
+
 
     wcscat(path,relativeChangePath);
     wcscat(path,L"\\");
@@ -799,20 +806,29 @@ void start1(){
 
     }
 
-    if(wExist(program,L"")!= 0){
+    int existCheck = 0;
+    if((existCheck=wExist(program,L"")) == 3){
+        printf("Invalid argument!\n");
+        return;
+
+    }
+
+    if(existCheck != 0){
         printf("First argument is a file(regular file or directory)!\n");
         return;
 
     }
-        HINSTANCE shellCheck = 0;
-        if((shellCheck=ShellExecuteW(NULL,L"open",program,NULL,NULL,1)) <= (HINSTANCE)32){
-            if(shellCheck == (HINSTANCE)2){
-                printf("Program not found!\n");
-                return;
 
-            }
-            printf("Start1ShellExecuteError:%p!\n",shellCheck);
+    HINSTANCE shellCheck = 0;
+    if((shellCheck=ShellExecuteW(NULL,L"open",program,NULL,NULL,1)) <= (HINSTANCE)32){
+        if(shellCheck == (HINSTANCE)2){
+            printf("Program not found!\n");
             return;
+
+        }
+
+        printf("Start1ShellExecuteError:%p!\n",shellCheck);
+        return;
 
         }
 
@@ -851,7 +867,14 @@ void start2(wchar_t* path){
     }
 
     int exeCheck = 0;
-    if(wExist(path,program) == 1){
+    int existCheck = 0;
+    if((existCheck=wExist(path,program)) == 3){
+        printf("Invalid argument!\n");
+        return;
+
+    }
+
+    if(existCheck == 1){
         if(wcscmp(program+wcslen(program)-4,L".exe") == 0){
             exeCheck =1 ;
 
@@ -905,16 +928,21 @@ void start2(wchar_t* path){
 
 
         int existCheck = 0;
-        if((existCheck=wExist(path,openFileRelativeName)) == 0){
+        if((existCheck=wExist(path,openFileRelativeName)) == 3){
+            printf("Invalid argument!\n");
+            return;
+
+        }
+
+        if(existCheck == 0){
             printf("Second argument doesn't exist as file!\n");
             return;
 
-        }else{
-            if(existCheck != 1){
-                printf("Second argument isn't a regular file!\n");
-                return;
+        }
 
-            }
+        if(existCheck != 1){
+            printf("Second argument isn't a regular file!\n");
+            return;
 
         }
 
@@ -1109,8 +1137,14 @@ void openPath(wchar_t *absolutePath){
 
    }
 
-    int pathCheck = 0;
-    if((pathCheck=wExist(absolutePath,L"")) == 0){
+    int existCheck = 0;
+    if((existCheck=wExist(absolutePath,L"")) == 3){
+        printf("Invalid argument!\n");
+        return;
+
+    }
+
+    if(existCheck == 0){
         printf("This path doesn't exist as file!\n");
         return;
 
@@ -1263,16 +1297,21 @@ void copyDirectoryWraper(char* control){
    }
 
     int existCheck = 0;
-    if((existCheck=wExist(sourcePath,L"")) == 0){
+    if((existCheck=wExist(sourcePath,L"")) == 3){
+        printf("Invalid argument!\n");
+        return;
+
+    }
+
+    if(existCheck == 0){
         printf("SourcePath doesn't exist as file!\n");
         return;
 
-    }else{
-        if(existCheck != 2){
-            printf("SourcePath isn't a directory!\n");
-            return;
+    }
 
-        }
+    if(existCheck != 2){
+        printf("SourcePath isn't a directory!\n");
+        return;
 
     }
 
@@ -1301,6 +1340,18 @@ void copyDirectoryWraper(char* control){
         return;
 
    }
+
+    if((existCheck=wExist(destinationPath,L"")) == 3){
+        printf("Invalid argument!\n");
+        return;
+
+    }
+
+    if(existCheck != 0){
+        printf("The file already exists!\n");
+        return;
+
+    }
 
     copyDirectory(sourcePath,destinationPath);
 
@@ -1374,6 +1425,12 @@ void backup(wchar_t* absolutePath,wchar_t* name){
     int existCheck = 0;
     if((existCheck=wExist(absolutePath,L"")) == 0){
         printf("SourcePath doesn't exist as file!\n");
+        return;
+
+    }
+
+    if(existCheck == 3){
+        printf("Invalid argument!\n");
         return;
 
     }
