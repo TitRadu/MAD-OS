@@ -73,8 +73,13 @@ int wExist(wchar_t* path,wchar_t *name){
     if( (fileType=GetFileAttributesW(newpath)) == INVALID_FILE_ATTRIBUTES){
         error = GetLastError();
 
-        if(error == ERROR_FILE_NOT_FOUND || error == ERROR_PATH_NOT_FOUND || error == ERROR_INVALID_NAME){
+        if(error == ERROR_FILE_NOT_FOUND || error == ERROR_PATH_NOT_FOUND){
             return 0;
+
+        }
+
+        if(error == ERROR_INVALID_NAME){
+            return 3;
 
         }
 
@@ -203,12 +208,18 @@ void newPath(wchar_t *oldPath){
         printf("This path doesn't exist as file!\n");
         return;
 
-    }else{
-        if(pathCheck != 2){
-            printf("This path isn't a directory!\n");
-            return;
+    }
 
-        }
+    if(pathCheck == 3){
+        printf("Invalid argument!\n");
+        return;
+
+    }
+
+    if(pathCheck != 2){
+        printf("This path isn't a directory!\n");
+        return;
+
     }
 
     if(wcslen(newPath) == 3){
@@ -476,13 +487,20 @@ void removeDirectoryRecursive(wchar_t* absolutePath){
         printf("This path doesn't exist as file!\n");
         return;
 
-    }else{
-        if(pathCheck != 2){
-            printf("This path isn't a directory!\n");
-            return;
-
-        }
     }
+
+    if(pathCheck == 3){
+        printf("Invalid argument!\n");
+        return;
+
+    }
+
+    if(pathCheck != 2){
+        printf("This path isn't a directory!\n");
+        return;
+
+    }
+
 
     printf("\nList of deleted files:\n");
     parse(absolutePath,'R');
@@ -658,10 +676,17 @@ void renameFileWraper(){
         printf("File name is too long!\n");
         return;
 
-   }
+    }
 
-    if(wExist(oldName,L"") == 0){
+    int existCheck = 0;
+    if((existCheck=wExist(oldName,L"")) == 0){
         printf("OldName doesn't exist as file!\n");
+        return;
+
+    }
+
+    if(existCheck == 3){
+        printf("Invalid argument!\n");
         return;
 
     }
@@ -691,9 +716,15 @@ void renameFileWraper(){
 
     }
 
-    int existCheck = wExist(newName,L"");
+    existCheck = wExist(newName,L"");
     if(existCheck == 1 || existCheck == 2){
         printf("The NewName already exists!\n");
+        return;
+
+    }
+
+    if(existCheck == 3){
+        printf("Invalid argument!\n");
         return;
 
     }

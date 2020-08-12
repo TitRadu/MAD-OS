@@ -31,14 +31,22 @@ int main(){
         pause();
         ExitProcess(-1);
 
-    }else{
-        if(pathCheck != 2){
+    }
+
+    if(pathCheck == 3){
+        printf("Invalid argument!\n");
+        pause();
+        ExitProcess(-1);
+
+    }
+
+    if(pathCheck != 2){
             printf("This path isn't a directory!\n");
             pause();
             ExitProcess(-1);
 
-        }
     }
+
 
     if(wcslen(path) == 3){
 
