@@ -6,24 +6,28 @@ int main(){
     printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~(c) 2020 MAD OS Software. All rights reserved!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
 
     DWORD userSize = THIRTY;
-    char userName[THIRTY];
-    if(!GetUserName(userName,&userSize)){
+    wchar_t userName[THIRTY];
+    if(!GetUserNameW(userName,&userSize)){
         printf("GetUserNameError");
         ExitProcess(-1);
 
     }
 
     DWORD PCsize = THIRTY;
-    char PCname[THIRTY];
-    if(!GetComputerName(PCname,&PCsize)){
+    wchar_t PCname[THIRTY];
+    if(!GetComputerNameW(PCname,&PCsize)){
         printf("GetUserNameError");
         ExitProcess(-1);
 
     }
-    char* command = malloc(OH);
+    char command[MAX_PATH];
     wchar_t path[PATH];
+
     printf("Starting path:");
-    _getws(path);
+    fgetws(path,MAX_PATH,stdin);
+    if(path[wcslen(path)-1] == '\n'){
+        path[wcslen(path)-1] = '\0';
+    }
 
     int pathCheck = 0;
     if((pathCheck=wExist(path,L"")) == 0){
@@ -41,9 +45,9 @@ int main(){
     }
 
     if(pathCheck != 2){
-            printf("This path isn't a directory!\n");
-            pause();
-            ExitProcess(-1);
+        printf("This path isn't a directory!\n");
+        pause();
+        ExitProcess(-1);
 
     }
 
@@ -57,10 +61,14 @@ int main(){
 
     fflush(stdin);
     while(1){
-        printf("%s@%s->",userName,PCname);
-        wprintf(L"%s:",path);
+        wprintf(L"%s@%s->%s",userName,PCname,path);
         fflush(stdin);
-        gets(command);
+
+        fgets(command,MAX_PATH,stdin);
+        if(command[strlen(command)-1] == '\n'){
+            command[strlen(command)-1] = '\0';
+        }
+
         if(strcmp(command,"exit") == 0){
             printf("Exit from command line!\n");
             pause();

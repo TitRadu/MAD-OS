@@ -489,6 +489,12 @@ void removeDirectoryRecursiveWraper(wchar_t* path){
 }
 
 void removeDirectoryRecursive(wchar_t* absolutePath){
+    if(wcslen(absolutePath) > 247){
+        printf("File name is too long!\n");
+        return -1;
+
+    }
+
     int pathCheck = 0;
     if((pathCheck=wExist(absolutePath,L"")) == 0){
         printf("This path doesn't exist as file!\n");
