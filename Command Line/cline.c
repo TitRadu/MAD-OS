@@ -377,6 +377,12 @@ int main(){
 
         }
 
+        if(strcmp(command,"tcolor") == 0){
+            changeTextColorWraper();
+            continue;
+
+        }
+
         printf("Incorrect command!\n");
 
     }

@@ -491,7 +491,7 @@ void removeDirectoryRecursiveWraper(wchar_t* path){
 void removeDirectoryRecursive(wchar_t* absolutePath){
     if(wcslen(absolutePath) > 247){
         printf("File name is too long!\n");
-        return -1;
+        return;
 
     }
 
@@ -2460,4 +2460,139 @@ void killProcess(DWORD killPid){
     }
 
     printf("Process was killed succesfully!\n\n");
+}
+
+void changeTextColorWraper(){
+    wchar_t color[THIRTY];
+    fgetws(color,THIRTY,stdin);
+    if(color[wcslen(color)-1] == '\n'){
+        color[wcslen(color)-1] = '\0';
+    }
+
+    changeTextColor(color);
+}
+
+void changeTextColor(wchar_t* color){
+    if(wStringCheck(color) == 1){
+        return;
+
+    }
+
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    HANDLE out;
+    int c;
+
+    DWORD error = 0;
+    if((out = GetStdHandle(STD_OUTPUT_HANDLE)) == INVALID_HANDLE_VALUE){
+        error = GetLastError();
+        printf("Error:%lu\n",error);
+        return;
+
+    }
+
+    if(GetConsoleScreenBufferInfo(out,&csbi) == 0){
+        error = GetLastError();
+        printf("Error:%lu\n",error);
+        return;
+
+    }
+
+    int colorCheck=0;
+    if(wcscmp(color,L"black") == 0){
+        c = 0;
+        colorCheck=1;
+
+    }
+    if(wcscmp(color,L"blue") == 0){
+        c = 1;
+        colorCheck=1;
+
+    }
+    if(wcscmp(color,L"green") == 0){
+        c = 2;
+        colorCheck=1;
+
+    }
+    if(wcscmp(color,L"aqua") == 0){
+        c = 3;
+        colorCheck=1;
+
+    }
+    if(wcscmp(color,L"red") == 0){
+        c = 4;
+        colorCheck=1;
+
+    }
+    if(wcscmp(color,L"purple") == 0){
+        c = 5;
+        colorCheck=1;
+
+    }
+    if(wcscmp(color,L"yellow") == 0){
+        c = 6;
+        colorCheck=1;
+
+    }
+    if(wcscmp(color,L"white") == 0){
+        c = 7;
+        colorCheck=1;
+
+    }
+    if(wcscmp(color,L"gray") == 0){
+        c = 8;
+        colorCheck=1;
+
+    }
+    if(wcscmp(color,L"lblue") == 0){
+        c = 9;
+        colorCheck=1;
+
+    }
+    if(wcscmp(color,L"lgreen") == 0){
+        c = 10;
+        colorCheck=1;
+
+    }
+    if(wcscmp(color,L"laqua") == 0){
+        c = 11;
+        colorCheck=1;
+
+    }
+    if(wcscmp(color,L"lred") == 0){
+        c = 12;
+        colorCheck=1;
+
+    }
+    if(wcscmp(color,L"lpurple") == 0){
+        c = 13;
+        colorCheck=1;
+
+    }
+    if(wcscmp(color,L"lyellow") == 0){
+        c = 14;
+        colorCheck=1;
+
+    }
+    if(wcscmp(color,L"bwhite") == 0){
+        c = 15;
+        colorCheck=1;
+
+    }
+    if(colorCheck == 0){
+        printf("Invalid color!\n\n");
+        return;
+
+    }
+
+    int attr = 0;
+    attr = csbi.wAttributes;
+    attr = attr & 240;
+    attr = attr + c;
+
+    if(SetConsoleTextAttribute(out,attr) == 0){
+        error  = GetLastError();
+        printf("Error:%lu\n",error);
+
+    }
+
 }

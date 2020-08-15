@@ -95,5 +95,7 @@ void listProcessesWraper();
 void listProcesses(wchar_t*,char*);
 void killProcessWraper();
 void killProcess(DWORD);
+void changeTextColorWraper();
+void changeTextColor(wchar_t*);
 
 #endif // MADOS_H_INCLUDED

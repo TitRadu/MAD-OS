@@ -6,4 +6,6 @@ https://man.cx/wcslen(3)
 https://stackoverflow.com/questions/27356706/create-windows-user-profile-with-netuseradd-function --> adaugarea in grup a noului utilizator(addUser).
 https://stackoverflow.com/questions/43791666/access-denied-on-waitforsingleobject-on-an-event-created-from-managed-code -> SYNCRHONIZE for OpenProcess(killProcess).
 https://stackoverflow.com/questions/7956519/how-to-kill-processes-by-name-win32-api -> PROCESS_TERMINATE for OpenProcess(killProcess).
-stackoverflow.com/questions/1855956/how-do-you-concatenate-two-wchar-t-together -> wcsncat -> wcscat. 
+stackoverflow.com/questions/1855956/how-do-you-concatenate-two-wchar-t-together -> wcsncat -> wcscat.
+https://stackoverflow.com/questions/6460932/change-entire-console-background-color-win32-c -> GetStdHandle, SetConsoleTextAttribute, valori culori.
+https://stackoverflow.com/questions/8578909/how-to-get-current-console-background-and-text-colors -> GetConsoleScreenBufferInfo.
