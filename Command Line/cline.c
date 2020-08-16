@@ -378,7 +378,13 @@ int main(){
         }
 
         if(strcmp(command,"tcolor") == 0){
-            changeTextColorWraper();
+            changeColorWraper(L"text");
+            continue;
+
+        }
+
+        if(strcmp(command,"bcolor") == 0){
+            changeColorWraper(L"background");
             continue;
 
         }

@@ -2462,17 +2462,17 @@ void killProcess(DWORD killPid){
     printf("Process was killed succesfully!\n\n");
 }
 
-void changeTextColorWraper(){
+void changeColorWraper(wchar_t* control){
     wchar_t color[THIRTY];
     fgetws(color,THIRTY,stdin);
     if(color[wcslen(color)-1] == '\n'){
         color[wcslen(color)-1] = '\0';
     }
 
-    changeTextColor(color);
+    changeColor(color,control);
 }
 
-void changeTextColor(wchar_t* color){
+void changeColor(wchar_t* color,wchar_t* control){
     if(wStringCheck(color) == 1){
         return;
 
@@ -2586,8 +2586,19 @@ void changeTextColor(wchar_t* color){
 
     int attr = 0;
     attr = csbi.wAttributes;
-    attr = attr & 240;
-    attr = attr + c;
+
+    if(wcscmp(control,L"text") == 0){
+        attr = attr & 240;
+        attr = attr + c;
+
+    }
+
+    if(wcscmp(control,L"background") == 0){
+        attr = attr & 15;
+        attr = attr | (c << 4);
+
+    }
+
 
     if(SetConsoleTextAttribute(out,attr) == 0){
         error  = GetLastError();
