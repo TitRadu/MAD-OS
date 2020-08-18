@@ -29,9 +29,9 @@ int pathType(wchar_t* path){
 void wStringInQuatationMarks(wchar_t* string){
     wchar_t newString[wcslen(string)+3];
     newString[0] = '\0';
-    wcscat(newString,L"\"");
-    wcscat(newString,string);
-    wcscat(newString,L"\"");
+    wcscat_s(newString,sizeof(newString),L"\"");
+    wcscat_s(newString,sizeof(newString),string);
+    wcscat_s(newString,sizeof(newString),L"\"");
     wcscpy(string,newString);
 
 }
@@ -127,11 +127,11 @@ void forkk(wchar_t *application,wchar_t *args){
     ZeroMemory(&p,sizeof(PROCESS_INFORMATION));
     wchar_t commandLine[PATH];
     commandLine[0] = '\0';
-    wcscat(commandLine,L"\"");
-    wcscat(commandLine,application);
-    wcscat(commandLine,L"\"");
-    wcscat(commandLine,L" ");
-    wcscat(commandLine,args);
+    wcscat_s(commandLine,sizeof(commandLine),L"\"");
+    wcscat_s(commandLine,sizeof(commandLine),application);
+    wcscat_s(commandLine,sizeof(commandLine),L"\"");
+    wcscat_s(commandLine,sizeof(commandLine),L" ");
+    wcscat_s(commandLine,sizeof(commandLine),args);
     BOOL createProccesCheck = FALSE;
     SetConsoleCtrlHandler(NULL,FALSE);
 createProccesCheck = CreateProcessW(
@@ -225,7 +225,7 @@ void newPath(wchar_t *oldPath){
     if(wcslen(newPath) == 3){
 
     }else{
-        wcscat(newPath,L"\\");
+        wcscat_s(newPath,sizeof(newPath),L"\\");
 
     }
 
@@ -277,8 +277,8 @@ void changePath(wchar_t *path){
     }
 
 
-    wcscat(path,relativeChangePath);
-    wcscat(path,L"\\");
+    wcscat_s(path,sizeof(path),relativeChangePath);
+    wcscat_s(path,sizeof(path),L"\\");
 
 
 }
@@ -286,18 +286,18 @@ void changePath(wchar_t *path){
 void parse(wchar_t* path,wchar_t control){
     wchar_t args[8+wcslen(path)+1];
     args[0] = '\0';
-    wcscat(args,L"\"");
-    wcscat(args,path);
-    wcscat(args,L"\\");
+    wcscat_s(args,sizeof(args),L"\"");
+    wcscat_s(args,sizeof(args),path);
+    wcscat_s(args,sizeof(args),L"\\");
     if(control == 'R'){
-        wcscat(args,L"\\");
+        wcscat_s(args,sizeof(args),L"\\");
 
     }
-    wcscat(args,L"\"");
-    wcscat(args,L" ");
-    wcscat(args,L"\"");
+    wcscat_s(args,sizeof(args),L"\"");
+    wcscat_s(args,sizeof(args),L" ");
+    wcscat_s(args,sizeof(args),L"\"");
     wcsncat(args,&control,1);
-    wcscat(args,L"\"");
+    wcscat_s(args,sizeof(args),L"\"");
     forkk(L"parseCL.exe",args);
 
 }
@@ -322,8 +322,8 @@ void createDirectoryWraper(wchar_t* path){
 
     wchar_t fullPath[wcslen(path)+wcslen(directoryShortPath)+1];
     fullPath[0] = '\0';
-    wcscat(fullPath,path);
-    wcscat(fullPath,directoryShortPath);
+    wcscat_s(fullPath,sizeof(fullPath),path);
+    wcscat_s(fullPath,sizeof(fullPath),directoryShortPath);
 
     createDirectory(fullPath);
 
@@ -400,8 +400,8 @@ void removeDirectoryWraper(wchar_t* path){
 
     wchar_t fullPath[wcslen(path)+wcslen(directoryShortPath)+1];
     fullPath[0] = '\0';
-    wcscat(fullPath,path);
-    wcscat(fullPath,directoryShortPath);
+    wcscat_s(fullPath,sizeof(fullPath),path);
+    wcscat_s(fullPath,sizeof(fullPath),directoryShortPath);
 
     removeDirectory(fullPath);
 
@@ -481,8 +481,8 @@ void removeDirectoryRecursiveWraper(wchar_t* path){
 
     wchar_t removeDirectoryName[wcslen(path)+wcslen(name)+1];
     removeDirectoryName[0] = '\0';
-    wcscat(removeDirectoryName,path);
-    wcscat(removeDirectoryName,name);
+    wcscat_s(removeDirectoryName,sizeof(removeDirectoryName),path);
+    wcscat_s(removeDirectoryName,sizeof(removeDirectoryName),name);
 
     removeDirectoryRecursive(removeDirectoryName);
 
@@ -546,8 +546,8 @@ void createFileWraper(wchar_t* path){
 
     wchar_t fullPath[wcslen(path)+wcslen(name)+1+10];
     fullPath[0] = '\0';
-    wcscat(fullPath,path);
-    wcscat(fullPath,name);
+    wcscat_s(fullPath,sizeof(fullPath),path);
+    wcscat_s(fullPath,sizeof(fullPath),name);
 
     createFile(fullPath);
 
@@ -619,8 +619,8 @@ void removeFileWraper(wchar_t* path){
 
     wchar_t fullPath[wcslen(path)+wcslen(name)+1];
     fullPath[0] = '\0';
-    wcscat(fullPath,path);
-    wcscat(fullPath,name);
+    wcscat_s(fullPath,sizeof(fullPath),path);
+    wcscat_s(fullPath,sizeof(fullPath),name);
 
     removeFile(fullPath);
 
@@ -902,8 +902,8 @@ void start2(wchar_t* path){
 
         }
         args[0] = '\0';
-        wcscat(args,L"\"");
-        wcscat(args,path);
+        wcscat_s(args,sizeof(args),L"\"");
+        wcscat_s(args,sizeof(args),path);
 
         wchar_t openFileRelativeName[MAX_PATH];
         printf("FileName:");
@@ -924,8 +924,8 @@ void start2(wchar_t* path){
 
         }
 
-        wcscat(args,openFileRelativeName);
-        wcscat(args,L"\"");
+        wcscat_s(args,sizeof(args),openFileRelativeName);
+        wcscat_s(args,sizeof(args),L"\"");
 
         if(wcslen(args) >= MAX_PATH -3){
             printf("File name is too long!\n");
@@ -979,10 +979,10 @@ void start2(wchar_t* path){
 
         }
         args[0] = '\0';
-        wcscat(args,list);
+        wcscat_s(args,sizeof(args),list);
         executable[0] = '\0';
-        wcscat(executable,path);
-        wcscat(executable,program);
+        wcscat_s(executable,sizeof(executable),path);
+        wcscat_s(executable,sizeof(executable),program);
         forkk(executable,args);
 
 
@@ -1231,8 +1231,8 @@ void connectToURLWraper(){
 
     wchar_t command[9+wcslen(domainName)];
     command[0] = '\0';
-    wcscat(command,L"https://");
-    wcscat(command,domainName);
+    wcscat_s(command,sizeof(command),L"https://");
+    wcscat_s(command,sizeof(command),domainName);
 
     connectToURL(command);
 
@@ -1372,16 +1372,16 @@ void copyDirectoryWraper(char* control){
 void copyDirectory(wchar_t* sourcePath,wchar_t* destinationPath){
     wchar_t command[52+wcslen(sourcePath)+wcslen(destinationPath)];
     command[0] = '\0';
-    wcscat(command,L"/c ");
-    wcscat(command,L"xcopy ");
-    wcscat(command,L"\"");
-    wcscat(command,sourcePath);
-    wcscat(command,L"\" ");
-    wcscat(command,L"\"");
-    wcscat(command,destinationPath);
-    wcscat(command,L"\" ");
-    wcscat(command,L"/s ");
-    wcscat(command,L"/e");
+    wcscat_s(command,sizeof(command),L"/c ");
+    wcscat_s(command,sizeof(command),L"xcopy ");
+    wcscat_s(command,sizeof(command),L"\"");
+    wcscat_s(command,sizeof(command),sourcePath);
+    wcscat_s(command,sizeof(command),L"\" ");
+    wcscat_s(command,sizeof(command),L"\"");
+    wcscat_s(command,sizeof(command),destinationPath);
+    wcscat_s(command,sizeof(command),L"\" ");
+    wcscat_s(command,sizeof(command),L"/s ");
+    wcscat_s(command,sizeof(command),L"/e");
     forkk(CMD,command);
 
 }
@@ -1408,8 +1408,8 @@ void backupWraper(wchar_t* path){
 
     wchar_t fullPath[PATH];
     fullPath[0] = '\0';
-    wcscat(fullPath,path);
-    wcscat(fullPath,backUpFileRelativeName);
+    wcscat_s(fullPath,sizeof(fullPath),path);
+    wcscat_s(fullPath,sizeof(fullPath),backUpFileRelativeName);
 
     backup(fullPath,backUpFileRelativeName);
 
@@ -1454,13 +1454,13 @@ void backup(wchar_t* absolutePath,wchar_t* name){
     DWORD size = PATH;
 
     GetEnvironmentVariableW(variableName,variableValue,size);
-    wcscat(backupPath,variableValue);
+    wcscat_s(backupPath,sizeof(backupPath),variableValue);
     printf("BACKUP:");
-    wcscat(backupPath,L"\\BACKUP");
+    wcscat_s(backupPath,sizeof(backupPath),L"\\BACKUP");
     createDirectory(backupPath);
 
-    wcscat(backupPath,L"\\");
-    wcscat(backupPath,name);
+    wcscat_s(backupPath,sizeof(backupPath),L"\\");
+    wcscat_s(backupPath,sizeof(backupPath),name);
 
     if(wExist(backupPath,L"") != 0){
         printf("Backup file exists.\n\n");
@@ -1475,7 +1475,7 @@ void backup(wchar_t* absolutePath,wchar_t* name){
     }
 
     if(existCheck == 2){
-        wcscat(backupPath,L"\\");
+        wcscat_s(backupPath,sizeof(backupPath),L"\\");
         copyDirectory(absolutePath,backupPath);
         return;
 
@@ -1534,10 +1534,10 @@ void netshPasswordWraper(){
 void netshPassword(wchar_t* ssid){
     wchar_t command[OH];
     command[0] = '\0';
-    wcscat(command,L"/c netsh wlan show profile name=");
-    wcscat(command,ssid);
-    wcscat(command,L" ");
-    wcscat(command,L"key=clear");
+    wcscat_s(command,sizeof(command),L"/c netsh wlan show profile name=");
+    wcscat_s(command,sizeof(command),ssid);
+    wcscat_s(command,sizeof(command),L" ");
+    wcscat_s(command,sizeof(command),L"key=clear");
     forkk(CMD,command);
 
 }
@@ -1910,12 +1910,18 @@ do{
 }
 
 void addUserWraper(){
-    wchar_t userName[21];
+    wchar_t userName[22];
     userName[0] = '\0';
     printf("UserName:");
-    fgetws(userName,21,stdin);
+    fgetws(userName,22,stdin);
     if(userName[wcslen(userName)-1] == '\n'){
         userName[wcslen(userName)-1] = '\0';
+
+    }
+
+    if(wcslen(userName) > 20){
+        printf("User name is too long!\n\n");
+        return;
 
     }
 
@@ -1928,12 +1934,18 @@ void addUserWraper(){
 
     fflush(stdin);
 
-    wchar_t userPassword[21];
+    wchar_t userPassword[LM20_PWLEN+2];
     userPassword[0] = '\0';
     printf("UserPassword:");
-    fgetws(userPassword,LM20_PWLEN+1,stdin);
+    fgetws(userPassword,LM20_PWLEN+2,stdin);
     if(userPassword[wcslen(userPassword)-1] == '\n'){
         userPassword[wcslen(userPassword)-1] = '\0';
+
+    }
+
+    if(wcslen(userPassword) > 14){
+        printf("Password is too long!\n\n");
+        return;
 
     }
 
@@ -1966,8 +1978,8 @@ void addUser(wchar_t* userName,wchar_t* userPassword){
 
     }
 
-    wcscat(content.usri1_name,userName);
-    wcscat(content.usri1_password,userPassword);
+    wcscat_s(content.usri1_name,sizeof(content.usri1_name),userName);
+    wcscat_s(content.usri1_password,sizeof(content.usri1_password),userPassword);
 
     content.usri1_priv = USER_PRIV_USER;
     content.usri1_home_dir = NULL;

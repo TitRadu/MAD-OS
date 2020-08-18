@@ -55,7 +55,7 @@ int main(){
     if(wcslen(path) == 3){
 
     }else{
-        wcscat(path,L"\\");
+        wcscat_s(path,sizeof(path),L"\\");
 
     }
 
