@@ -2607,3 +2607,48 @@ void changeColor(wchar_t* color,wchar_t* control){
     }
 
 }
+
+void changeConsoleFontSize(char* direction){
+    HANDLE consoleHandler;
+    CONSOLE_FONT_INFOEX textFontInformation;
+    textFontInformation.cbSize = sizeof(CONSOLE_FONT_INFOEX);
+
+    DWORD error = 0;
+    if((consoleHandler = GetStdHandle(STD_OUTPUT_HANDLE)) == INVALID_HANDLE_VALUE){
+        error = GetLastError();
+        printf("ChangeConsoleFontSizeGetStdHandleError:%lu\n",error);
+        return;
+
+    }
+
+    if(GetCurrentConsoleFontEx(consoleHandler,FALSE,&textFontInformation) == FALSE){
+        error = GetLastError();
+        printf("ChangeConsoleFontSizeGetCurrentConsoleFontExError:%lu\n",error);
+        return;
+
+    }
+    printf("Current Size:\nX:%d\nY:%d\n",textFontInformation.dwFontSize.X,textFontInformation.dwFontSize.Y);
+
+    if(strcmp(direction,"up") == 0){
+        textFontInformation.dwFontSize.X ++;
+        textFontInformation.dwFontSize.Y = textFontInformation.dwFontSize.X*2;
+
+    }
+
+    if(strcmp(direction,"down") == 0){
+        if(textFontInformation.dwFontSize.X >= 5){
+        textFontInformation.dwFontSize.X --;
+        textFontInformation.dwFontSize.Y = textFontInformation.dwFontSize.X*2;
+        }
+
+    }
+
+    printf("Newest Size:\nX:%d\nY:%d\n",textFontInformation.dwFontSize.X,textFontInformation.dwFontSize.Y);
+    if(SetCurrentConsoleFontEx(consoleHandler,TRUE,&textFontInformation) == FALSE){
+        error = GetLastError();
+        printf("ChangeConsoleFontSizeSetCurrentConsoleFontExError:%lu\n",error);
+       return;
+
+    }
+
+}

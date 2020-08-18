@@ -389,6 +389,18 @@ int main(){
 
         }
 
+        if(strcmp(command,"f+") == 0){
+            changeConsoleFontSize("up");
+            continue;
+
+        }
+
+        if(strcmp(command,"f-") == 0){
+            changeConsoleFontSize("down");
+            continue;
+
+        }
+
         printf("Incorrect command!\n");
 
     }

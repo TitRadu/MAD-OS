@@ -97,5 +97,6 @@ void killProcessWraper();
 void killProcess(DWORD);
 void changeColorWraper(wchar_t*);
 void changeColor(wchar_t*,wchar_t*);
+void changeConsoleFontSize(char*);
 
 #endif // MADOS_H_INCLUDED
