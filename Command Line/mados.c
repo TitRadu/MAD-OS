@@ -2054,14 +2054,22 @@ void addUser(wchar_t* userName,wchar_t* userPassword){
 }
 
 void deleteUserWraper(){
-    wchar_t userName[21];
+    wchar_t userName[22];
     printf("Name:");
-    fgetws(userName,21,stdin);
-    if(userName[wcslen(userName)-1] == '\n')
+    fgetws(userName,22,stdin);
+    if(userName[wcslen(userName)-1] == '\n'){
         userName[wcslen(userName)-1] = '\0';
 
+    }
+
+    if(wcslen(userName) > 20){
+        printf("User name is too long!\n\n");
+        return;
+
+    }
 
     deleteUser(userName);
+
 }
 
 void deleteUser(wchar_t *userName){
@@ -2090,12 +2098,12 @@ void deleteUser(wchar_t *userName){
 
 
 void changeUserPasswordWraper(){
-    wchar_t userName[21];userName[0] = '\0';
-    wchar_t oldPassword[LM20_PWLEN+1];oldPassword[0] = '\0';
-    wchar_t newPassword[LM20_PWLEN+1];newPassword[0] = '\0';
+    wchar_t userName[22];userName[0] = '\0';
+    wchar_t oldPassword[LM20_PWLEN+2];oldPassword[0] = '\0';
+    wchar_t newPassword[LM20_PWLEN+2];newPassword[0] = '\0';
 
     printf("UserName:");
-    fgetws(userName,21,stdin);
+    fgetws(userName,22,stdin);
     if(userName[wcslen(userName)-1] == '\n'){
         userName[wcslen(userName)-1] = '\0';
 
@@ -2107,17 +2115,39 @@ void changeUserPasswordWraper(){
 
     }
 
+    if(wcslen(userName) > 20){
+        printf("User name is too long!\n\n");
+        return;
+
+    }
+
     fflush(stdin);
     printf("OldPassword:");
-    fgetws(oldPassword,LM20_PWLEN+1,stdin);
-    if(oldPassword[wcslen(oldPassword)-1] == '\n')
+    fgetws(oldPassword,LM20_PWLEN+2,stdin);
+    if(oldPassword[wcslen(oldPassword)-1] == '\n'){
         oldPassword[wcslen(oldPassword)-1] = '\0';
+
+    }
+
+    if(wcslen(oldPassword) > 14){
+        printf("Old password is too long!\n\n");
+        return;
+
+    }
 
     fflush(stdin);
     printf("NewPassword:");
-    fgetws(newPassword,LM20_PWLEN+1,stdin);
-    if(newPassword[wcslen(newPassword)-1] == '\n')
+    fgetws(newPassword,LM20_PWLEN+2,stdin);
+    if(newPassword[wcslen(newPassword)-1] == '\n'){
         newPassword[wcslen(newPassword)-1] = '\0';
+
+    }
+
+    if(wcslen(newPassword) > 14){
+        printf("New password is too long!\n\n");
+        return;
+
+    }
 
     changeUserPassword(userName,oldPassword,newPassword);
 
@@ -2659,7 +2689,7 @@ void changeConsoleFontSize(char* direction){
     if(SetCurrentConsoleFontEx(consoleHandler,TRUE,&textFontInformation) == FALSE){
         error = GetLastError();
         printf("ChangeConsoleFontSizeSetCurrentConsoleFontExError:%lu\n",error);
-       return;
+        return;
 
     }
 
