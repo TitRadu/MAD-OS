@@ -13,6 +13,7 @@
 #include <psapi.h>
 
 void pause();
+int pathType(wchar_t*);
 void wStringInQuatationMarks(wchar_t*);
 HANDLE getProcessHeapChecker();
 int heapFreeChecker(HANDLE,DWORD,LPVOID);

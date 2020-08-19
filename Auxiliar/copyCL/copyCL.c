@@ -1,49 +1,51 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <Windows.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <errno.h>
-#define PATH 1024
-#define BLOCK 4096
+#include "C:\Users\radut\Desktop\Aplicatii in C\Aplicatii\MAD OS Command Line\Command Line\mados.h"
 
-int allSpaces(char* string){
-    for(int i = 0;i < strlen(string);i++){
-        if(string[i] != 32){
-            return 0;
-
-        }
-    }
-
-    return 1;
-}
-
-int stringCheck(char *string){
-    if(strcmp(string,"") == 0 || allSpaces(string) == 1){
-        printf("Argument is empty or contains only spaces!\n");
+int main(int argc,char* argv[]){
+    SetConsoleCtrlHandler(NULL,FALSE);
+    HANDLE processHeap = NULL;
+    if((processHeap = getProcessHeapChecker()) == NULL){
         return 1;
 
     }
 
-    return 0;
+    wchar_t sourceFullName[MAX_PATH];
+    wchar_t destinationFullName[MAX_PATH];
 
-}
+    printf("Source full name:");
+    fgetws(sourceFullName,MAX_PATH,stdin);
+    if(sourceFullName[wcslen(sourceFullName)-1] == '\n'){
+        sourceFullName[wcslen(sourceFullName)-1] = '\0';
 
-int main(int argc,char* argv[]){
-    SetConsoleCtrlHandler(NULL,FALSE);
-    char source[PATH];
-    char destination[PATH];
-    printf("Source-File:");gets(source);
-    if(stringCheck(source) == 1){
-        ExitProcess(1);
+    }
+
+    if(wStringCheck(sourceFullName) == 1){
+        return 1;
+
+    }
+
+    if(pathType(sourceFullName) == 1){
+        printf("You need a absolute path!\n");
+        return 1;
+
+    }
+
+    if(wcslen(sourceFullName) >= MAX_PATH -1){
+        printf("File name is too long!\n");
+        return 1;
 
     }
 
     DWORD error = 0;
 
-    LPOFSTRUCT fileInformation = malloc(sizeof(OFSTRUCT));
+    LPOFSTRUCT fileInformation;
+    if((fileInformation = (LPOFSTRUCT)HeapAlloc(processHeap,HEAP_ZERO_MEMORY,sizeof(OFSTRUCT))) == NULL){
+        printf("HeapAllocError!\n");
+        return 1;
+
+    }
+
     HANDLE readFileHandler = NULL;
-    if((readFileHandler = CreateFileA(source,GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL)) == INVALID_HANDLE_VALUE){
+    if((readFileHandler = CreateFileW(sourceFullName,GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL)) == INVALID_HANDLE_VALUE){
         error = GetLastError();
         if(error == 2){
             printf("The system cannot find the file specified.\n");
@@ -64,34 +66,62 @@ int main(int argc,char* argv[]){
             ExitProcess(123);
 
         }
-        printf("CreateFileARead:%d\n",error);
+        printf("CreateFileARead:%lu\n",error);
         ExitProcess(error);
 
     }
 
-    struct _stat st;
-    if(_stat(source,&st) < 0){
-        if(errno == ENOENT){
-            return 0;
+    HANDLE readFileHandlerFindFirst = NULL;
+    WIN32_FIND_DATAW fileInfo;
+    LARGE_INTEGER fileSize;
+    unsigned long long sizeInBytes = 0;
+    unsigned long long remaining = 0;
+    if((readFileHandlerFindFirst = FindFirstFileW(sourceFullName,&fileInfo)) == INVALID_HANDLE_VALUE){
+        error = GetLastError();
+        if(error == ERROR_ACCESS_DENIED){
+            printf("-\tAcces to this file is denied!\n");
+            return 1;
 
         }
+        printf("FindFirstFileError:%lu\n",error);
+        return 1;
 
-        perror("StatCheck");
-        ExitProcess(-1);
 
     }
-    unsigned long long size = st.st_size;
-    unsigned long long remaining = size;
+
+    fileSize.LowPart = fileInfo.nFileSizeLow;
+    fileSize.HighPart = fileInfo.nFileSizeHigh;
+    sizeInBytes = fileSize.QuadPart;
+    remaining = sizeInBytes;
     double status = 0;
 
-    printf("Destination-File:");gets(destination);
-    if(stringCheck(destination) == 1){
-        ExitProcess(1);
+    printf("Destination full name:");
+
+    fgetws(destinationFullName,MAX_PATH,stdin);
+    if(destinationFullName[wcslen(destinationFullName)-1] == '\n'){
+        destinationFullName[wcslen(destinationFullName)-1] = '\0';
+
+    }
+
+    if(wStringCheck(destinationFullName) == 1){
+        return 1;
+
+    }
+
+    if(pathType(destinationFullName) == 1){
+        printf("You need a absolute path!\n");
+        return 1;
+
+    }
+
+    if(wcslen(destinationFullName) >= MAX_PATH -1){
+        printf("File name is too long!\n");
+        return 1;
 
     }
 
     HANDLE writeFileHandler = NULL;
-    if((writeFileHandler = CreateFileA(destination,GENERIC_WRITE,0,NULL,CREATE_NEW,FILE_ATTRIBUTE_NORMAL,NULL)) == INVALID_HANDLE_VALUE){
+    if((writeFileHandler = CreateFileW(destinationFullName,GENERIC_WRITE,0,NULL,CREATE_NEW,FILE_ATTRIBUTE_NORMAL,NULL)) == INVALID_HANDLE_VALUE){
         error = GetLastError();
         if(error == 80){
             printf("(Destination)The file exists.\n");
@@ -113,20 +143,35 @@ int main(int argc,char* argv[]){
 
         }
 
-        printf("CreateFileAWrite:%d\n",error);
+        printf("CreateFileAWrite:%lu\n",error);
         ExitProcess(error);
 
     }
 
-    LPVOID buffer = malloc(BLOCK);
-    PDWORD nrReadBytes = malloc(sizeof(DWORD));
-    PDWORD nrWriteBytes = malloc(sizeof(DWORD));
+    LPVOID buffer;
+    if((buffer = (LPVOID)HeapAlloc(processHeap,HEAP_ZERO_MEMORY,BLOCK)) == NULL){
+        printf("HeapAllocError!\n");
+        return 1;
+
+    }
+    PDWORD nrReadBytes;
+    if((nrReadBytes = (PDWORD)HeapAlloc(processHeap,HEAP_ZERO_MEMORY,sizeof(DWORD))) == NULL){
+        printf("HeapAllocError!\n");
+        return 1;
+
+    }
+    PDWORD nrWriteBytes;
+    if((nrWriteBytes = (PDWORD)HeapAlloc(processHeap,HEAP_ZERO_MEMORY,sizeof(DWORD))) == NULL){
+        printf("HeapAllocError!\n");
+        return 1;
+
+    }
     BOOL readCheck;
     BOOL writeCheck;
     while((readCheck = ReadFile(readFileHandler,buffer,BLOCK,nrReadBytes,NULL)) == TRUE){
         if((writeCheck = WriteFile(writeFileHandler,buffer,*nrReadBytes,nrWriteBytes,NULL)) ==FALSE){
             error = GetLastError();
-            printf("WriteCheck:%d\n",error);
+            printf("WriteCheck:%lu\n",error);
             ExitProcess(error);
         }
 
@@ -137,14 +182,14 @@ int main(int argc,char* argv[]){
         }
 
         remaining = remaining - *nrWriteBytes;
-        status =((((double)size) - (double)remaining)/(double)size)*100;
+        status =((((double)sizeInBytes) - (double)remaining)/(double)sizeInBytes)*100;
         printf("\rGenerating...%.2f%% Complete!",status);
 
     }
 
     if(readCheck == FALSE){
         error = GetLastError();
-        printf("ReadCheck:%d\n",error);
+        printf("ReadCheck:%lu\n",error);
         ExitProcess(error);
 
     }
@@ -155,9 +200,35 @@ int main(int argc,char* argv[]){
 
     }
 
+    if(FindClose(readFileHandlerFindFirst) == FALSE){
+        error = GetLastError();
+        ExitProcess(error);
+
+    }
+
     if(CloseHandle(writeFileHandler) == FALSE){
         error = GetLastError();
         ExitProcess(error);
+
+    }
+
+    if(heapFreeChecker(processHeap,0,fileInformation) == FALSE){
+        return 1;
+
+    }
+
+    if(heapFreeChecker(processHeap,0,buffer) == FALSE){
+        return 1;
+
+    }
+
+    if(heapFreeChecker(processHeap,0,nrReadBytes) == FALSE){
+        return 1;
+
+    }
+
+    if(heapFreeChecker(processHeap,0,nrWriteBytes) == FALSE){
+        return 1;
 
     }
 
