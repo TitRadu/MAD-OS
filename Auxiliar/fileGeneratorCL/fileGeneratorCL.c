@@ -1,41 +1,30 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <Windows.h>
-#include <time.h>
-#include <stdbool.h>
+#include "C:\Users\radut\Desktop\Aplicatii in C\Aplicatii\MAD OS Command Line\Command Line\mados.h"
 #define lowLimit 32
 #define highLimit 126
-#define PATH 1024
-#define BLOCK 4096
 
-int allSpaces(char* string){
-    for(int i = 0;i < strlen(string);i++){
-        if(string[i] != 32){
-            return 0;
+int main(){
+    SetConsoleCtrlHandler(NULL,FALSE);
+    wchar_t generateFileFullName[MAX_PATH];
+    printf("File-Path:");
+    fgetws(generateFileFullName,MAX_PATH,stdin);
+    if(generateFileFullName[wcslen(generateFileFullName)-1] == '\n'){
+        generateFileFullName[wcslen(generateFileFullName)-1] = '\0';
 
-        }
     }
 
-    return 1;
-}
-
-int stringCheck(char *string){
-    if(strcmp(string,"") == 0 || allSpaces(string) == 1){
-        printf("Argument is empty or contains only spaces!\n");
+    if(wStringCheck(generateFileFullName) == 1){
         return 1;
 
     }
 
-    return 0;
+    if(pathType(generateFileFullName) == 1){
+        printf("You need a absolute path!\n");
+        return 1;
 
-}
+    }
 
-int main(){
-    SetConsoleCtrlHandler(NULL,FALSE);
-    char path[PATH];
-    printf("File-Path:");
-    gets(path);
-    if(stringCheck(path) == 1){
+    if(wcslen(generateFileFullName) >= MAX_PATH -1){
+        printf("File name is too long!\n");
         return 1;
 
     }
@@ -45,7 +34,7 @@ int main(){
 
     DWORD error = 0;
     HANDLE writeFileHandler = NULL;
-    if((writeFileHandler = CreateFileA(path,GENERIC_WRITE,0,NULL,CREATE_NEW,FILE_ATTRIBUTE_NORMAL,NULL)) == INVALID_HANDLE_VALUE){
+    if((writeFileHandler = CreateFileW(generateFileFullName,GENERIC_WRITE,0,NULL,CREATE_NEW,FILE_ATTRIBUTE_NORMAL,NULL)) == INVALID_HANDLE_VALUE){
         error = GetLastError();
         if(error == 80){
             printf("The file exists.\n\n");
@@ -63,19 +52,20 @@ int main(){
 
         }
 
-        printf("CreateFileAWrite:%d\n\n",error);
+        printf("CreateFileAWrite:%lu\n\n",error);
         ExitProcess(error);
 
     }
 
-    unsigned long long size = 0;
-    unsigned long long remaining = 0;
+    unsigned long sizeInMB = 0;
+    unsigned long remaining = 0;
     double status = 0;
     printf("Size(MB):");
-    scanf("%lld",&size);
-    size = size * 1024*1024;
-    remaining = size;
+    scanf("%lu",&sizeInMB);
+    sizeInMB = sizeInMB * 1024*1024;
+    remaining = sizeInMB;
     DWORD nrWritingBytes = BLOCK;
+    DWORD nrWriteBytes = 0;
     while(remaining > 0){
         if(remaining <= BLOCK){
             nrWritingBytes = remaining;
@@ -86,17 +76,17 @@ int main(){
             content[i] = (rand() % (highLimit - lowLimit)) +lowLimit;
         }
         content[BLOCK -1] = '\n';
-        PDWORD nrWriteBytes = malloc(sizeof(DWORD));
+
         BOOL writeCheck;
-        if((writeCheck = WriteFile(writeFileHandler,content,nrWritingBytes,nrWriteBytes,NULL)) == FALSE){
+        if((writeCheck = WriteFile(writeFileHandler,content,nrWritingBytes,&nrWriteBytes,NULL)) == FALSE){
                 error = GetLastError();
-                printf("WriteCheck:%d\n",error);
+                printf("WriteCheck:%lu\n",error);
                 ExitProcess(error);
         }
 
 
-        remaining = remaining - *nrWriteBytes;
-        status =((((double)size) - (double)remaining)/(double)size)*100;
+        remaining = remaining - nrWriteBytes;
+        status =((((double)sizeInMB) - (double)remaining)/(double)sizeInMB)*100;
         printf("\rGenerating...%.2f%% Complete!",status);
 
     }

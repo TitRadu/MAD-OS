@@ -1760,11 +1760,13 @@ void statusCheck(NET_API_STATUS status,LPDWORD error){
 }
 
 void getUserInfoWraper(){
-    wchar_t userName[21];
+    wchar_t userName[22];
     printf("Name:");
-    fgetws(userName,21,stdin);
-    if(wcslen(userName) < 20)
+    fgetws(userName,22,stdin);
+    if(userName[wcslen(userName)-1] == '\n'){
         userName[wcslen(userName)-1] = '\0';
+
+    }
 
     getUserInfo(userName);
 
@@ -1774,6 +1776,12 @@ void getUserInfoWraper(){
 void getUserInfo(wchar_t* userName){
     if(wStringCheck(userName) == 1){
         printf("\n");
+        return;
+
+    }
+
+    if(wcslen(userName) > 20){
+        printf("User name is too long!\n\n");
         return;
 
     }
@@ -1919,18 +1927,17 @@ void addUserWraper(){
 
     }
 
-    if(wcslen(userName) > 20){
-        printf("User name is too long!\n\n");
-        return;
-
-    }
-
     if(wStringCheck(userName) == 1){
         printf("\n");
         return;
 
     }
 
+    if(wcslen(userName) > 20){
+        printf("User name is too long!\n\n");
+        return;
+
+    }
 
     fflush(stdin);
 
