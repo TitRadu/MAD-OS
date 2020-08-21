@@ -61,7 +61,7 @@ int main(){
 
     fflush(stdin);
     while(1){
-        wprintf(L"%s@%s->%s",userName,PCname,path);
+        wprintf(L"%s@%s->%s:",userName,PCname,path);
         fflush(stdin);
 
         fgets(command,MAX_PATH,stdin);

@@ -1489,15 +1489,13 @@ void backup(wchar_t* absolutePath,wchar_t* name){
 }
 
 void fileContentWraper(){
-    wchar_t path[PATH];
-    printf("File-Path:");_getws(path);
-    if(wStringCheck(path) == 1){
-        return;
-
+    wchar_t contentFileFullName[PATH];
+    printf("File-Path:");
+    fgetws(contentFileFullName,MAX_PATH,stdin);
+    if(contentFileFullName[wcslen(contentFileFullName)-1] == '\n'){
+        contentFileFullName[wcslen(contentFileFullName)-1] = '\0';
     }
-
-    printf("\n");
-    fileContent(path);
+    fileContent(contentFileFullName);
 
 }
 

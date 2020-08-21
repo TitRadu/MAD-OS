@@ -1,15 +1,41 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <Windows.h>
-#define PATH 1024
-#define BLOCK 4096
+#include "C:\Users\radut\Desktop\Aplicatii in C\Aplicatii\MAD OS Command Line\Command Line\mados.h"
 
 int main(int argc,char* argv[]){
     SetConsoleCtrlHandler(NULL,FALSE);
+    LPWSTR commandLineString;
+    commandLineString = GetCommandLineW();
+    wchar_t separators[2] = L" ";
+    wchar_t* part;
+    part = wcstok(commandLineString,separators);
+    wcscpy(part,commandLineString + wcslen(part) + 1);
+    part[wcslen(part) - 1] = '\0';
+
+    int length = wcslen(part);
+    for(int i = 0; i <= length-1;i++){
+        part[i] = part[i+1];
+
+    }
+
+    if(wStringCheck(part) == 1){
+        return 1;
+
+    }
+
+    if(pathType(part) == 1){
+        printf("You need a absolute path!\n\n");
+        return 1;
+
+    }
+
+    if(wcslen(part) >= MAX_PATH -1){
+        printf("File name is too long!\n\n");
+        return 1;
+
+    }
 
     DWORD error = 0;
     HANDLE readFileHandler = NULL;
-    if((readFileHandler = CreateFileA(argv[1],GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL)) == INVALID_HANDLE_VALUE){
+    if((readFileHandler = CreateFileW(part,GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL)) == INVALID_HANDLE_VALUE){
        error = GetLastError();
         if(error == 2){
             printf("The system cannot find the file specified.\n\n");
@@ -26,26 +52,26 @@ int main(int argc,char* argv[]){
             ExitProcess(5);
         }
         if(error == 123){
-            printf("Source must be a relative path!\n\n");
+            printf("Invalid argument!\n\n");
             ExitProcess(123);
 
         }
-        printf("CreateFileARead:%d\n",error);
+        printf("CreateFileARead:%lu\n\n",error);
         ExitProcess(error);
 
     }
 
-    char* buffer = malloc(BLOCK);
-    PDWORD nrReadBytes = malloc(sizeof(DWORD));
+    char buffer[BLOCK];
+    DWORD nrReadBytes;
     BOOL readCheck;
 
-    while((readCheck = ReadFile(readFileHandler,buffer,BLOCK,nrReadBytes,NULL)) == TRUE){
-        for(int i = 0;i < *nrReadBytes;i++){
+    while((readCheck = ReadFile(readFileHandler,buffer,BLOCK,&nrReadBytes,NULL)) == TRUE){
+        for(int i = 0;i < nrReadBytes;i++){
             printf("%c",buffer[i]);
 
         }
 
-        if(*nrReadBytes == 0){
+        if(nrReadBytes == 0){
             break;
 
         }
@@ -54,7 +80,7 @@ int main(int argc,char* argv[]){
 
     if(readCheck == FALSE){
         error = GetLastError();
-        printf("ReadCheck:%lu\n",error);
+        printf("ReadCheck:%lu\n\n",error);
         ExitProcess(error);
 
     }
@@ -65,10 +91,9 @@ int main(int argc,char* argv[]){
 
     }
 
-    free(buffer);
-    free(nrReadBytes);
 
     printf("\nContent display finished!\n\n");
+    return 0;
 
 }
 
