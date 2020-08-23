@@ -10,3 +10,4 @@ stackoverflow.com/questions/1855956/how-do-you-concatenate-two-wchar-t-together 
 https://stackoverflow.com/questions/6460932/change-entire-console-background-color-win32-c -> GetStdHandle, SetConsoleTextAttribute, valori culori.
 https://stackoverflow.com/questions/8578909/how-to-get-current-console-background-and-text-colors -> GetConsoleScreenBufferInfo.
 http://cplusplus.com/forum/windows/48863/ ->  setare cbSize(câmp al structurii CONSOLE_FONT_INFOEX) la valoarea sizeof(CONSOLE_FONT_INFOEX).
+https://stackoverflow.com/questions/4725115/on-windows-is-there-an-interface-for-copying-folders -> copiere de director cu WIN API.

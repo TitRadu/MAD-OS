@@ -21,7 +21,7 @@ int main(){
 
     }
     char command[MAX_PATH];
-    wchar_t path[PATH];
+    wchar_t path[MAX_PATH];
 
     printf("Starting path:");
     fgetws(path,MAX_PATH,stdin);

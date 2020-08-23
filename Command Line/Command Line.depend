@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1598023933 source:c:\users\radut\desktop\aplicatii in c\aplicatii\mad os command line\command line\cline.c
+1598124891 source:c:\users\radut\desktop\aplicatii in c\aplicatii\mad os command line\command line\cline.c
 	"mados.h"
 
 1597845603 c:\users\radut\desktop\aplicatii in c\aplicatii\mad os command line\command line\mados.h
@@ -11,6 +11,6 @@
 	<lm.h>
 	<psapi.h>
 
-1598020211 source:c:\users\radut\desktop\aplicatii in c\aplicatii\mad os command line\command line\mados.c
+1598137930 source:c:\users\radut\desktop\aplicatii in c\aplicatii\mad os command line\command line\mados.c
 	"mados.h"
 

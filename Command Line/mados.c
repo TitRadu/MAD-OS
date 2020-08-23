@@ -277,9 +277,8 @@ void changePath(wchar_t *path){
     }
 
 
-    wcscat_s(path,sizeof(path),relativeChangePath);
-    wcscat_s(path,sizeof(path),L"\\");
-
+    wcscat_s(path,MAX_PATH*2,relativeChangePath);
+    wcscat_s(path,MAX_PATH*2,L"\\");
 
 }
 
@@ -1359,6 +1358,9 @@ void copyDirectoryWraper(char* control){
 
     }
 
+    sourcePath[wcslen(sourcePath) + 1] = '\0';
+    destinationPath[wcslen(sourcePath) + 1] = '\0';
+
     copyDirectory(sourcePath,destinationPath);
 
     if(strcmp(control,"cut") == 0){
@@ -1370,19 +1372,29 @@ void copyDirectoryWraper(char* control){
 }
 
 void copyDirectory(wchar_t* sourcePath,wchar_t* destinationPath){
-    wchar_t command[52+wcslen(sourcePath)+wcslen(destinationPath)];
-    command[0] = '\0';
-    wcscat_s(command,sizeof(command),L"/c ");
-    wcscat_s(command,sizeof(command),L"xcopy ");
-    wcscat_s(command,sizeof(command),L"\"");
-    wcscat_s(command,sizeof(command),sourcePath);
-    wcscat_s(command,sizeof(command),L"\" ");
-    wcscat_s(command,sizeof(command),L"\"");
-    wcscat_s(command,sizeof(command),destinationPath);
-    wcscat_s(command,sizeof(command),L"\" ");
-    wcscat_s(command,sizeof(command),L"/s ");
-    wcscat_s(command,sizeof(command),L"/e");
-    forkk(CMD,command);
+    SHFILEOPSTRUCTW s = {0};
+    s.pFrom = sourcePath;
+    s.pTo = destinationPath;
+    s.wFunc = FO_COPY;
+
+
+    int error = 0;
+    if((error = SHFileOperationW(&s)) != 0){
+        if(error == 2 || error == 124){
+            printf("Source directory doesn't exist!\n\n");
+            return;
+
+        }
+        if(error == 1223){
+            printf("Operation was cancelled!\n\n");
+            return;
+
+        }
+
+        printf("Error:%d\n",error);
+        return;
+
+    }
 
 }
 
@@ -1406,7 +1418,7 @@ void backupWraper(wchar_t* path){
 
     }
 
-    wchar_t fullPath[PATH];
+    wchar_t fullPath[MAX_PATH];
     fullPath[0] = '\0';
     wcscat_s(fullPath,sizeof(fullPath),path);
     wcscat_s(fullPath,sizeof(fullPath),backUpFileRelativeName);
@@ -1441,7 +1453,7 @@ void backup(wchar_t* absolutePath,wchar_t* name){
 
     }
 
-    wchar_t backupPath[OH];
+    wchar_t backupPath[MAX_PATH];
     backupPath[0] = '\0';
 
     LPCWSTR variableName = L"USERPROFILE";
