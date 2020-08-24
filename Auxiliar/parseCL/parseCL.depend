@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1598305328 source:c:\users\radut\desktop\aplicatii in c\aplicatii\mad os command line\auxiliar\parsecl\parsecl.c
+	<stdio.h>
+	<stdlib.h>
+	<Windows.h>
+
