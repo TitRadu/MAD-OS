@@ -1,9 +1,4 @@
 # depslib dependency file v1.0
-1598375260 source:c:\users\radut\desktop\aplicatii in c\aplicatii\mad os command line\auxiliar\parsecl\parsecl.c
-	<stdio.h>
-	<stdlib.h>
-	<Windows.h>
-
 1598137930 source:c:\users\radut\desktop\aplicatii in c\aplicatii\mad os command line\command line\mados.c
 	"mados.h"
 
@@ -15,4 +10,7 @@
 	<ctype.h>
 	<lm.h>
 	<psapi.h>
+
+1598396952 source:c:\users\radut\desktop\aplicatii in c\aplicatii\mad os command line\auxiliar\sortdircl\sortdircl.c
+	"C:\Users\radut\Desktop\Aplicatii in C\Aplicatii\MAD OS Command Line\Command Line\mados.h"
 

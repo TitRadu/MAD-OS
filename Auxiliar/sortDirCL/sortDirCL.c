@@ -1,105 +1,17 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <dirent.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <errno.h>
-#include <Windows.h>
-#define CMD "C:\\Windows\\System32\\cmd.exe"
-#define PATH 1024
-
-int allSpaces(char* string){
-    for(int i = 0;i < strlen(string);i++){
-        if(string[i] != 32){
-            return 0;
-
-        }
-    }
-
-    return 1;
-}
-
-int stringCheck(char *string){
-    if(strcmp(string,"") == 0 || allSpaces(string) == 1){
-        printf("First argument is empty or contains only spaces!\n");
-        return 1;
-
-    }
-
-    return 0;
-
-}
-
-void forkk(char *application,char *args){
-    STARTUPINFO s;
-    PROCESS_INFORMATION p;
-    ZeroMemory(&s,sizeof(STARTUPINFO));
-    s.cb = sizeof(STARTUPINFO);
-    ZeroMemory(&p,sizeof(PROCESS_INFORMATION));
-    char commandLine[PATH];
-    commandLine[0] = '\0';
-    strcat(commandLine,application);
-    strcat(commandLine," ");
-    strcat(commandLine,args);
-
-
-
-    BOOL createProccesCheck = FALSE;
-createProccesCheck = CreateProcess(
-application,
-commandLine,
-NULL,
-NULL,
-FALSE,
-0,
-NULL,
-NULL,
-&s,
-&p
-    );
-
-    DWORD error = 0;
-    if(createProccesCheck == FALSE){
-        error = GetLastError();
-        printf("CreateProcessCheck:%lu\n",error);
-        ExitProcess(error);
-
-    }
-
-    if(WaitForSingleObject(p.hProcess,INFINITE) == WAIT_FAILED){
-        error = GetLastError();
-        printf("WaitForSingleObjectCheck:%lu\n",error);
-        ExitProcess(error);
-
-    }
-
-    if(CloseHandle(p.hProcess) == FALSE){
-        error = GetLastError();
-        ExitProcess(error);
-
-    }
-
-    if(CloseHandle(p.hThread) == FALSE){
-        error = GetLastError();
-        ExitProcess(error);
-
-    }
-
-}
+#include "C:\Users\radut\Desktop\Aplicatii in C\Aplicatii\MAD OS Command Line\Command Line\mados.h"
+#define CMD L"C:\\Windows\\System32\\cmd.exe"
 
 typedef struct fisier{
 
-char *nume;
-struct fisier *urm;
+wchar_t* nume;
+struct fisier* urm;
 
 }fisier;
 
 typedef struct extensie{
 
-char *nume;
-struct extensie *urm;
+wchar_t* nume;
+struct extensie* urm;
 
 }extensie;
 
@@ -107,10 +19,27 @@ struct extensie *urm;
 fisier *rootF=NULL;
 extensie *rootE=NULL;
 
-void adaugaFisier(char* nume){
-    fisier *nou=malloc(sizeof(fisier));//
-    nou->nume=malloc(100);//Alocarea de memorie pentru noul fisier plus copierea datelor necesare in noul fisier(numele fisierului).
-    strcpy(nou->nume,nume);//
+void adaugaFisier(wchar_t* nume){
+    HANDLE processHeap = NULL;
+    if((processHeap = getProcessHeapChecker()) == NULL){
+        return;
+
+    }
+
+    //Alocarea de memorie pentru noul fisier plus copierea datelor necesare in noul fisier(numele fisierului).
+    fisier* nou;
+    if((nou = (fisier*)HeapAlloc(processHeap,HEAP_ZERO_MEMORY,sizeof(fisier))) == NULL){
+            printf("AdaugaFisierHeapAllocError!\n");
+            ExitProcess(1);
+
+    }
+
+    if((nou->nume = (wchar_t*)HeapAlloc(processHeap,HEAP_ZERO_MEMORY,MAX_PATH*2)) == NULL){
+            printf("AdaugaFisierHeapAllocError!\n");
+            ExitProcess(1);
+
+    }
+    wcscpy(nou->nume,nume);
 
     //Aici se face legatura corespunzatoare adaugarii in lista de fisiere.Adaugarea este implementata la stanga adica noul nod creat va deveni intotdeauna noua radacina.
     if(rootF!=NULL){
@@ -126,7 +55,7 @@ void adaugaFisier(char* nume){
 
 ///Functia cautareExtensie.
 //Aceasta functie cauta existenta unei extensii in lista de extensii,extensie data prin numele sau.
-int cautareExtensie(char *nume){
+int cautareExtensie(wchar_t *nume){
     if(rootE==NULL){//Verificam daca radacina este NULL.
 
         return 0;//Daca este returnam 0.
@@ -134,7 +63,7 @@ int cautareExtensie(char *nume){
 
     extensie *aux;
     for(aux=rootE;aux!=NULL;aux=aux->urm){//Parcurgeam lista de extensii.
-        if(strcmp(aux->nume,nume)==0)//Verificam existenta extensiei cu numele dat.
+        if(wcscmp(aux->nume,nume)==0)//Verificam existenta extensiei cu numele dat.
             return 1;//Evident,daca gasim extensia in lista returnam 1.
 
 
@@ -146,18 +75,33 @@ int cautareExtensie(char *nume){
 
 ///Functia adaugaExtensie.
 //Aceasta functie adauga o extensie in lista de extensii.Nu vor exista noduri ce au aceeasi valoarea a numelui.
-void adaugaExtensie(char *nume){
+void adaugaExtensie(wchar_t *nume){
+    HANDLE processHeap = NULL;
+    if((processHeap = getProcessHeapChecker()) == NULL){
+        return;
 
-    char *ext=malloc(10);
-    ext[0]='\0';
-    strcat(ext,nume);
+    }
+
+    wchar_t ext[10];
+    wcscpy(ext,nume);
 
 
     //In cele de mai jos se fac atribuirile necesare adaugarii noului nod in lista,asta in cazul in care nu exista deja o extensie identica
     if(cautareExtensie(ext)==0){//ca valoare a numelui cu cea de mai sus.
         extensie *nou=malloc(sizeof(extensie));
-        nou->nume=malloc(10);
-        strcpy(nou->nume,ext);
+        if((nou = (extensie*)HeapAlloc(processHeap,HEAP_ZERO_MEMORY,sizeof(extensie))) == NULL){
+            printf("AdaugaExtensieHeapAllocError!\n");
+            ExitProcess(1);
+
+        }
+
+        if((nou->nume = (wchar_t*)HeapAlloc(processHeap,HEAP_ZERO_MEMORY,20)) == NULL){
+            printf("AdaugaFisierHeapAllocError!\n");
+            ExitProcess(1);
+
+        }
+
+        wcscpy(nou->nume,ext);
 
 
         if(rootE!=NULL){
@@ -169,14 +113,14 @@ void adaugaExtensie(char *nume){
         }
 
     }
-     free(ext);
+
 }
 
 
-int ultimaAparitie(char *fisier,char c){
+int ultimaAparitie(wchar_t* fisier,wchar_t c){
     int index=-1;
     int i;
-    for(i=0;i<strlen(fisier);i++){
+    for(i=0;i<wcslen(fisier);i++){
 
         if(fisier[i] == c){
             index=i;
@@ -188,64 +132,77 @@ int ultimaAparitie(char *fisier,char c){
 
 ///Functia preluareDate.
 //Aceasta functie preia datele din directorul dorit a fi sortat(fisiere si extensiile corespunzatoare).
-void preluareDate(char *path){
-    //Functia opendir este folosita pentru a deschide un director.Returneaza o referinta la structura de tip DIR.
-    DIR *dir = NULL;
-    if((dir=opendir(path)) == NULL){
-        if(errno == ENOENT){
-            printf("This path doesn't exist!\n");
-            ExitProcess(-1);
+void preluareDate(wchar_t *path){
+    HANDLE hd;
+    WIN32_FIND_DATAW fileInfo;
+    wchar_t starPath[MAX_PATH];
+    starPath[0] = '\0';
+    wcscat_s(starPath,sizeof(starPath),path);
+    wcscat_s(starPath,sizeof(starPath),L"\\*");
+
+    DWORD error = 0;
+    if((hd = FindFirstFileW(starPath,&fileInfo)) == INVALID_HANDLE_VALUE){
+        printf("ceplm\n");
+        error = GetLastError();
+        if(error == ERROR_FILE_NOT_FOUND){
+            printf("The system cannot find the file specified.\n");
+            ExitProcess(error);
+
+        }
+        if(error == ERROR_PATH_NOT_FOUND){
+            printf("A part from source path isn't a directory!\n");
+            ExitProcess(error);
+
+        }
+        if(error == ERROR_ACCESS_DENIED){
+            printf("-\tAcces to this file is denied!\n");
+            ExitProcess(error);
+
+        }
+        if(error == ERROR_INVALID_NAME){
+            printf("Invalid argument!\n");
+            ExitProcess(error);
+
+        }
+        if(error == ERROR_DIRECTORY){
+            printf("Sort path is a regular file!\n");
+            ExitProcess(error);
 
         }
 
-        if(errno == ENOTDIR){
-            printf("This path isn't a directory!\n");
-            ExitProcess(-1);
-
-        }
+        printf("Error:%lu\n",error);
+        ExitProcess(error);
 
     }
 
-    //Functia readdir citeste pe rand fiecare intrare din director(fisier sau alt director).Returneaza o referinta la o structura de tip
-    //dirent.Aceasta structura contine un camp char d_name[] care va contine numele intrarii cu tot cu extensie daca aceasta e fisier.
-    struct dirent *dr = NULL;
-    char newpath[PATH];
-
-    int ok=0;
-    while((dr=readdir(dir)) != NULL){//Citim din director pana se ajunge la NULL.
-        if((strcmp(dr->d_name,".") == 0) || (strcmp(dr->d_name,"..") == 0)){
+    do{
+        if((wcscmp(fileInfo.cFileName,L".") == 0) || (wcscmp(fileInfo.cFileName,L"..") == 0)){
             continue;
 
         }
 
-        //Ne formam noua cale catre fiecare intrare din director,pentru a putea obtine cu ajutorul functiei stat informatii(vezi mai jos)).
-        snprintf(newpath,PATH,"%s\\%s",path,dr->d_name);
-        struct _stat buf;
-        //Stat este o functie ce ne ofera diferite informatii despre fisierul dat ca si parametru(newpath).
-        if(_stat(newpath,&buf) < 0){
-            perror("StatCheck");
-            ExitProcess(-1);
-
-        }
-
-        if(S_ISREG(buf.st_mode)){
-            if(strcmp("sortDir.exe",dr->d_name) != 0){
-                adaugaFisier(dr->d_name);
+        if(!(fileInfo.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)){
+            if(wcscmp(L"sortDir.exe",fileInfo.cFileName) != 0){
+                adaugaFisier(fileInfo.cFileName);
                 int i;
-                i=ultimaAparitie(dr->d_name,'.');
-                adaugaExtensie(dr->d_name+i);
+                i=ultimaAparitie(fileInfo.cFileName,'.');
+                adaugaExtensie(fileInfo.cFileName+i);
 
             }
 
         }
 
     }
+    while(FindNextFileW(hd,&fileInfo) != 0);
 
-    if(closedir(dir) < 0){
-        perror("CloseDirCheck");
-        ExitProcess(-1);
+
+    if(FindClose(hd) == FALSE){
+        error = GetLastError();
+        printf("FindCloseError:%lu\n",error);
+        ExitProcess(error);
 
     }
+
 
 }
 
@@ -258,7 +215,7 @@ void listare(){
     printf("Fisierele continute sunt:");
     for(auxF=rootF;auxF!=NULL;auxF=auxF->urm){
 
-        printf("%s   ",auxF->nume);
+        wprintf(L"%s   ",auxF->nume);
 
     }
 
@@ -266,7 +223,7 @@ void listare(){
     printf("Extensiile obtinute:");
     for(auxE=rootE;auxE!=NULL;auxE=auxE->urm){
 
-        printf("%s   ",auxE->nume);
+        wprintf(L"%s   ",auxE->nume);
 
     }
 
@@ -276,21 +233,21 @@ void listare(){
 
 ///Functia creeazaDirectoare.
 //Aceasta functie creeaza directoarele specifice extensiilor.
-void creeazaDirectoare(char *cale){
-    char comanda[PATH];
+void creeazaDirectoare(wchar_t* cale){
+    wchar_t comanda[PATH];
 
-    char *auxiliar;
-    extensie *auxE;
+    wchar_t* auxiliar;
+    extensie* auxE;
 
     for(auxE=rootE;auxE!=NULL;auxE=auxE->urm){
-        auxiliar=strtok(auxE->nume,".");
+        auxiliar=wcstok(auxE->nume,L".");
         comanda[0]='\0';
-        strcat(comanda,"/c mkdir ");
-        strcat(comanda,"\"");
-        strcat(comanda,cale);
-        strcat(comanda,"\\");
-        strcat(comanda,auxiliar);
-        strcat(comanda,"\"");
+        wcscat_s(comanda,sizeof(comanda),L"/c mkdir ");
+        wcscat_s(comanda,sizeof(comanda),L"\"");
+        wcscat_s(comanda,sizeof(comanda),cale);
+        wcscat_s(comanda,sizeof(comanda),L"\\");
+        wcscat_s(comanda,sizeof(comanda),auxiliar);
+        wcscat_s(comanda,sizeof(comanda),L"\"");
         forkk(CMD,comanda);
 
     }
@@ -300,43 +257,33 @@ void creeazaDirectoare(char *cale){
 
 ///Functia mutaFisiere.
 //Aceasta functie muta un fisier in directorul cu extensia specifica fisierului.
-void mutaFisiere(char *cale){
+void mutaFisiere(wchar_t *cale){
 
 
     fisier *auxF;
     extensie *auxE;
-    char cale1[PATH];
-    char cale2[PATH];
-    char *folder;
+    wchar_t cale1[MAX_PATH];
+    wchar_t cale2[MAX_PATH];
+    wchar_t* folder;
 
     for(auxF=rootF;auxF!=NULL;auxF=auxF->urm){
         for(auxE=rootE;auxE!=NULL;auxE=auxE->urm){
 
-            if(strstr(auxF->nume,auxE->nume)){
+            if(wcsstr(auxF->nume,auxE->nume)){
 
-                folder=strtok(auxE->nume,".");
+                folder=wcstok(auxE->nume,L".");
                 cale1[0]='\0';
                 cale2[0]='\0';
-                strcat(cale1,cale);
-                strcat(cale1,"\\");
-                strcat(cale1,auxF->nume);
+                wcscat_s(cale1,sizeof(cale1),cale);
+                wcscat_s(cale1,sizeof(cale1),L"\\");
+                wcscat_s(cale1,sizeof(cale1),auxF->nume);
 
-                strcat(cale2,cale);
-                strcat(cale2,"\\");
-                strcat(cale2,folder);
-                strcat(cale2,"\\");
-                strcat(cale2,auxF->nume);
-                if(rename(cale1,cale2) < 0){
-                    if(errno == EEXIST){
-                        printf("%s-->",auxF->nume);
-                        printf("File exists in both directories!\n");
-                        continue;
-
-                    }
-                    printf("%s:",auxF->nume);
-                    perror("MoveFilesRenameCheck");
-
-                }
+                wcscat_s(cale2,sizeof(cale2),cale);
+                wcscat_s(cale2,sizeof(cale2),L"\\");
+                wcscat_s(cale2,sizeof(cale2),folder);
+                wcscat_s(cale2,sizeof(cale2),L"\\");
+                wcscat_s(cale2,sizeof(cale2),auxF->nume);
+                renameFile(cale1,cale2);
 
             }
 
@@ -348,18 +295,41 @@ void mutaFisiere(char *cale){
 }
 
 int main(int argc, char* argv[]){
-    char path[PATH];
+    wchar_t sortFullPath[MAX_PATH];
     printf("Sort-Path:");
-    gets(path);
-    if(stringCheck(path) == 1){
-        return 1;
+    fgetws(sortFullPath,MAX_PATH,stdin);
+    if(sortFullPath[wcslen(sortFullPath)-1] == '\n'){
+        sortFullPath[wcslen(sortFullPath)-1] = '\0';
+
     }
 
-    preluareDate(path);
+    if(wStringCheck(sortFullPath) == 1){
+        return 1;
 
-    creeazaDirectoare(path);
+    }
 
-    mutaFisiere(path);
+    if(pathType(sortFullPath) == 1){
+        printf("You need a absolute path!\n");
+        return 1;
+
+    }
+
+    if(wcslen(sortFullPath) > 247){
+        printf("File name is too long!\n");
+        return 1;
+
+    }
+    if(wExist(sortFullPath,L"") == 0){
+        printf("The system cannot find the file specified.\n");
+        ExitProcess(ERROR_FILE_NOT_FOUND);
+
+    }
+    printf("Mata\n");
+    preluareDate(sortFullPath);
+    printf("Mata\n");
+    creeazaDirectoare(sortFullPath);
+    printf("Mata\n");
+    mutaFisiere(sortFullPath);
 
     return 0;
 }

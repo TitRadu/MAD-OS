@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <Windows.h>
 
-void parse(wchar_t* path,char control,int* numberOfFiles,int* numberOfDirectories,int* numberOfDeniedFiles){
+void parseCL(wchar_t* path,char control,int* numberOfFiles,int* numberOfDirectories,int* numberOfDeniedFiles){
     HANDLE hd;
     WIN32_FIND_DATAW fileInfo;
     SYSTEMTIME fileLastWriteTime;
@@ -53,7 +53,7 @@ void parse(wchar_t* path,char control,int* numberOfFiles,int* numberOfDirectorie
             (*numberOfDirectories)++;
             wprintf(L"D\t%.3f\t\t%02d/%02d %02d:%02d:%02d %04d \t%s\n",sizeMB,fileLastWriteTime.wMonth,fileLastWriteTime.wDay,fileLastWriteTime.wHour,fileLastWriteTime.wMinute,fileLastWriteTime.wSecond,fileLastWriteTime.wYear,newPath);
             if(control == 'r' || control == 'R'){
-                parse(newPath,control,numberOfFiles,numberOfDirectories,numberOfDeniedFiles);
+                parseCL(newPath,control,numberOfFiles,numberOfDirectories,numberOfDeniedFiles);
             }
             if(control == 'R'){
                 if(RemoveDirectoryW(newPath) == 0){
@@ -108,7 +108,7 @@ int main(int argc,char* argv[]){
     int numberOfDirectories = 0;
     int numberOfDeniedFiles = 0;
     printf("Type\tSize(MB)\tModified\t\t\tPath\n");
-    parse(part,argv[2][0],&numberOfFiles,&numberOfDirectories,&numberOfDeniedFiles);
+    parseCL(part,argv[2][0],&numberOfFiles,&numberOfDirectories,&numberOfDeniedFiles);
     printf("Directory statistics: Files:%d   Directories:%d   DeniedFiles:%d\n",numberOfFiles,numberOfDirectories,numberOfDeniedFiles);
 
 
