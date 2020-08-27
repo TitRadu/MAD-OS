@@ -142,18 +142,7 @@ void preluareDate(wchar_t *path){
 
     DWORD error = 0;
     if((hd = FindFirstFileW(starPath,&fileInfo)) == INVALID_HANDLE_VALUE){
-        printf("ceplm\n");
         error = GetLastError();
-        if(error == ERROR_FILE_NOT_FOUND){
-            printf("The system cannot find the file specified.\n");
-            ExitProcess(error);
-
-        }
-        if(error == ERROR_PATH_NOT_FOUND){
-            printf("A part from source path isn't a directory!\n");
-            ExitProcess(error);
-
-        }
         if(error == ERROR_ACCESS_DENIED){
             printf("-\tAcces to this file is denied!\n");
             ExitProcess(error);
@@ -234,21 +223,18 @@ void listare(){
 ///Functia creeazaDirectoare.
 //Aceasta functie creeaza directoarele specifice extensiilor.
 void creeazaDirectoare(wchar_t* cale){
-    wchar_t comanda[PATH];
+    wchar_t directoryFullPath[MAX_PATH];
 
     wchar_t* auxiliar;
     extensie* auxE;
 
     for(auxE=rootE;auxE!=NULL;auxE=auxE->urm){
         auxiliar=wcstok(auxE->nume,L".");
-        comanda[0]='\0';
-        wcscat_s(comanda,sizeof(comanda),L"/c mkdir ");
-        wcscat_s(comanda,sizeof(comanda),L"\"");
-        wcscat_s(comanda,sizeof(comanda),cale);
-        wcscat_s(comanda,sizeof(comanda),L"\\");
-        wcscat_s(comanda,sizeof(comanda),auxiliar);
-        wcscat_s(comanda,sizeof(comanda),L"\"");
-        forkk(CMD,comanda);
+        directoryFullPath[0]='\0';
+        wcscat_s(directoryFullPath,sizeof(directoryFullPath),cale);
+        wcscat_s(directoryFullPath,sizeof(directoryFullPath),L"\\");
+        wcscat_s(directoryFullPath,sizeof(directoryFullPath),auxiliar);
+        createDirectory(directoryFullPath);
 
     }
 
@@ -324,11 +310,11 @@ int main(int argc, char* argv[]){
         ExitProcess(ERROR_FILE_NOT_FOUND);
 
     }
-    printf("Mata\n");
+
     preluareDate(sortFullPath);
-    printf("Mata\n");
+
     creeazaDirectoare(sortFullPath);
-    printf("Mata\n");
+
     mutaFisiere(sortFullPath);
 
     return 0;
