@@ -401,6 +401,18 @@ int main(){
 
         }
 
+        if(strcmp(command,"logoff") == 0){
+            logOff();
+            continue;
+
+        }
+
+        if(strcmp(command,"lock") == 0){
+            lockStation();
+            continue;
+
+        }
+
         printf("Incorrect command!\n");
 
     }

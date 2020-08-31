@@ -2711,3 +2711,23 @@ void changeConsoleFontSize(char* direction){
     }
 
 }
+
+void logOff(){
+    DWORD error = 0;
+    if(ExitWindowsEx(EWX_LOGOFF,0) == FALSE){
+        printf("LogOffError:%lu\n\n",error);
+        return;
+
+    }
+
+}
+
+void lockStation(){
+    DWORD error = 0;
+    if(LockWorkStation() == FALSE){
+        printf("LockStationError:%lu\n\n",error);
+        return;
+
+    }
+
+}
