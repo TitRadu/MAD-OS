@@ -413,6 +413,18 @@ int main(){
 
         }
 
+        if(strcmp(command,"restart") == 0){
+            shutDown(L"restart");
+            continue;
+
+        }
+
+        if(strcmp(command,"sd") == 0){
+            shutDown(L"");
+            continue;
+
+        }
+
         printf("Incorrect command!\n");
 
     }

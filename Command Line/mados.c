@@ -2731,3 +2731,50 @@ void lockStation(){
     }
 
 }
+
+void shutDown(wchar_t* mode){
+    unsigned int operation = 0;
+    HANDLE tokenHandle;
+    TOKEN_PRIVILEGES tokenPriv;
+
+    DWORD error = 0 ;
+    if(OpenProcessToken(GetCurrentProcess(),TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY,&tokenHandle) == 0){
+        error = GetLastError();
+        printf("ShutDownOpenProcessTokenError:%lu\n",error);
+        return;
+
+    }
+
+    if(LookupPrivilegeValueW(NULL,L"SeShutdownPrivilege",&tokenPriv.Privileges[0].Luid) == 0){
+        error = GetLastError();
+        printf("ShutDownLookupPrivilegeValueError:%lu\n",error);
+        return;
+
+    }
+
+    tokenPriv.PrivilegeCount = 1;
+    tokenPriv.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+
+    if(AdjustTokenPrivileges(tokenHandle,FALSE,&tokenPriv,0,NULL,NULL) == 0){
+        error = GetLastError();
+        printf("ShutDownAdjustTokenPrivilegesError:%lu\n",error);
+        return;
+
+    }
+
+    if(wcscmp(mode,L"restart") == 0){
+        operation = EWX_REBOOT;
+
+    }else{
+        operation = EWX_POWEROFF;
+    }
+
+    if(ExitWindowsEx(operation | EWX_FORCE,SHTDN_REASON_MAJOR_OPERATINGSYSTEM | SHTDN_REASON_FLAG_PLANNED) == 0){
+        error = GetLastError();
+        printf("ShutDownExitWindowsExError:%lu\n",error);
+        return;
+
+    }
+
+
+}

@@ -101,5 +101,6 @@ void changeColor(wchar_t*,wchar_t*);
 void changeConsoleFontSize(char*);
 void logOff();
 void lockStation();
+void shutDown(wchar_t*);
 
 #endif // MADOS_H_INCLUDED
