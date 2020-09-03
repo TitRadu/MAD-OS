@@ -21,6 +21,7 @@ int main(int argc,char* argv[]){
 
     }
 
+    if(wcscmp(part,L"Manual.txt") !=0)
     if(pathType(part) == 1){
         printf("You need a absolute path!\n\n");
         return 1;

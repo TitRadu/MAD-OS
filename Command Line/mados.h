@@ -11,6 +11,13 @@
 #include <ctype.h>
 #include <lm.h>
 #include <psapi.h>
+#include <intsafe.h>
+
+typedef struct command{
+char* commandName;
+struct command* nextCommand;
+
+}command;
 
 void pause();
 int pathType(wchar_t*);
@@ -102,5 +109,6 @@ void changeConsoleFontSize(char*);
 void logOff();
 void lockStation();
 void shutDown(wchar_t*);
+command* addCommand(command*,char*);
 
 #endif // MADOS_H_INCLUDED

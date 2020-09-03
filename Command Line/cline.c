@@ -2,6 +2,12 @@
 
 int main(){
     SetConsoleCtrlHandler(NULL,TRUE);
+    HANDLE processHeap = NULL;
+    if((processHeap = getProcessHeapChecker()) == NULL){
+        return 1;
+
+    }
+
     printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~MAD OS Command Line Version 1.0~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
     printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~(c) 2020 MAD OS Software. All rights reserved!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
 
@@ -20,6 +26,9 @@ int main(){
         ExitProcess(-1);
 
     }
+    int commandsCount = 0;
+    command* history = NULL;
+    command* aux;
     char command[MAX_PATH];
     wchar_t path[MAX_PATH];
 
@@ -69,6 +78,7 @@ int main(){
             command[strlen(command)-1] = '\0';
         }
 
+
         if(strcmp(command,"exit") == 0){
             printf("Exit from command line!\n");
             pause();
@@ -80,6 +90,8 @@ int main(){
             continue;
 
         }
+
+        history = addCommand(history,command);
 
         if(strcmp(command,"help") == 0){
             help();
@@ -421,6 +433,18 @@ int main(){
 
         if(strcmp(command,"sd") == 0){
             shutDown(L"");
+            continue;
+
+        }
+
+        if(strcmp(command,"history") == 0){
+
+            for(aux = history; aux != NULL; aux=aux->nextCommand){
+                commandsCount++;
+                printf("%d. %s\n",commandsCount,aux->commandName);
+
+            }
+            printf("\n");
             continue;
 
         }

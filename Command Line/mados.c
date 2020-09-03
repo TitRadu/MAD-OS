@@ -1177,7 +1177,7 @@ void sort(){
 
 void help(){
     printf("\n");
-    forkk(L"contentCL.exe",L"Manual.txt");
+    forkk(L"contentCL.exe",L"\"Manual.txt\"");
 
 }
 
@@ -2776,5 +2776,48 @@ void shutDown(wchar_t* mode){
 
     }
 
-
 }
+
+command* addCommand(command* root,char* newCommandName){
+    HANDLE processHeap = NULL;
+    if((processHeap = getProcessHeapChecker()) == NULL){
+        return NULL;
+
+    }
+
+    command* newCommand;
+    if((newCommand = (command*)HeapAlloc(processHeap,HEAP_ZERO_MEMORY,sizeof(command))) == NULL){
+            printf("AddCommandHeapAllocError!\n");
+            ExitProcess(1);
+
+    }
+
+    if((newCommand->commandName = (char*)HeapAlloc(processHeap,HEAP_ZERO_MEMORY,sizeof(newCommandName) + 1)) == NULL){
+            printf("AdaugaFisierHeapAllocError!\n");
+            ExitProcess(1);
+
+    }
+
+    strcpy(newCommand->commandName,newCommandName);
+    newCommand->nextCommand = NULL;
+
+    if(root == NULL){
+        return newCommand;
+
+    }else{
+        command* aux;
+        for(aux = root;aux != NULL;aux = aux->nextCommand){
+            if(aux->nextCommand == NULL){
+                aux->nextCommand = newCommand;
+                return root;
+            }
+
+        }
+
+    }
+
+    return root;
+}
+
+
+
