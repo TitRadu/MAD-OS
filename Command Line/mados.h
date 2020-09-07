@@ -12,6 +12,8 @@
 #include <lm.h>
 #include <psapi.h>
 #include <intsafe.h>
+#include <shlwapi.h>
+#include <errno.h>
 
 typedef struct command{
 char* commandName;
@@ -110,5 +112,6 @@ void logOff();
 void lockStation();
 void shutDown(wchar_t*);
 command* addCommand(command*,char*);
+void grep();
 
 #endif // MADOS_H_INCLUDED

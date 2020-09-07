@@ -1,0 +1,19 @@
+# depslib dependency file v1.0
+1599437052 source:c:\users\radut\desktop\aplicatii in c\aplicatii\mad os command line\command line\mados.c
+	"mados.h"
+
+1599436974 c:\users\radut\desktop\aplicatii in c\aplicatii\mad os command line\command line\mados.h
+	<stdio.h>
+	<stdlib.h>
+	<Windows.h>
+	<time.h>
+	<ctype.h>
+	<lm.h>
+	<psapi.h>
+	<intsafe.h>
+	<shlwapi.h>
+	<errno.h>
+
+1599437907 source:c:\users\radut\desktop\aplicatii in c\aplicatii\mad os command line\auxiliar\grepcl\grepcl.c
+	"C:\Users\radut\Desktop\Aplicatii in C\Aplicatii\MAD OS Command Line\Command Line\mados.h"
+

@@ -438,13 +438,19 @@ int main(){
         }
 
         if(strcmp(command,"history") == 0){
-
+            commandsCount = 0;
             for(aux = history; aux != NULL; aux=aux->nextCommand){
                 commandsCount++;
                 printf("%d. %s\n",commandsCount,aux->commandName);
 
             }
             printf("\n");
+            continue;
+
+        }
+
+        if(strcmp(command,"grep") == 0){
+            grep();
             continue;
 
         }

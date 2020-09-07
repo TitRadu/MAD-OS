@@ -2819,5 +2819,10 @@ command* addCommand(command* root,char* newCommandName){
     return root;
 }
 
+void grep(){
+    forkk(L"grepCL.exe",L"");
+
+}
+
 
 
