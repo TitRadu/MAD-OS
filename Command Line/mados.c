@@ -277,8 +277,8 @@ void changePath(wchar_t *path){
     }
 
 
-    wcscat_s(path,MAX_PATH*2,relativeChangePath);
-    wcscat_s(path,MAX_PATH*2,L"\\");
+    wcscat_s(path,MAX_PATH*sizeof(wchar_t),relativeChangePath);
+    wcscat_s(path,MAX_PATH*sizeof(wchar_t),L"\\");
 
 }
 
@@ -840,12 +840,6 @@ void start1(){
 }
 
 void start2(wchar_t* path){
-    HANDLE processHeap = NULL;
-    if((processHeap = getProcessHeapChecker()) == NULL){
-        return;
-
-    }
-
     wchar_t program[MAX_PATH];
     printf("Program:");
     fgetws(program,MAX_PATH,stdin);
@@ -892,15 +886,9 @@ void start2(wchar_t* path){
 
     }
 
-    wchar_t* args;
+    wchar_t args[MAX_PATH];
 
     if(exeCheck == 0){
-        if((args = (wchar_t*)HeapAlloc(processHeap,HEAP_ZERO_MEMORY,1+wcslen(path)+wcslen(program)+2)) == NULL){
-            printf("Start2HeapAllocError!\n");
-            return;
-
-        }
-        args[0] = '\0';
         wcscat_s(args,sizeof(args),L"\"");
         wcscat_s(args,sizeof(args),path);
 
@@ -955,11 +943,6 @@ void start2(wchar_t* path){
         if((shellCheck=ShellExecuteW(NULL,L"open",program,args,NULL,1)) <= (HINSTANCE)32){
             if(shellCheck == (HINSTANCE)2){
                 printf("Program not found!\n");
-                if(heapFreeChecker(processHeap,0,args) == FALSE){
-                    return;
-
-                }
-
                 return;
 
             }
@@ -972,11 +955,6 @@ void start2(wchar_t* path){
     }else{
         wchar_t list[THIRTY];wchar_t executable[1+wcslen(path)+wcslen(program)];
         printf("List of arguments:");_getws(list);
-        if((args = HeapAlloc(processHeap,HEAP_ZERO_MEMORY,1+wcslen(list))) == NULL){
-            printf("Start2HeapReAllocError!\n");
-            return;
-
-        }
         args[0] = '\0';
         wcscat_s(args,sizeof(args),list);
         executable[0] = '\0';
@@ -984,11 +962,6 @@ void start2(wchar_t* path){
         wcscat_s(executable,sizeof(executable),program);
         forkk(executable,args);
 
-
-    }
-
-    if(heapFreeChecker(processHeap,0,args) == FALSE){
-        return;
 
     }
 
@@ -1983,20 +1956,19 @@ void addUser(wchar_t* userName,wchar_t* userPassword){
     DWORD level = 1;
     DWORD error = -1;
 
-    if((content.usri1_name = (LPWSTR)HeapAlloc(processHeap,HEAP_ZERO_MEMORY,100)) == NULL){
+    if((content.usri1_name = (LPWSTR)HeapAlloc(processHeap,HEAP_ZERO_MEMORY,22*sizeof(wchar_t))) == NULL){
         printf("AddUserHeapAllocError!\n");
         return;
 
     }
 
-    if((content.usri1_password = (LPWSTR)HeapAlloc(processHeap,HEAP_ZERO_MEMORY,100)) == NULL){
+    if((content.usri1_password = (LPWSTR)HeapAlloc(processHeap,HEAP_ZERO_MEMORY,(LM20_PWLEN+2)*sizeof(wchar_t))) == NULL){
         printf("AddUserHeapAllocError!\n");
         return;
 
     }
-
-    wcscat_s(content.usri1_name,sizeof(content.usri1_name),userName);
-    wcscat_s(content.usri1_password,sizeof(content.usri1_password),userPassword);
+    wcscat_s(content.usri1_name,22*sizeof(wchar_t),userName);
+    wcscat_s(content.usri1_password,(LM20_PWLEN+2)*sizeof(wchar_t),userPassword);
 
     content.usri1_priv = USER_PRIV_USER;
     content.usri1_home_dir = NULL;
