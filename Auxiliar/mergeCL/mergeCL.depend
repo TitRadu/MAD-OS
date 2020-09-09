@@ -1,6 +1,6 @@
 # depslib dependency file v1.0
-1599670943 source:c:\users\radut\desktop\aplicatii in c\aplicatii\mad os command line\command line\cline.c
-	"mados.h"
+1599670187 source:c:\users\radut\desktop\aplicatii in c\aplicatii\mad os command line\auxiliar\mergecl\mergecl.c
+	"C:\Users\radut\Desktop\Aplicatii in C\Aplicatii\MAD OS Command Line\Command Line\mados.h"
 
 1599670981 c:\users\radut\desktop\aplicatii in c\aplicatii\mad os command line\command line\mados.h
 	<stdio.h>

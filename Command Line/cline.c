@@ -455,6 +455,12 @@ int main(){
 
         }
 
+        if(strcmp(command,"merge") == 0){
+            mergeFiles();
+            continue;
+
+        }
+
         printf("Incorrect command!\n");
 
     }

@@ -113,5 +113,6 @@ void lockStation();
 void shutDown(wchar_t*);
 command* addCommand(command*,char*);
 void grep();
+void mergeFiles();
 
 #endif // MADOS_H_INCLUDED

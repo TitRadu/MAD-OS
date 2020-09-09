@@ -889,6 +889,7 @@ void start2(wchar_t* path){
     wchar_t args[MAX_PATH];
 
     if(exeCheck == 0){
+        args[0] = '\0';
         wcscat_s(args,sizeof(args),L"\"");
         wcscat_s(args,sizeof(args),path);
 
@@ -939,6 +940,7 @@ void start2(wchar_t* path){
 
         }
 
+        wprintf(L"--%s--\n",args);
         HINSTANCE shellCheck = 0;
         if((shellCheck=ShellExecuteW(NULL,L"open",program,args,NULL,1)) <= (HINSTANCE)32){
             if(shellCheck == (HINSTANCE)2){
@@ -2796,5 +2798,10 @@ void grep(){
 
 }
 
+
+void mergeFiles(){
+    forkk(L"mergeCL.exe",L"");
+
+}
 
 
