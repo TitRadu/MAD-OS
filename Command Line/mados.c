@@ -2809,3 +2809,8 @@ void mergePartOfFiles(){
 
 }
 
+void filesDiferences(){
+    forkk(L"diffCL.exe",L"");
+
+}
+

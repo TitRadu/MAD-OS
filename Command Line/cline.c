@@ -467,6 +467,12 @@ int main(){
 
         }
 
+        if(strcmp(command,"diff") == 0){
+            filesDiferences();
+            continue;
+
+        }
+
         printf("Incorrect command!\n");
 
     }

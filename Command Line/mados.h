@@ -115,5 +115,6 @@ command* addCommand(command*,char*);
 void grep();
 void mergeFiles();
 void mergePartOfFiles();
+void filesDiferences();
 
 #endif // MADOS_H_INCLUDED
