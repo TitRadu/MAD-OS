@@ -2804,4 +2804,8 @@ void mergeFiles(){
 
 }
 
+void mergePartOfFiles(){
+    forkk(L"mergePCL.exe",L"");
+
+}
 

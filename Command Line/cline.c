@@ -461,6 +461,12 @@ int main(){
 
         }
 
+        if(strcmp(command,"mergeP") == 0){
+            mergePartOfFiles();
+            continue;
+
+        }
+
         printf("Incorrect command!\n");
 
     }

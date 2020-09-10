@@ -114,5 +114,6 @@ void shutDown(wchar_t*);
 command* addCommand(command*,char*);
 void grep();
 void mergeFiles();
+void mergePartOfFiles();
 
 #endif // MADOS_H_INCLUDED
