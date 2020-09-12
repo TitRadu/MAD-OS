@@ -116,5 +116,8 @@ void grep();
 void mergeFiles();
 void mergePartOfFiles();
 void filesDiferences();
+void init();
+unsigned long long fibonacci(int);
+void printFibonacci();
 
 #endif // MADOS_H_INCLUDED

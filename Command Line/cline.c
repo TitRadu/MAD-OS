@@ -7,6 +7,8 @@ int main(){
         return 1;
 
     }
+    extern unsigned long long values[];
+    init(values);
 
     printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~MAD OS Command Line Version 1.0~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
     printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~(c) 2020 MAD OS Software. All rights reserved!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
@@ -469,6 +471,12 @@ int main(){
 
         if(strcmp(command,"diff") == 0){
             filesDiferences();
+            continue;
+
+        }
+
+        if(strcmp(command,"fib") == 0){
+            printFibonacci();
             continue;
 
         }
