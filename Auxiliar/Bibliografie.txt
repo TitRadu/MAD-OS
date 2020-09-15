@@ -11,3 +11,4 @@ https://stackoverflow.com/questions/6460932/change-entire-console-background-col
 https://stackoverflow.com/questions/8578909/how-to-get-current-console-background-and-text-colors -> GetConsoleScreenBufferInfo.
 http://cplusplus.com/forum/windows/48863/ ->  setare cbSize(câmp al structurii CONSOLE_FONT_INFOEX) la valoarea sizeof(CONSOLE_FONT_INFOEX).
 https://stackoverflow.com/questions/4725115/on-windows-is-there-an-interface-for-copying-folders -> copiere de director cu WIN API.
+https://www.youtube.com/watch?v=2jHhSsDAA6k -> afisarea partitiilor.

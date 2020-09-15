@@ -72,6 +72,11 @@ int main()
         appPerLine = 0;
         position = 0;
         lineCount++;
+        if(line[wcslen(line)-1] != '\n'){
+                line[wcslen(line)] = '\n';
+                line[wcslen(line)+1] = '\0';
+
+        }
 
         while((auxString = wcsstr(line+position,searchString)) != NULL){
             appPerLine++;

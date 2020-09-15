@@ -119,5 +119,6 @@ void filesDiferences();
 void init();
 unsigned long long fibonacci(int);
 void printFibonacci();
+void getPartitions();
 
 #endif // MADOS_H_INCLUDED

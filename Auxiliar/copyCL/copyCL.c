@@ -183,7 +183,7 @@ int main(int argc,char* argv[]){
 
         remaining = remaining - *nrWriteBytes;
         status =((((double)sizeInBytes) - (double)remaining)/(double)sizeInBytes)*100;
-        printf("\rGenerating...%.2f%% Complete!",status);
+        printf("\rCopying...%.2f%% Complete!",status);
 
     }
 

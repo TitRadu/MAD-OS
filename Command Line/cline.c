@@ -481,6 +481,12 @@ int main(){
 
         }
 
+        if(strcmp(command,"partitions") == 0){
+            getPartitions();
+            continue;
+
+        }
+
         printf("Incorrect command!\n");
 
     }

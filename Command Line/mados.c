@@ -2864,3 +2864,29 @@ void printFibonacci(){
     printf("Result:%llu\n\n",result);
 
 }
+
+void getPartitions(){
+
+    DWORD partitionNumber = 0;
+    DWORD partitions = 0;
+
+    if((partitions = GetLogicalDrives()) == FALSE){
+        partitions = GetLastError();
+        printf("GetPartitionsGetLogicalDrivesError:%lu\n\n",partitions);
+        return;
+
+    }
+
+    printf("List of partitions:\n");
+    for(int i = 0;i <= 26;i++){
+        if(partitions & (1<<i)){
+            partitionNumber++;
+            printf("%c:\\\n",i+65);
+
+        }
+
+    }
+
+    printf("\n");
+
+}
