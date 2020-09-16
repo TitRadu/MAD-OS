@@ -1013,7 +1013,7 @@ void back(wchar_t* path){
 }
 
 void cline(){
-    if((ShellExecuteW(NULL,L"open",L"MAD OS Command Line.exe",NULL,NULL,1)) <= (HINSTANCE)32){
+    if((ShellExecuteW(NULL,L"open",L"Command Line.exe",NULL,NULL,1)) <= (HINSTANCE)32){
         printf("ClineShellExecuteError:Error!\n");
         return;
 
@@ -1068,7 +1068,7 @@ void clearr(){
 }
 
 void newCline(){
-    if((ShellExecuteW(NULL,L"open",L"MAD OS Command Line.exe",NULL,NULL,1)) <= (HINSTANCE)32){
+    if((ShellExecuteW(NULL,L"open",L"Command Line.exe",NULL,NULL,1)) <= (HINSTANCE)32){
         printf("Error!\n");
         return;
 
@@ -1333,9 +1333,6 @@ void copyDirectoryWraper(char* control){
 
     }
 
-    sourcePath[wcslen(sourcePath) + 1] = '\0';
-    destinationPath[wcslen(sourcePath) + 1] = '\0';
-
     copyDirectory(sourcePath,destinationPath);
 
     if(strcmp(control,"cut") == 0){
@@ -1343,15 +1340,16 @@ void copyDirectoryWraper(char* control){
 
     }
 
-
 }
 
 void copyDirectory(wchar_t* sourcePath,wchar_t* destinationPath){
+    sourcePath[wcslen(sourcePath) + 1] = '\0';
+    destinationPath[wcslen(destinationPath) + 1] = '\0';
+
     SHFILEOPSTRUCTW s = {0};
     s.pFrom = sourcePath;
     s.pTo = destinationPath;
     s.wFunc = FO_COPY;
-
 
     int error = 0;
     if((error = SHFileOperationW(&s)) != 0){
@@ -1431,16 +1429,14 @@ void backup(wchar_t* absolutePath,wchar_t* name){
     wchar_t backupPath[MAX_PATH];
     backupPath[0] = '\0';
 
-    LPCWSTR variableName = L"USERPROFILE";
     LPWSTR variableValue;
-    if((variableValue = (LPWSTR)HeapAlloc(processHeap,HEAP_ZERO_MEMORY,PATH)) == NULL){
+    if((variableValue = (LPWSTR)HeapAlloc(processHeap,HEAP_ZERO_MEMORY,sizeof(wchar_t)*MAX_PATH)) == NULL){
         printf("BckpHeapAllocError!\n");
         return;
 
     }
-    DWORD size = PATH;
 
-    GetEnvironmentVariableW(variableName,variableValue,size);
+    GetEnvironmentVariableW(L"USERPROFILE",variableValue,sizeof(wchar_t)*MAX_PATH);
     wcscat_s(backupPath,sizeof(backupPath),variableValue);
     printf("BACKUP:");
     wcscat_s(backupPath,sizeof(backupPath),L"\\BACKUP");
@@ -1462,7 +1458,6 @@ void backup(wchar_t* absolutePath,wchar_t* name){
     }
 
     if(existCheck == 2){
-        wcscat_s(backupPath,sizeof(backupPath),L"\\");
         copyDirectory(absolutePath,backupPath);
         return;
 

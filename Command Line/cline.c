@@ -34,43 +34,9 @@ int main(){
     char command[MAX_PATH];
     wchar_t path[MAX_PATH];
 
-    printf("Starting path:");
-    fgetws(path,MAX_PATH,stdin);
-    if(path[wcslen(path)-1] == '\n'){
-        path[wcslen(path)-1] = '\0';
-    }
+    GetEnvironmentVariableW(L"USERPROFILE",path,sizeof(wchar_t)*MAX_PATH);
+    wcscat_s(path,sizeof(path),L"\\");
 
-    int pathCheck = 0;
-    if((pathCheck=wExist(path,L"")) == 0){
-        printf("This path doesn't exist as file!\n");
-        pause();
-        ExitProcess(-1);
-
-    }
-
-    if(pathCheck == 3){
-        printf("Invalid argument!\n");
-        pause();
-        ExitProcess(-1);
-
-    }
-
-    if(pathCheck != 2){
-        printf("This path isn't a directory!\n");
-        pause();
-        ExitProcess(-1);
-
-    }
-
-
-    if(wcslen(path) == 3){
-
-    }else{
-        wcscat_s(path,sizeof(path),L"\\");
-
-    }
-
-    fflush(stdin);
     while(1){
         wprintf(L"%s@%s->%s:",userName,PCname,path);
         fflush(stdin);
