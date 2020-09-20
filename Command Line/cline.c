@@ -170,19 +170,25 @@ int main(){
 
         }
 
-        if(strcmp(command,"start1") == 0){
-            start1();
+        if(strcmp(command,"openD") == 0){
+            openDefault();
             continue;
 
         }
 
-        if(strcmp(command,"start2") == 0){
-            start2(path);
+        if(strcmp(command,"openPF") == 0){
+            openFileWithProgramWraper(path);
             continue;
 
         }
 
-        if(strcmp(command,"opath") == 0){
+        if(strcmp(command,"run") == 0){
+            run();
+            continue;
+
+        }
+
+        if(strcmp(command,"openP") == 0){
             openPathWraper();
             continue;
 

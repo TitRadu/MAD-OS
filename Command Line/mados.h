@@ -45,8 +45,10 @@ void removeFileWraper(wchar_t*);
 void removeFile(wchar_t*);//
 void renameFileWraper();
 void renameFile(wchar_t*,wchar_t*);
-void start1();//
-void start2(wchar_t*);///
+void openDefault();//
+void openFileWithProgramWraper(wchar_t*);
+void openFileWithProgram(wchar_t*,wchar_t*);///
+void run();
 int wNumberOfAparition(wchar_t*,wchar_t);
 int wLastAparition(wchar_t*,wchar_t);
 void back(wchar_t*);//

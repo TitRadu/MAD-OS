@@ -797,7 +797,7 @@ void renameFile(wchar_t* oldName,wchar_t* newName){
 
 }
 
-void start1(){
+void openDefault(){
     wchar_t program[MAX_PATH];
     printf("Program:");
     fgetws(program,MAX_PATH,stdin);
@@ -839,7 +839,7 @@ void start1(){
 
 }
 
-void start2(wchar_t* path){
+void openFileWithProgramWraper(wchar_t* path){
     wchar_t program[MAX_PATH];
     printf("Program:");
     fgetws(program,MAX_PATH,stdin);
@@ -847,7 +847,6 @@ void start2(wchar_t* path){
         program[wcslen(program)-1] = '\0';
 
     }
-
 
     if(wStringCheck(program) == 1){
         return;
@@ -859,13 +858,6 @@ void start2(wchar_t* path){
         return;
     }
 
-    if(pathType(program) == 0){
-        printf("You need a relative path!\n");
-        return;
-
-    }
-
-    int exeCheck = 0;
     int existCheck = 0;
     if((existCheck=wExist(path,program)) == 3){
         printf("Invalid argument!\n");
@@ -873,101 +865,140 @@ void start2(wchar_t* path){
 
     }
 
-    if(existCheck == 1){
-        if(wcscmp(program+wcslen(program)-4,L".exe") == 0){
-            exeCheck =1 ;
+    if(existCheck == 1 || existCheck == 2){
+        printf("First argument is a file(regular file or directory)!\n");
+        return;
+    }
 
-        }else{
+    wchar_t absolutePath[MAX_PATH];
+    absolutePath[0] = '\0';
+    wcscat_s(absolutePath,sizeof(absolutePath),path);
 
-            printf("First argument is a non-executable file!\n");
-            return;
-
-        }
+    wchar_t openFileRelativeName[MAX_PATH];
+    printf("FileName:");
+    fgetws(openFileRelativeName,MAX_PATH,stdin);
+    if(openFileRelativeName[wcslen(openFileRelativeName)-1] == '\n'){
+        openFileRelativeName[wcslen(openFileRelativeName)-1] = '\0';
 
     }
 
-    wchar_t args[MAX_PATH];
+    if(wStringCheck(openFileRelativeName) == 1){
+        return;
 
-    if(exeCheck == 0){
-        args[0] = '\0';
-        wcscat_s(args,sizeof(args),L"\"");
-        wcscat_s(args,sizeof(args),path);
+    }
 
-        wchar_t openFileRelativeName[MAX_PATH];
-        printf("FileName:");
-        fgetws(openFileRelativeName,MAX_PATH,stdin);
-        if(openFileRelativeName[wcslen(openFileRelativeName)-1] == '\n'){
-            openFileRelativeName[wcslen(openFileRelativeName)-1] = '\0';
+    if(pathType(openFileRelativeName) == 0){
+        printf("You need a relative path!\n");
+        return;
 
-        }
+    }
 
-        if(wStringCheck(openFileRelativeName) == 1){
+    wcscat_s(absolutePath,sizeof(absolutePath),openFileRelativeName);
+
+    if(wcslen(absolutePath) >= MAX_PATH -1){
+        printf("File name is too long!\n");
+        return;
+    }
+
+    if((existCheck=wExist(path,openFileRelativeName)) == 3){
+        printf("Invalid argument!\n");
+        return;
+
+    }
+
+    if(existCheck == 0){
+        printf("Second argument doesn't exist as file!\n");
+        return;
+
+    }
+
+    if(existCheck != 1){
+        printf("Second argument isn't a regular file!\n");
+        return;
+
+    }
+
+    openFileWithProgram(program,absolutePath);
+
+}
+void openFileWithProgram(wchar_t* program,wchar_t* absolutePath){
+    HINSTANCE shellCheck = 0;
+    if((shellCheck=ShellExecuteW(NULL,L"open",program,absolutePath,NULL,1)) <= (HINSTANCE)32){
+        if(shellCheck == (HINSTANCE)2){
+            printf("Program not found!\n");
             return;
 
         }
+        printf("OpenFileWithProgramShellExecuteError:%p!\n",shellCheck);
+        return;
 
-        if(pathType(openFileRelativeName) == 0){
-            printf("You need a relative path!\n");
+    }
+
+
+}
+
+void run(){
+    wchar_t executable[MAX_PATH];
+    printf("Executable:");
+    fgetws(executable,MAX_PATH,stdin);
+    if(executable[wcslen(executable)-1] == '\n'){
+        executable[wcslen(executable)-1] = '\0';
+
+    }
+
+
+    if(wStringCheck(executable) == 1){
+        return;
+
+    }
+
+    if(wcslen(executable) >= MAX_PATH -1){
+        printf("Executable name is too long!\n");
+        return;
+    }
+
+    if(pathType(executable) == 1){
+        printf("You need a absolute path!\n");
+        return;
+
+    }
+
+    int existCheck = 0;
+    if((existCheck=wExist(executable,L"")) == 3){
+        printf("Invalid argument!\n");
+        return;
+
+    }
+
+    if(existCheck == 2){
+        printf("The argument is a directory!\n\n");
+        return;
+
+    }
+
+    if(existCheck == 0){
+        printf("The argument doesn't exist as file!\n\n");
+
+    }
+
+    if(existCheck == 1){
+        if(wcscmp(executable+wcslen(executable)-4,L".exe") == 0){
+            wchar_t list[THIRTY];
+            printf("List of arguments:");_getws(list);
+            forkk(executable,list);
+
+
+        }else{
+
+            printf("First argument is a non-executable file!\n\n");
             return;
 
         }
-
-        wcscat_s(args,sizeof(args),openFileRelativeName);
-        wcscat_s(args,sizeof(args),L"\"");
-
-        if(wcslen(args) >= MAX_PATH -3){
-            printf("File name is too long!\n");
-            return;
-        }
-
-
-        int existCheck = 0;
-        if((existCheck=wExist(path,openFileRelativeName)) == 3){
-            printf("Invalid argument!\n");
-            return;
-
-        }
-
-        if(existCheck == 0){
-            printf("Second argument doesn't exist as file!\n");
-            return;
-
-        }
-
-        if(existCheck != 1){
-            printf("Second argument isn't a regular file!\n");
-            return;
-
-        }
-
-        wprintf(L"--%s--\n",args);
-        HINSTANCE shellCheck = 0;
-        if((shellCheck=ShellExecuteW(NULL,L"open",program,args,NULL,1)) <= (HINSTANCE)32){
-            if(shellCheck == (HINSTANCE)2){
-                printf("Program not found!\n");
-                return;
-
-            }
-            printf("Start2ShellExecuteError:%p!\n",shellCheck);
-            return;
-
-        }
-
-
-    }else{
-        wchar_t list[THIRTY];wchar_t executable[1+wcslen(path)+wcslen(program)];
-        printf("List of arguments:");_getws(list);
-        args[0] = '\0';
-        wcscat_s(args,sizeof(args),list);
-        executable[0] = '\0';
-        wcscat_s(executable,sizeof(executable),path);
-        wcscat_s(executable,sizeof(executable),program);
-        forkk(executable,args);
-
 
     }
 
 }
+
 
 int wNumberOfAparition(wchar_t* string,wchar_t c){
     int index = 0;
@@ -1106,7 +1137,7 @@ void openPath(wchar_t *absolutePath){
     }
 
     if(pathType(absolutePath) == 1){
-        printf("You need a absolute path!\n");
+    printf("You need a absolute path!\n");
         return;
 
     }
