@@ -119,6 +119,21 @@ int wStringCheck(wchar_t* string){
 
 }
 
+wchar_t* wStringWithoutLast(wchar_t* string,wchar_t c){
+    int index = 0;
+    index = wLastAparition(string,c);
+
+    if(index != -1){
+        string[index] = '\0';
+    }
+    else{
+        string = NULL;
+
+    }
+
+    return string;
+}
+
 void forkk(wchar_t *application,wchar_t *args){
     STARTUPINFOW s;
     PROCESS_INFORMATION p;
@@ -132,6 +147,11 @@ void forkk(wchar_t *application,wchar_t *args){
     wcscat_s(commandLine,sizeof(commandLine),L"\"");
     wcscat_s(commandLine,sizeof(commandLine),L" ");
     wcscat_s(commandLine,sizeof(commandLine),args);
+
+    wchar_t applicationCopy[MAX_PATH];
+    wcscpy_s(applicationCopy,sizeof(applicationCopy),application);
+    wchar_t* applicationDirectory = wStringWithoutLast(applicationCopy,'\\');
+
     BOOL createProccesCheck = FALSE;
     SetConsoleCtrlHandler(NULL,FALSE);
 createProccesCheck = CreateProcessW(
@@ -142,7 +162,7 @@ NULL,
 FALSE,
 0,
 NULL,
-NULL,
+applicationDirectory,
 &s,
 &p
     );

@@ -29,6 +29,7 @@ int heapFreeChecker(HANDLE,DWORD,LPVOID);
 int wExist(wchar_t*,wchar_t*);
 int wAllSpaces(wchar_t*);
 int wStringCheck(wchar_t*);
+wchar_t* wStringWithoutLast(wchar_t*,wchar_t);
 void forkk(wchar_t*,wchar_t*);
 void newPath(wchar_t*);
 void changePath(wchar_t*);

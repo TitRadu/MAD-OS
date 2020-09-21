@@ -2,7 +2,7 @@
 1600615281 source:c:\users\radut\desktop\aplicatii in c\aplicatii\mad os command line\command line\cline.c
 	"mados.h"
 
-1600615229 c:\users\radut\desktop\aplicatii in c\aplicatii\mad os command line\command line\mados.h
+1600700402 c:\users\radut\desktop\aplicatii in c\aplicatii\mad os command line\command line\mados.h
 	<stdio.h>
 	<stdlib.h>
 	<Windows.h>
@@ -14,6 +14,6 @@
 	<shlwapi.h>
 	<errno.h>
 
-1600634975 source:c:\users\radut\desktop\aplicatii in c\aplicatii\mad os command line\command line\mados.c
+1600706265 source:c:\users\radut\desktop\aplicatii in c\aplicatii\mad os command line\command line\mados.c
 	"mados.h"
 
