@@ -106,13 +106,7 @@ int main(){
 
         }
 
-        if(strcmp(command,"nwpath") == 0){
-            newPath(path);
-            continue;
-
-        }
-
-        if(strcmp(command,"chpath") == 0){
+        if(strcmp(command,"cp") == 0){
             changePath(path);
             continue;
 

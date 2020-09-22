@@ -199,86 +199,38 @@ applicationDirectory,
 
 }
 
-void newPath(wchar_t *oldPath){
-    wchar_t newPath[MAX_PATH];
-    fgetws(newPath,MAX_PATH,stdin);
-    if(newPath[wcslen(newPath)-1] == '\n'){
-        newPath[wcslen(newPath)-1] = '\0';
+void changePath(wchar_t *path){
+    wchar_t changePath[MAX_PATH];
+    fgetws(changePath,MAX_PATH,stdin);
+    if(changePath[wcslen(changePath)-1] == '\n'){
+        changePath[wcslen(changePath)-1] = '\0';
     }
 
-    if(wStringCheck(newPath) == 1){
+    if(wStringCheck(changePath) == 1){
         return;
 
     }
 
-    if(pathType(newPath) == 1){
-        printf("You need a absolute path!\n");
-        return;
 
-    }
+    wchar_t absolutePath[MAX_PATH];
 
-    if(wcslen(newPath) > 247){
-        printf("File name is too long!\n");
-        return;
-
-    }
-
-    int pathCheck = 0;
-    if((pathCheck=wExist(newPath,L"")) == 0){
-        printf("This path doesn't exist as file!\n");
-        return;
-
-    }
-
-    if(pathCheck == 3){
-        printf("Invalid argument!\n");
-        return;
-
-    }
-
-    if(pathCheck != 2){
-        printf("This path isn't a directory!\n");
-        return;
-
-    }
-
-    if(wcslen(newPath) == 3){
+    if(pathType(changePath) == 0){
+        wcscpy_s(absolutePath,sizeof(absolutePath),changePath);
 
     }else{
-        wcscat_s(newPath,sizeof(newPath),L"\\");
+        wcscpy_s(absolutePath,sizeof(absolutePath),path);
+        wcscat_s(absolutePath,sizeof(absolutePath),changePath);
 
     }
 
-    wcscpy(oldPath,newPath);
-
-}
-
-void changePath(wchar_t *path){
-    wchar_t relativeChangePath[MAX_PATH];
-    fgetws(relativeChangePath,MAX_PATH,stdin);
-    if(relativeChangePath[wcslen(relativeChangePath)-1] == '\n'){
-        relativeChangePath[wcslen(relativeChangePath)-1] = '\0';
-    }
-
-    if(wStringCheck(relativeChangePath) == 1){
-        return;
-
-    }
-
-    if(pathType(relativeChangePath) == 0){
-        printf("You need a relative path!\n");
-        return;
-
-    }
-
-    if((wcslen(path)+wcslen(relativeChangePath)) > 247){
+    if(wcslen(absolutePath) > 247){
         printf("File name is too long!\n");
         return;
 
     }
 
     int existCheck = 0;
-    if((existCheck=wExist(path,relativeChangePath)) == 0){
+    if((existCheck=wExist(absolutePath,L"")) == 0){
         printf("This path doesn't exist as file!\n");
         return;
 
@@ -297,8 +249,11 @@ void changePath(wchar_t *path){
     }
 
 
-    wcscat_s(path,MAX_PATH*sizeof(wchar_t),relativeChangePath);
-    wcscat_s(path,MAX_PATH*sizeof(wchar_t),L"\\");
+    wcscpy_s(path,MAX_PATH*sizeof(wchar_t),absolutePath);
+    if(wcslen(path) != 3){
+        wcscat_s(path,MAX_PATH*sizeof(wchar_t),L"\\");
+
+    }
 
 }
 
