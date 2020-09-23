@@ -129,19 +129,19 @@ int main(){
         }
 
         if(strcmp(command,"cdir") == 0){
-            createDirectoryWraper(path);
+            fileOperationWraper(path,command);
             continue;
 
         }
 
         if(strcmp(command,"rdir") == 0){
-            removeDirectoryWraper(path);
+            fileOperationWraper(path,command);
             continue;
 
         }
 
         if(strcmp(command,"Rdir") == 0){
-            removeDirectoryRecursiveWraper(path);
+            fileOperationWraper(path,command);
             continue;
 
         }
@@ -153,13 +153,13 @@ int main(){
         }
 
         if(strcmp(command,"cfile") == 0){
-            createFileWraper(path);
+            fileOperationWraper(path,command);
             continue;
 
         }
 
         if(strcmp(command,"rfile") == 0){
-            removeFileWraper(path);
+            fileOperationWraper(path,command);
             continue;
 
         }

@@ -276,33 +276,65 @@ void parse(wchar_t* path,wchar_t control){
 
 }
 
-void createDirectoryWraper(wchar_t* path){
-    wchar_t directoryShortPath[PATH];
-    fgetws(directoryShortPath,PATH,stdin);
-    if(directoryShortPath[wcslen(directoryShortPath)-1] == '\n'){
-        directoryShortPath[wcslen(directoryShortPath)-1] = '\0';
-    }
+void chooseFileOperation(wchar_t* absolutePath,char* control){
+    if(strcmp(control,"cdir") == 0){
+            createDirectory(absolutePath);
+            return;
 
-    if(wStringCheck(directoryShortPath) == 1){
-        return;
+        }
 
-    }
+    if(strcmp(control,"rdir") == 0){
+            removeDirectory(absolutePath);
+            return;
 
-    if(pathType(directoryShortPath) == 0){
-        printf("You need a relative path!\n");
-        return;
+        }
 
-    }
+    if(strcmp(control,"Rdir") == 0){
+            removeDirectoryRecursive(absolutePath);
+            return;
 
-    wchar_t fullPath[wcslen(path)+wcslen(directoryShortPath)+1];
-    fullPath[0] = '\0';
-    wcscat_s(fullPath,sizeof(fullPath),path);
-    wcscat_s(fullPath,sizeof(fullPath),directoryShortPath);
+        }
 
-    createDirectory(fullPath);
+    if(strcmp(control,"cfile") == 0){
+            createFile(absolutePath);
+            return;
+
+        }
+
+    if(strcmp(control,"rfile") == 0){
+            removeFile(absolutePath);
+            return;
+
+        }
 
 }
 
+void fileOperationWraper(wchar_t* path, char* control){
+    wchar_t filePath[MAX_PATH];
+    fgetws(filePath,MAX_PATH,stdin);
+    if(filePath[wcslen(filePath)-1] == '\n'){
+        filePath[wcslen(filePath)-1] = '\0';
+    }
+
+    if(wStringCheck(filePath) == 1){
+        return;
+
+    }
+
+    wchar_t absolutePath[MAX_PATH];
+
+    if(pathType(filePath) == ABSOLUTE_PATH){
+        wcscpy_s(absolutePath,sizeof(absolutePath),filePath);
+
+    }else{
+        wcscpy_s(absolutePath,sizeof(absolutePath),path);
+        wcscat_s(absolutePath,sizeof(absolutePath),filePath);
+
+    }
+
+    chooseFileOperation(absolutePath,control);
+
+}
 
 void createDirectory(wchar_t* absolutePath){
     if(wcslen(absolutePath) > 247){
@@ -350,34 +382,6 @@ void createDirectory(wchar_t* absolutePath){
     }
 
 
-
-}
-
-
-void removeDirectoryWraper(wchar_t* path){
-    wchar_t directoryShortPath[MAX_PATH];
-    fgetws(directoryShortPath,MAX_PATH,stdin);
-    if(directoryShortPath[wcslen(directoryShortPath)-1] == '\n'){
-        directoryShortPath[wcslen(directoryShortPath)-1] = '\0';
-    }
-
-     if(wStringCheck(directoryShortPath) == 1){
-            return;
-
-    }
-
-    if(pathType(directoryShortPath) == 0){
-        printf("You need a relative path!\n");
-        return;
-
-    }
-
-    wchar_t fullPath[wcslen(path)+wcslen(directoryShortPath)+1];
-    fullPath[0] = '\0';
-    wcscat_s(fullPath,sizeof(fullPath),path);
-    wcscat_s(fullPath,sizeof(fullPath),directoryShortPath);
-
-    removeDirectory(fullPath);
 
 }
 
@@ -435,33 +439,6 @@ int removeDirectory(wchar_t* absolutePath){
     return 0;
 }
 
-void removeDirectoryRecursiveWraper(wchar_t* path){
-    wchar_t name[MAX_PATH];
-    fgetws(name,MAX_PATH,stdin);
-    if(name[wcslen(name)-1] == '\n'){
-        name[wcslen(name)-1] = '\0';
-    }
-
-    if(wStringCheck(name) == 1){
-        return;
-
-    }
-
-    if(pathType(name) == 0){
-        printf("You need a relative path!\n");
-        return;
-
-    }
-
-    wchar_t removeDirectoryName[wcslen(path)+wcslen(name)+1];
-    removeDirectoryName[0] = '\0';
-    wcscat_s(removeDirectoryName,sizeof(removeDirectoryName),path);
-    wcscat_s(removeDirectoryName,sizeof(removeDirectoryName),name);
-
-    removeDirectoryRecursive(removeDirectoryName);
-
-}
-
 void removeDirectoryRecursive(wchar_t* absolutePath){
     if(wcslen(absolutePath) > 247){
         printf("File name is too long!\n");
@@ -496,34 +473,6 @@ void removeDirectoryRecursive(wchar_t* absolutePath){
         printf("The source directory was deleted successfully!\n");
 
     }
-
-}
-
-void createFileWraper(wchar_t* path){
-    wchar_t name[MAX_PATH];
-    fgetws(name,MAX_PATH,stdin);
-    if(name[wcslen(name)-1] == '\n'){
-        name[wcslen(name)-1] = '\0';
-
-    }
-
-    if(wStringCheck(name) == 1){
-        return;
-
-    }
-
-    if(pathType(name) == 0){
-        printf("You need a relative path!\n");
-        return;
-
-    }
-
-    wchar_t fullPath[wcslen(path)+wcslen(name)+1+10];
-    fullPath[0] = '\0';
-    wcscat_s(fullPath,sizeof(fullPath),path);
-    wcscat_s(fullPath,sizeof(fullPath),name);
-
-    createFile(fullPath);
 
 }
 
@@ -569,34 +518,6 @@ void createFile(wchar_t* absolutePath){
         return;
 
     }
-
-}
-
-void removeFileWraper(wchar_t* path){
-    wchar_t name[MAX_PATH];
-    fgetws(name,MAX_PATH,stdin);
-    if(name[wcslen(name)-1] == '\n'){
-        name[wcslen(name)-1] = '\0';
-
-    }
-
-    if(wStringCheck(name) == 1){
-        return;
-
-    }
-
-    if(pathType(name) == 0){
-        printf("You need a relative path!\n");
-        return;
-
-    }
-
-    wchar_t fullPath[wcslen(path)+wcslen(name)+1];
-    fullPath[0] = '\0';
-    wcscat_s(fullPath,sizeof(fullPath),path);
-    wcscat_s(fullPath,sizeof(fullPath),name);
-
-    removeFile(fullPath);
 
 }
 

@@ -4,6 +4,8 @@
 #define OH 100
 #define PATH 1024
 #define BLOCK 4096
+#define ABSOLUTE_PATH 0
+#define RELATIVE_PATH 1
 #include <stdio.h>
 #include <stdlib.h>
 #include <Windows.h>
