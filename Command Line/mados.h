@@ -48,7 +48,7 @@ void renameFile(wchar_t*,wchar_t*);
 void openDefault();//
 void openFileWithProgramWraper(wchar_t*);
 void openFileWithProgram(wchar_t*,wchar_t*);///
-void run();
+void run(wchar_t*);
 int wNumberOfAparition(wchar_t*,wchar_t);
 int wLastAparition(wchar_t*,wchar_t);
 void back(wchar_t*);//
@@ -57,8 +57,8 @@ void clearr();//
 void newCline();//
 void ipc();//
 void ipca();//
-void openPathWraper();
-void openPath(wchar_t*);//
+void openPathWraper(wchar_t*);
+void openPath(wchar_t*,wchar_t*);//
 void sort();//
 void help();//
 void copyFile(wchar_t*,wchar_t*);

@@ -2,7 +2,7 @@
 
 int main(){
     SetConsoleCtrlHandler(NULL,TRUE);
-    HANDLE processHeap = NULL;
+    extern HANDLE processHeap;
     if((processHeap = getProcessHeapChecker()) == NULL){
         return 1;
 
@@ -177,13 +177,13 @@ int main(){
         }
 
         if(strcmp(command,"run") == 0){
-            run();
+            run(path);
             continue;
 
         }
 
         if(strcmp(command,"openP") == 0){
-            openPathWraper();
+            openPathWraper(path);
             continue;
 
         }

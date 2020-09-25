@@ -36,6 +36,7 @@ void wStringInQuatationMarks(wchar_t* string){
 
 }
 
+HANDLE processHeap = NULL;
 HANDLE getProcessHeapChecker(){
     HANDLE heap = NULL;
     DWORD error = 0;
@@ -277,12 +278,6 @@ void parse(wchar_t* path,wchar_t control){
 }
 
 wchar_t* preparePathDependingOnType(wchar_t* path,wchar_t* checkPath){
-    HANDLE processHeap = NULL;
-    if((processHeap = getProcessHeapChecker()) == NULL){
-        return NULL;
-
-    }
-
     wchar_t* absolutePath;
     if((absolutePath = (wchar_t*)HeapAlloc(processHeap,HEAP_ZERO_MEMORY,sizeof(wchar_t)*MAX_PATH)) == NULL){
         printf("PreparePathDepedingOnTypeHeapAllocError!\n");
@@ -337,12 +332,6 @@ void chooseFileOperation(wchar_t* absolutePath,char* control){
 }
 
 void fileOperationWraper(wchar_t* path, char* control){
-    HANDLE processHeap = NULL;
-    if((processHeap = getProcessHeapChecker()) == NULL){
-        return;
-
-    }
-
     wchar_t filePath[MAX_PATH];
     fgetws(filePath,MAX_PATH,stdin);
     if(filePath[wcslen(filePath)-1] == '\n'){
@@ -594,12 +583,6 @@ void removeFile(wchar_t* absolutePath){
 }
 
 void renameFileWraper(wchar_t* path){
-    HANDLE processHeap = NULL;
-    if((processHeap = getProcessHeapChecker()) == NULL){
-        return;
-
-    }
-
     wchar_t oldName[MAX_PATH];
     printf("OldName:");
     fgetws(oldName,MAX_PATH,stdin);
@@ -777,7 +760,7 @@ void openDefault(){
         printf("Start1ShellExecuteError:%p!\n",shellCheck);
         return;
 
-        }
+    }
 
 }
 
@@ -801,7 +784,7 @@ void openFileWithProgramWraper(wchar_t* path){
     }
 
     int existCheck = 0;
-    if((existCheck=wExist(path,program)) == 3){
+    if((existCheck=wExist(program,L"")) == 3){
         printf("Invalid argument!\n");
         return;
 
@@ -812,37 +795,31 @@ void openFileWithProgramWraper(wchar_t* path){
         return;
     }
 
-    wchar_t absolutePath[MAX_PATH];
-    absolutePath[0] = '\0';
-    wcscat_s(absolutePath,sizeof(absolutePath),path);
-
-    wchar_t openFileRelativeName[MAX_PATH];
+    wchar_t openFileName[MAX_PATH];
     printf("FileName:");
-    fgetws(openFileRelativeName,MAX_PATH,stdin);
-    if(openFileRelativeName[wcslen(openFileRelativeName)-1] == '\n'){
-        openFileRelativeName[wcslen(openFileRelativeName)-1] = '\0';
+    fgetws(openFileName,MAX_PATH,stdin);
+    if(openFileName[wcslen(openFileName)-1] == '\n'){
+        openFileName[wcslen(openFileName)-1] = '\0';
 
     }
 
-    if(wStringCheck(openFileRelativeName) == 1){
+    if(wStringCheck(openFileName) == 1){
         return;
 
     }
 
-    if(pathType(openFileRelativeName) == 0){
-        printf("You need a relative path!\n");
+    wchar_t* absolutePath;
+    if((absolutePath = preparePathDependingOnType(path,openFileName)) == NULL){
         return;
 
     }
-
-    wcscat_s(absolutePath,sizeof(absolutePath),openFileRelativeName);
 
     if(wcslen(absolutePath) >= MAX_PATH -1){
         printf("File name is too long!\n");
         return;
     }
 
-    if((existCheck=wExist(path,openFileRelativeName)) == 3){
+    if((existCheck=wExist(absolutePath,L"")) == 3){
         printf("Invalid argument!\n");
         return;
 
@@ -862,7 +839,13 @@ void openFileWithProgramWraper(wchar_t* path){
 
     openFileWithProgram(program,absolutePath);
 
+    if(heapFreeChecker(processHeap,0,absolutePath) == FALSE){
+        return;
+
+    }
+
 }
+
 void openFileWithProgram(wchar_t* program,wchar_t* absolutePath){
     HINSTANCE shellCheck = 0;
     if((shellCheck=ShellExecuteW(NULL,L"open",program,absolutePath,NULL,1)) <= (HINSTANCE)32){
@@ -879,7 +862,7 @@ void openFileWithProgram(wchar_t* program,wchar_t* absolutePath){
 
 }
 
-void run(){
+void run(wchar_t* path){
     wchar_t executable[MAX_PATH];
     printf("Executable:");
     fgetws(executable,MAX_PATH,stdin);
@@ -894,19 +877,19 @@ void run(){
 
     }
 
-    if(wcslen(executable) >= MAX_PATH -1){
+    wchar_t* executableAbsolutePath;
+    if((executableAbsolutePath = preparePathDependingOnType(path,executable)) == NULL){
+        return;
+
+    }
+
+    if(wcslen(executableAbsolutePath) >= MAX_PATH -1){
         printf("Executable name is too long!\n");
         return;
     }
 
-    if(pathType(executable) == 1){
-        printf("You need a absolute path!\n");
-        return;
-
-    }
-
     int existCheck = 0;
-    if((existCheck=wExist(executable,L"")) == 3){
+    if((existCheck=wExist(executableAbsolutePath,L"")) == 3){
         printf("Invalid argument!\n");
         return;
 
@@ -927,7 +910,7 @@ void run(){
         if(wcscmp(executable+wcslen(executable)-4,L".exe") == 0){
             wchar_t list[THIRTY];
             printf("List of arguments:");_getws(list);
-            forkk(executable,list);
+            forkk(executableAbsolutePath,list);
 
 
         }else{
@@ -939,8 +922,12 @@ void run(){
 
     }
 
-}
+    if(heapFreeChecker(processHeap,0,executableAbsolutePath) == FALSE){
+        return;
 
+    }
+
+}
 
 int wNumberOfAparition(wchar_t* string,wchar_t c){
     int index = 0;
@@ -1060,26 +1047,26 @@ void ipca(){
 
 }
 
-void openPathWraper(){
-    wchar_t openFileAbsoluteName[MAX_PATH];
-    fgetws(openFileAbsoluteName,MAX_PATH,stdin);
-    if(openFileAbsoluteName[wcslen(openFileAbsoluteName)-1] == '\n'){
-        openFileAbsoluteName[wcslen(openFileAbsoluteName)-1] = '\0';
+void openPathWraper(wchar_t* path){
+    wchar_t openFileName[MAX_PATH];
+    fgetws(openFileName,MAX_PATH,stdin);
+    if(openFileName[wcslen(openFileName)-1] == '\n'){
+        openFileName[wcslen(openFileName)-1] = '\0';
 
     }
 
-    openPath(openFileAbsoluteName);
+    openPath(path,openFileName);
 
 }
 
-void openPath(wchar_t *absolutePath){
-    if(wStringCheck(absolutePath) == 1){
+void openPath(wchar_t* path, wchar_t *openFileName){
+    if(wStringCheck(openFileName) == 1){
         return;
 
     }
 
-    if(pathType(absolutePath) == 1){
-    printf("You need a absolute path!\n");
+    wchar_t* absolutePath;
+    if((absolutePath = preparePathDependingOnType(path,openFileName)) == NULL){
         return;
 
     }
@@ -1112,6 +1099,11 @@ void openPath(wchar_t *absolutePath){
         }
 
         printf("OpenPathShellExecuteError:%p!\n",shellCheck);
+        return;
+
+    }
+
+    if(heapFreeChecker(processHeap,0,absolutePath) == FALSE){
         return;
 
     }
@@ -1379,12 +1371,6 @@ void backup(wchar_t* absolutePath,wchar_t* name){
         return;
 
    }
-
-    HANDLE processHeap = NULL;
-    if((processHeap = getProcessHeapChecker()) == NULL){
-        return;
-
-    }
 
     int existCheck = 0;
     if((existCheck=wExist(absolutePath,L"")) == 0){
@@ -1914,12 +1900,6 @@ void addUserWraper(){
 }
 
 void addUser(wchar_t* userName,wchar_t* userPassword){
-    HANDLE processHeap = NULL;
-    if((processHeap = getProcessHeapChecker()) == NULL){
-        return;
-
-    }
-
     USER_INFO_1 content;
     LOCALGROUP_MEMBERS_INFO_3 account;
 
@@ -2721,12 +2701,6 @@ void shutDown(wchar_t* mode){
 }
 
 command* addCommand(command* root,char* newCommandName){
-    HANDLE processHeap = NULL;
-    if((processHeap = getProcessHeapChecker()) == NULL){
-        return NULL;
-
-    }
-
     command* newCommand;
     if((newCommand = (command*)HeapAlloc(processHeap,HEAP_ZERO_MEMORY,sizeof(command))) == NULL){
             printf("AddCommandHeapAllocError!\n");
