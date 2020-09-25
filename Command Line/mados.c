@@ -276,6 +276,33 @@ void parse(wchar_t* path,wchar_t control){
 
 }
 
+wchar_t* preparePathDependingOnType(wchar_t* path,wchar_t* checkPath){
+    HANDLE processHeap = NULL;
+    if((processHeap = getProcessHeapChecker()) == NULL){
+        return NULL;
+
+    }
+
+    wchar_t* absolutePath;
+    if((absolutePath = (wchar_t*)HeapAlloc(processHeap,HEAP_ZERO_MEMORY,sizeof(wchar_t)*MAX_PATH)) == NULL){
+        printf("PreparePathDepedingOnTypeHeapAllocError!\n");
+        return NULL;
+
+    }
+
+    if(pathType(checkPath) == ABSOLUTE_PATH){
+        wcscpy_s(absolutePath,sizeof(wchar_t)*MAX_PATH,checkPath);
+
+    }else{
+        wcscpy_s(absolutePath,sizeof(wchar_t)*MAX_PATH,path);
+        wcscat_s(absolutePath,sizeof(wchar_t)*MAX_PATH,checkPath);
+
+    }
+
+    return absolutePath;
+
+}
+
 void chooseFileOperation(wchar_t* absolutePath,char* control){
     if(strcmp(control,"cdir") == 0){
             createDirectory(absolutePath);
@@ -310,6 +337,12 @@ void chooseFileOperation(wchar_t* absolutePath,char* control){
 }
 
 void fileOperationWraper(wchar_t* path, char* control){
+    HANDLE processHeap = NULL;
+    if((processHeap = getProcessHeapChecker()) == NULL){
+        return;
+
+    }
+
     wchar_t filePath[MAX_PATH];
     fgetws(filePath,MAX_PATH,stdin);
     if(filePath[wcslen(filePath)-1] == '\n'){
@@ -321,18 +354,18 @@ void fileOperationWraper(wchar_t* path, char* control){
 
     }
 
-    wchar_t absolutePath[MAX_PATH];
-
-    if(pathType(filePath) == ABSOLUTE_PATH){
-        wcscpy_s(absolutePath,sizeof(absolutePath),filePath);
-
-    }else{
-        wcscpy_s(absolutePath,sizeof(absolutePath),path);
-        wcscat_s(absolutePath,sizeof(absolutePath),filePath);
+    wchar_t* absolutePath;
+    if((absolutePath = preparePathDependingOnType(path,filePath)) == NULL){
+        return;
 
     }
 
     chooseFileOperation(absolutePath,control);
+
+    if(heapFreeChecker(processHeap,0,absolutePath) == FALSE){
+        return;
+
+    }
 
 }
 
@@ -560,7 +593,13 @@ void removeFile(wchar_t* absolutePath){
 
 }
 
-void renameFileWraper(){
+void renameFileWraper(wchar_t* path){
+    HANDLE processHeap = NULL;
+    if((processHeap = getProcessHeapChecker()) == NULL){
+        return;
+
+    }
+
     wchar_t oldName[MAX_PATH];
     printf("OldName:");
     fgetws(oldName,MAX_PATH,stdin);
@@ -574,21 +613,21 @@ void renameFileWraper(){
 
     }
 
-    if(pathType(oldName) == 1){
-        printf("You need a absolute path!\n");
+    wchar_t* absoluteOldPath;
+    if((absoluteOldPath = preparePathDependingOnType(path,oldName)) == NULL){
         return;
 
     }
 
-    if(wcslen(oldName) >= MAX_PATH -1){
+    if(wcslen(absoluteOldPath) >= MAX_PATH -1){
         printf("File name is too long!\n");
         return;
 
     }
 
     int existCheck = 0;
-    if((existCheck=wExist(oldName,L"")) == 0){
-        printf("OldName doesn't exist as file!\n");
+    if((existCheck=wExist(absoluteOldPath,L"")) == 0){
+        printf("Old name doesn't exist as file!\n");
         return;
 
     }
@@ -599,7 +638,7 @@ void renameFileWraper(){
 
     }
 
-    wchar_t newName[PATH];
+    wchar_t newName[MAX_PATH];
     printf("NewName:");
     fgetws(newName,MAX_PATH,stdin);
     if(newName[wcslen(newName)-1] == '\n'){
@@ -611,22 +650,21 @@ void renameFileWraper(){
         return;
     }
 
-    if(pathType(newName) == 1){
-        printf("You need a absolute path!\n");
+    wchar_t* absoluteNewPath;
+    if((absoluteNewPath = preparePathDependingOnType(path,newName)) == NULL){
         return;
 
     }
 
-
-    if(wcslen(newName) >= MAX_PATH -1){
+    if(wcslen(absoluteNewPath) >= MAX_PATH -1){
         printf("File name is too long!\n");
         return;
 
     }
 
-    existCheck = wExist(newName,L"");
+    existCheck = wExist(absoluteNewPath,L"");
     if(existCheck == 1 || existCheck == 2){
-        printf("The NewName already exists!\n");
+        printf("The new name already exists!\n");
         return;
 
     }
@@ -637,8 +675,16 @@ void renameFileWraper(){
 
     }
 
-    renameFile(oldName,newName);
-    return;
+    renameFile(absoluteOldPath,absoluteNewPath);
+
+    if(heapFreeChecker(processHeap,0,absoluteOldPath) == FALSE){
+        return;
+
+    }
+    if(heapFreeChecker(processHeap,0,absoluteNewPath) == FALSE){
+        return;
+
+    }
 
 }
 
@@ -660,13 +706,13 @@ void renameFile(wchar_t* oldName,wchar_t* newName){
         }
 
         if(error == ERROR_FILE_NOT_FOUND){
-            printf("OldName doesn't exist as file!\n");
+            printf("Old name doesn't exist as file!\n");
             return;
 
         }
 
         if(error == ERROR_ALREADY_EXISTS){
-            printf("The NewName already exists!\n");
+            printf("The new name already exists!\n");
             return;
 
         }

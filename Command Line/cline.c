@@ -147,7 +147,7 @@ int main(){
         }
 
         if(strcmp(command,"ren") == 0){
-            renameFileWraper();
+            renameFileWraper(path);
             continue;
 
         }
