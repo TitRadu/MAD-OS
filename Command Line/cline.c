@@ -225,13 +225,13 @@ int main(){
         }
 
         if(strcmp(command,"copyD") == 0){
-            copyDirectoryWraper("copy");
+            copyDirectoryWraper(path,"copy");
             continue;
 
         }
 
         if(strcmp(command,"cutD") == 0){
-            copyDirectoryWraper("cut");
+            copyDirectoryWraper(path,"cut");
             continue;
 
         }

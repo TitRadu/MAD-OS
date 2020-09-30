@@ -135,15 +135,31 @@ wchar_t* wStringWithoutLast(wchar_t* string,wchar_t c){
     return string;
 }
 
+wchar_t* wStringLastPart(wchar_t* string,wchar_t c){
+    int index = 0;
+    index = wLastAparition(string,c);
+
+    if(index != -1){
+        wcscpy_s(string,sizeof(wchar_t)*MAX_PATH,string+index);
+    }
+    else{
+        string = NULL;
+
+    }
+
+    return string;
+
+}
+
 void forkk(wchar_t *application,wchar_t *args){
     STARTUPINFOW s;
     PROCESS_INFORMATION p;
     ZeroMemory(&s,sizeof(STARTUPINFOW));
     s.cb = sizeof(STARTUPINFOW);
     ZeroMemory(&p,sizeof(PROCESS_INFORMATION));
-    wchar_t commandLine[PATH];
-    commandLine[0] = '\0';
-    wcscat_s(commandLine,sizeof(commandLine),L"\"");
+
+    wchar_t commandLine[MAX_PATH];
+    wcscpy_s(commandLine,sizeof(commandLine),L"\"");
     wcscat_s(commandLine,sizeof(commandLine),application);
     wcscat_s(commandLine,sizeof(commandLine),L"\"");
     wcscat_s(commandLine,sizeof(commandLine),L" ");
@@ -171,6 +187,12 @@ applicationDirectory,
     DWORD error = 0;
     if(createProccesCheck == FALSE){
         error = GetLastError();
+        if(error == 740){
+            printf("You don't have permission to do this operation.Please run command line as administrator!\n\n");
+            return;
+
+        }
+
         printf("ForkkCreateProcessError:%lu\n",error);
         ExitProcess(error);
 
@@ -908,9 +930,14 @@ void run(wchar_t* path){
 
     if(existCheck == 1){
         if(wcscmp(executable+wcslen(executable)-4,L".exe") == 0){
-            wchar_t list[THIRTY];
-            printf("List of arguments:");_getws(list);
-            forkk(executableAbsolutePath,list);
+            wchar_t argumentList[MAX_PATH];
+            printf("List of arguments:");
+            fgetws(argumentList,MAX_PATH,stdin);
+            if(argumentList[wcslen(argumentList)-1] == '\n'){
+                argumentList[wcslen(argumentList)-1] = '\0';
+
+            }
+            forkk(executableAbsolutePath,argumentList);
 
 
         }else{
@@ -1215,7 +1242,7 @@ void displayTime(){
 
 }
 
-void copyDirectoryWraper(char* control){
+void copyDirectoryWraper(wchar_t* path,char* control){
     wchar_t sourcePath[MAX_PATH];
     printf("SourceDirectory:");
     fgetws(sourcePath,MAX_PATH,stdin);
@@ -1229,20 +1256,20 @@ void copyDirectoryWraper(char* control){
 
     }
 
-    if(pathType(sourcePath) == 1){
-        printf("You need a absolute path!\n");
+    wchar_t* absoluteSourcePath;
+    if((absoluteSourcePath = preparePathDependingOnType(path,sourcePath)) == NULL){
         return;
 
     }
 
-    if(wcslen(sourcePath) > 247){
+    if(wcslen(absoluteSourcePath) > 247){
         printf("File name is too long!\n");
         return;
 
    }
 
     int existCheck = 0;
-    if((existCheck=wExist(sourcePath,L"")) == 3){
+    if((existCheck=wExist(absoluteSourcePath,L"")) == 3){
         printf("Invalid argument!\n");
         return;
 
@@ -1274,19 +1301,19 @@ void copyDirectoryWraper(char* control){
 
     }
 
-    if(pathType(destinationPath) == 1){
-        printf("You need a absolute path!\n\n");
+    wchar_t* absoluteDestinationPath;
+    if((absoluteDestinationPath = preparePathDependingOnType(path,destinationPath)) == NULL){
         return;
 
     }
 
-    if(wcslen(destinationPath) > 247){
+    if(wcslen(absoluteDestinationPath) > 247){
         printf("File name is too long!\n\n");
         return;
 
    }
 
-    if((existCheck=wExist(destinationPath,L"")) == 3){
+    if((existCheck=wExist(absoluteDestinationPath,L"")) == 3){
         printf("Invalid argument!\n");
         return;
 
@@ -1298,10 +1325,20 @@ void copyDirectoryWraper(char* control){
 
     }
 
-    copyDirectory(sourcePath,destinationPath);
+    copyDirectory(absoluteSourcePath,absoluteDestinationPath);
 
     if(strcmp(control,"cut") == 0){
-        removeDirectoryRecursive(sourcePath);
+        removeDirectoryRecursive(absoluteSourcePath);
+
+    }
+
+    if(heapFreeChecker(processHeap,0,absoluteSourcePath) == FALSE){
+        return;
+
+    }
+
+    if(heapFreeChecker(processHeap,0,absoluteDestinationPath) == FALSE){
+        return;
 
     }
 
@@ -1337,40 +1374,44 @@ void copyDirectory(wchar_t* sourcePath,wchar_t* destinationPath){
 }
 
 void backupWraper(wchar_t* path){
-    wchar_t backUpFileRelativeName[MAX_PATH];
+    wchar_t backUpFileName[MAX_PATH];
     printf("File to backup:");
-    fgetws(backUpFileRelativeName,MAX_PATH,stdin);
-    if(backUpFileRelativeName[wcslen(backUpFileRelativeName)-1] == '\n'){
-        backUpFileRelativeName[wcslen(backUpFileRelativeName)-1] = '\0';
+    fgetws(backUpFileName,MAX_PATH,stdin);
+    if(backUpFileName[wcslen(backUpFileName)-1] == '\n'){
+        backUpFileName[wcslen(backUpFileName)-1] = '\0';
 
     }
 
-    if(wStringCheck(backUpFileRelativeName) == 1){
+    if(wStringCheck(backUpFileName) == 1){
         return;
 
     }
 
-    if(pathType(backUpFileRelativeName) == 0){
-        printf("You need a relative path!\n\n");
+    wchar_t* absolutePath;
+    if((absolutePath = preparePathDependingOnType(path,backUpFileName)) == NULL){
         return;
 
     }
 
-    wchar_t fullPath[MAX_PATH];
-    fullPath[0] = '\0';
-    wcscat_s(fullPath,sizeof(fullPath),path);
-    wcscat_s(fullPath,sizeof(fullPath),backUpFileRelativeName);
+    backup(absolutePath);
 
-    backup(fullPath,backUpFileRelativeName);
+    if(heapFreeChecker(processHeap,0,absolutePath) == FALSE){
+        return;
+
+    }
 
 }
 
-void backup(wchar_t* absolutePath,wchar_t* name){
+void backup(wchar_t* absolutePath){
     if(wcslen(absolutePath) >= MAX_PATH - 1){
         printf("File name is too long!\n\n");
         return;
 
    }
+
+    wchar_t absolutePathCopy[MAX_PATH];
+    wcscpy_s(absolutePathCopy,sizeof(absolutePathCopy),absolutePath);
+    wchar_t* lastPart = wStringLastPart(absolutePathCopy,'\\');
 
     int existCheck = 0;
     if((existCheck=wExist(absolutePath,L"")) == 0){
@@ -1402,7 +1443,7 @@ void backup(wchar_t* absolutePath,wchar_t* name){
     createDirectory(backupPath);
 
     wcscat_s(backupPath,sizeof(backupPath),L"\\");
-    wcscat_s(backupPath,sizeof(backupPath),name);
+    wcscat_s(backupPath,sizeof(backupPath),lastPart);
 
     if(wExist(backupPath,L"") != 0){
         printf("Backup file exists.\n\n");

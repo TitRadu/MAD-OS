@@ -32,6 +32,7 @@ int wExist(wchar_t*,wchar_t*);
 int wAllSpaces(wchar_t*);
 int wStringCheck(wchar_t*);
 wchar_t* wStringWithoutLast(wchar_t*,wchar_t);
+wchar_t* wStringLastPart(wchar_t*,wchar_t);
 void forkk(wchar_t*,wchar_t*);
 void changePath(wchar_t*);
 void parse(wchar_t*,wchar_t);
@@ -67,10 +68,10 @@ void generateFile();//
 void connectToURLWraper();
 void connectToURL(wchar_t*);///
 void displayTime();//
-void copyDirectoryWraper(char*);
+void copyDirectoryWraper(wchar_t*,char*);
 void copyDirectory(wchar_t*,wchar_t*);
 void backupWraper(wchar_t*);
-void backup(wchar_t*,wchar_t*);
+void backup(wchar_t*);
 void fileContentWraper();
 void fileContent(wchar_t*);//
 void calc();//
