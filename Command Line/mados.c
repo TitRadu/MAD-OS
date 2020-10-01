@@ -1921,12 +1921,46 @@ void addUserWraper(){
 
     fflush(stdin);
 
+    HANDLE hideInput;
+    DWORD error = 0;
+    if((hideInput = GetStdHandle(STD_INPUT_HANDLE)) == INVALID_HANDLE_VALUE){
+        error = GetLastError();
+        printf("Error:%lu\n",error);
+        return;
+
+    }
+
+    DWORD mode = 0;
+    if(GetConsoleMode(hideInput,&mode) == 0){
+        error = GetLastError();
+        printf("Error:%lu\n",error);
+        return;
+
+    }
+
+    if(SetConsoleMode(hideInput,mode & (~ENABLE_ECHO_INPUT)) == 0){
+        error = GetLastError();
+        printf("Error:%lu\n",error);
+        return;
+
+    }
+
     wchar_t userPassword[LM20_PWLEN+2];
     userPassword[0] = '\0';
+
     printf("UserPassword:");
     fgetws(userPassword,LM20_PWLEN+2,stdin);
     if(userPassword[wcslen(userPassword)-1] == '\n'){
         userPassword[wcslen(userPassword)-1] = '\0';
+
+    }
+
+    printf("\n");
+
+    if(SetConsoleMode(hideInput,mode | ENABLE_ECHO_INPUT) == 0){
+        error = GetLastError();
+        printf("Error:%lu\n",error);
+        return;
 
     }
 
@@ -2102,12 +2136,46 @@ void changeUserPasswordWraper(){
     }
 
     fflush(stdin);
+
+    HANDLE hideInput;
+    DWORD error = 0;
+    DWORD mode = 0;
+    if((hideInput = GetStdHandle(STD_INPUT_HANDLE)) == INVALID_HANDLE_VALUE){
+        error = GetLastError();
+        printf("Error:%lu\n",error);
+        return;
+
+    }
+
+    if(GetConsoleMode(hideInput,&mode) == 0){
+        error = GetLastError();
+        printf("Error:%lu\n",error);
+        return;
+
+    }
+
+    if(SetConsoleMode(hideInput,mode & (~ENABLE_ECHO_INPUT)) == 0){
+        error = GetLastError();
+        printf("Error:%lu\n",error);
+        return;
+
+    }
+
     printf("OldPassword:");
     fgetws(oldPassword,LM20_PWLEN+2,stdin);
     if(oldPassword[wcslen(oldPassword)-1] == '\n'){
         oldPassword[wcslen(oldPassword)-1] = '\0';
 
     }
+    printf("\n");
+
+    if(SetConsoleMode(hideInput,mode | ENABLE_ECHO_INPUT) == 0){
+        error = GetLastError();
+        printf("Error:%lu\n",error);
+        return;
+
+    }
+
 
     if(wcslen(oldPassword) > 14){
         printf("Old password is too long!\n\n");
@@ -2116,10 +2184,34 @@ void changeUserPasswordWraper(){
     }
 
     fflush(stdin);
+
+    mode = 0;
+    if(GetConsoleMode(hideInput,&mode) == 0){
+        error = GetLastError();
+        printf("Error:%lu\n",error);
+        return;
+
+    }
+
+    if(SetConsoleMode(hideInput,mode & (~ENABLE_ECHO_INPUT)) == 0){
+        error = GetLastError();
+        printf("Error:%lu\n",error);
+        return;
+
+    }
+
     printf("NewPassword:");
     fgetws(newPassword,LM20_PWLEN+2,stdin);
     if(newPassword[wcslen(newPassword)-1] == '\n'){
         newPassword[wcslen(newPassword)-1] = '\0';
+
+    }
+    printf("\n");
+
+    if(SetConsoleMode(hideInput,mode | ENABLE_ECHO_INPUT) == 0){
+        error = GetLastError();
+        printf("Error:%lu\n",error);
+        return;
 
     }
 
