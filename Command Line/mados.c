@@ -158,7 +158,7 @@ void forkk(wchar_t *application,wchar_t *args){
     s.cb = sizeof(STARTUPINFOW);
     ZeroMemory(&p,sizeof(PROCESS_INFORMATION));
 
-    wchar_t commandLine[MAX_PATH];
+    wchar_t commandLine[MAX_PATH*2];
     wcscpy_s(commandLine,sizeof(commandLine),L"\"");
     wcscat_s(commandLine,sizeof(commandLine),application);
     wcscat_s(commandLine,sizeof(commandLine),L"\"");
@@ -1137,7 +1137,47 @@ void openPath(wchar_t* path, wchar_t *openFileName){
 
 }
 
-void sort(){
+void sortFilesWraper(wchar_t* path){
+    wchar_t sortDirectoryPath[MAX_PATH];
+    printf("Sort-Path:");
+    fgetws(sortDirectoryPath,MAX_PATH,stdin);
+    if(sortDirectoryPath[wcslen(sortDirectoryPath)-1] == '\n'){
+        sortDirectoryPath[wcslen(sortDirectoryPath)-1] = '\0';
+    }
+
+    if(wStringCheck(sortDirectoryPath) == 1){
+        return;
+
+    }
+
+    wchar_t* absolutePath;
+    if((absolutePath = preparePathDependingOnType(path,sortDirectoryPath)) == NULL){
+        return;
+
+    }
+
+    sortFiles(absolutePath);
+
+}
+
+void sortFiles(wchar_t* sortDirectoryPath){
+    wchar_t* arguments;
+    if((arguments = (wchar_t*)HeapAlloc(processHeap,HEAP_ZERO_MEMORY,4+wcslen(sortDirectoryPath)*sizeof(wchar_t)+2+2)) == NULL){
+            printf("SortFilesHeapAllocError!\n");
+            ExitProcess(1);
+
+    }
+
+    wcscpy_s(arguments,8+wcslen(sortDirectoryPath)*sizeof(wchar_t)+2+2,L"\"");
+    wcscat_s(arguments,8+wcslen(sortDirectoryPath)*sizeof(wchar_t)+2+2,sortDirectoryPath);
+    wcscat_s(arguments,8+wcslen(sortDirectoryPath)*sizeof(wchar_t)+2+2,L"\"");
+
+    forkk(L"sortFilesCL.exe",arguments);
+
+}
+
+
+void sortDirectory(){
     forkk(L"sortDirCL.exe",L"");
 
 }

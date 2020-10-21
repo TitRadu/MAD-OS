@@ -60,7 +60,9 @@ void ipc();//
 void ipca();//
 void openPathWraper(wchar_t*);
 void openPath(wchar_t*,wchar_t*);//
-void sort();//
+void sortFilesWraper(wchar_t*);
+void sortFiles(wchar_t*);
+void sortDirectory();//
 void help();//
 void copyFile(wchar_t*,wchar_t*);
 void myCopyFile(char*);//

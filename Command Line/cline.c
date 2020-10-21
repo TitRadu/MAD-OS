@@ -188,8 +188,14 @@ int main(){
 
         }
 
-        if(strcmp(command,"sort") == 0){
-            sort();
+        if(strcmp(command,"sortF") == 0){
+            sortFilesWraper(path);
+            continue;
+
+        }
+
+        if(strcmp(command,"sortD") == 0){
+            sortDirectory();
             continue;
 
         }
