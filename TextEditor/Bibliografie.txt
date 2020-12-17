@@ -1,0 +1,11 @@
+https://www.w3computing.com/vb2008/vb-textbox-text-selection-properties/
+https://www.dotnetperls.com/reverse-string-vbnet
+forums.codeguru.com/showthread.php?447492-Cursor-position-in-Rich-textbox
+https://stackoverflow.com/questions/10083761/getting-the-caret-position-in-a-richtextbox
+https://stackoverflow.com/questions/12005851/richtextbox-horizontal-scroll-not-working // nu se mai sare automat la linia urmatoare, apare scrollul orizontal.
+http://www.vbforums.com/showthread.php?178205-Ascii-for-up-down-left-right-arrows//KeyDown Event.
+https://www.homeandlearn.co.uk/NET/nets13p3.html
+https://stackoverflow.com/questions/11564642/richtextbox-for-source-code//ajutor la codul pentru display C language.
+https://www.tutorialspoint.com/vb.net/vb.net_regular_expressions.htm//ajutor la codul pentru display C language.
+https://stackoverflow.com/questions/49844852/richtextbox-select-multiple-appearances-of-the-same-word//alt+s
+https://stackoverflow.com/questions/15645380/richtextbox-and-tab-key//tab key.

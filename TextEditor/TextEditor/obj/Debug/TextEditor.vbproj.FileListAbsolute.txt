@@ -1,0 +1,12 @@
+C:\Users\radut\source\repos\TextEditor\TextEditor\bin\Debug\TextEditor.exe.config
+C:\Users\radut\source\repos\TextEditor\TextEditor\bin\Debug\TextEditor.exe
+C:\Users\radut\source\repos\TextEditor\TextEditor\bin\Debug\TextEditor.pdb
+C:\Users\radut\source\repos\TextEditor\TextEditor\bin\Debug\TextEditor.xml
+C:\Users\radut\source\repos\TextEditor\TextEditor\obj\Debug\TextEditor.vbprojAssemblyReference.cache
+C:\Users\radut\source\repos\TextEditor\TextEditor\obj\Debug\TextEditor.Form1.resources
+C:\Users\radut\source\repos\TextEditor\TextEditor\obj\Debug\TextEditor.Resources.resources
+C:\Users\radut\source\repos\TextEditor\TextEditor\obj\Debug\TextEditor.vbproj.GenerateResource.cache
+C:\Users\radut\source\repos\TextEditor\TextEditor\obj\Debug\TextEditor.exe
+C:\Users\radut\source\repos\TextEditor\TextEditor\obj\Debug\TextEditor.xml
+C:\Users\radut\source\repos\TextEditor\TextEditor\obj\Debug\TextEditor.pdb
+C:\Users\radut\source\repos\TextEditor\TextEditor\obj\Debug\TextEditor.Form2.resources

@@ -1,0 +1,22 @@
+C:\Users\radut\source\repos\VBCalculator\VBCalculator\bin\Debug\VBCalculator.exe.config
+C:\Users\radut\source\repos\VBCalculator\VBCalculator\bin\Debug\VBCalculator.exe
+C:\Users\radut\source\repos\VBCalculator\VBCalculator\bin\Debug\VBCalculator.pdb
+C:\Users\radut\source\repos\VBCalculator\VBCalculator\bin\Debug\VBCalculator.xml
+C:\Users\radut\source\repos\VBCalculator\VBCalculator\obj\Debug\VBCalculator.vbprojAssemblyReference.cache
+C:\Users\radut\source\repos\VBCalculator\VBCalculator\obj\Debug\VBCalculator.Calculator.resources
+C:\Users\radut\source\repos\VBCalculator\VBCalculator\obj\Debug\VBCalculator.Resources.resources
+C:\Users\radut\source\repos\VBCalculator\VBCalculator\obj\Debug\VBCalculator.vbproj.GenerateResource.cache
+C:\Users\radut\source\repos\VBCalculator\VBCalculator\obj\Debug\VBCalculator.exe
+C:\Users\radut\source\repos\VBCalculator\VBCalculator\obj\Debug\VBCalculator.xml
+C:\Users\radut\source\repos\VBCalculator\VBCalculator\obj\Debug\VBCalculator.pdb
+C:\Users\radut\Desktop\Aplicatii in C\Aplicatii\MAD OS Command Line\VBCalculator\VBCalculator\bin\Debug\VBCalculator.exe.config
+C:\Users\radut\Desktop\Aplicatii in C\Aplicatii\MAD OS Command Line\VBCalculator\VBCalculator\bin\Debug\VBCalculator.exe
+C:\Users\radut\Desktop\Aplicatii in C\Aplicatii\MAD OS Command Line\VBCalculator\VBCalculator\bin\Debug\VBCalculator.pdb
+C:\Users\radut\Desktop\Aplicatii in C\Aplicatii\MAD OS Command Line\VBCalculator\VBCalculator\bin\Debug\VBCalculator.xml
+C:\Users\radut\Desktop\Aplicatii in C\Aplicatii\MAD OS Command Line\VBCalculator\VBCalculator\obj\Debug\VBCalculator.vbprojAssemblyReference.cache
+C:\Users\radut\Desktop\Aplicatii in C\Aplicatii\MAD OS Command Line\VBCalculator\VBCalculator\obj\Debug\VBCalculator.Calculator.resources
+C:\Users\radut\Desktop\Aplicatii in C\Aplicatii\MAD OS Command Line\VBCalculator\VBCalculator\obj\Debug\VBCalculator.Resources.resources
+C:\Users\radut\Desktop\Aplicatii in C\Aplicatii\MAD OS Command Line\VBCalculator\VBCalculator\obj\Debug\VBCalculator.vbproj.GenerateResource.cache
+C:\Users\radut\Desktop\Aplicatii in C\Aplicatii\MAD OS Command Line\VBCalculator\VBCalculator\obj\Debug\VBCalculator.exe
+C:\Users\radut\Desktop\Aplicatii in C\Aplicatii\MAD OS Command Line\VBCalculator\VBCalculator\obj\Debug\VBCalculator.xml
+C:\Users\radut\Desktop\Aplicatii in C\Aplicatii\MAD OS Command Line\VBCalculator\VBCalculator\obj\Debug\VBCalculator.pdb
