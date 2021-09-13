@@ -230,6 +230,24 @@ int main(){
 
         }
 
+        if(strcmp(command,"utimer") == 0){
+            timerUp();
+            continue;
+
+        }
+
+        if(strcmp(command,"dtimer") == 0){
+            timerDown();
+            continue;
+
+        }
+
+        if(strcmp(command,"active") == 0){
+            activeTime();
+            continue;
+
+        }
+
         if(strcmp(command,"copyD") == 0){
             copyDirectoryWraper(path,"copy");
             continue;

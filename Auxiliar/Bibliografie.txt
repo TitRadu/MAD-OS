@@ -13,3 +13,5 @@ http://cplusplus.com/forum/windows/48863/ ->  setare cbSize(câmp al structurii 
 https://stackoverflow.com/questions/4725115/on-windows-is-there-an-interface-for-copying-folders -> copiere de director cu WIN API.
 https://www.youtube.com/watch?v=2jHhSsDAA6k -> afisarea partitiilor.
 https://stackoverflow.com/questions/9217908/how-to-disable-echo-in-windows-console -> hidden input.
+https://stackoverflow.com/questions/21294713/non-blocking-i-o-in-c-windows -> _kbhit() function for keyboard listening in timer implementation.
+https://stackoverflow.com/questions/10905892/equivalent-of-gettimeday-for-windows -> GetTickCount() function.

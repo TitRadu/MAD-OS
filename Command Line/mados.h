@@ -70,6 +70,9 @@ void generateFile();//
 void connectToURLWraper();
 void connectToURL(wchar_t*);///
 void displayTime();//
+void timerUp();
+void timerDown();
+void activeTime();
 void copyDirectoryWraper(wchar_t*,char*);
 void copyDirectory(wchar_t*,wchar_t*);
 void backupWraper(wchar_t*);
