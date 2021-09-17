@@ -23,6 +23,13 @@ struct command* nextCommand;
 
 }command;
 
+typedef struct CONSOLE_DATA{
+    HANDLE consoleHandle;
+    COORD currentCursorPosition;
+    CONSOLE_SCREEN_BUFFER_INFO screen;
+
+}CONSOLE_DATA;
+
 void pause();
 int pathType(wchar_t*);
 void wStringInQuatationMarks(wchar_t*);
@@ -128,5 +135,9 @@ void init();
 unsigned long long fibonacci(int);
 void printFibonacci();
 void getPartitions();
+void systemInformationPrint();
+void systemInformation();
+CONSOLE_DATA consoleDataPreparing();
+void liveSystemInformation();
 
 #endif // MADOS_H_INCLUDED

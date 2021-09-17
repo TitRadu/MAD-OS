@@ -1349,10 +1349,7 @@ void timerDown(){
     printf("Counter time:");
     scanf("%d",&timerTimeValueInSeconds);
 
-
     startTime = GetTickCount64();
-
-
     while(1){
         currentTime = GetTickCount64();
 
@@ -3147,3 +3144,148 @@ void getPartitions(){
     printf("\n");
 
 }
+
+void systemInformationPrint(MEMORYSTATUSEX memoryStatus, PERFORMANCE_INFORMATION performanceInformation){
+    double memoryLoadPercentage = 100 - ((double)memoryStatus.ullAvailPhys / memoryStatus.ullTotalPhys)* 100 ;
+    double totalPhysicalGB = (double)memoryStatus.ullTotalPhys / 1073741824;
+	double avaiblePhysicalGB = (double)memoryStatus.ullAvailPhys / 1073741824;
+	double totalVirtualGB = (double)memoryStatus.ullTotalVirtual / 1073741824;
+	double avaibleVirtualGB = (double)memoryStatus.ullAvailVirtual / 1073741824;
+
+
+    printf("MemoryLoad: %d%%\n", memoryStatus.dwMemoryLoad);
+    printf("MemoryLoad: %.2f%%\n", memoryLoadPercentage);
+	printf("TotalPhys: %.2f GB\n", totalPhysicalGB);
+	printf("AvailablePhys: %.2f GB\n", avaiblePhysicalGB);
+	printf("TotalVirtual: %.2f GB\n", totalVirtualGB);
+	printf("AvailableVirtual: %.2f GB\n", avaibleVirtualGB);
+	printf("Number of processess: %lu\n", performanceInformation.ProcessCount);
+	printf("Number of threads: %lu\n", performanceInformation.ThreadCount);
+
+}
+
+void systemInformation(){
+    MEMORYSTATUSEX memoryStatus;
+	memoryStatus.dwLength = sizeof(MEMORYSTATUSEX);
+	DWORD error = 0;
+
+	if (GlobalMemoryStatusEx(&memoryStatus) == 0){
+	    error = GetLastError();
+		printf("SystemInformationGlobalMemoryStatusExError:%lu\n", error);
+		ExitProcess(error);
+
+	}
+
+	PERFORMANCE_INFORMATION performanceInformation;
+    if (GetPerformanceInfo(&performanceInformation,sizeof(PERFORMACE_INFORMATION)) == 0){
+        error = GetLastError();
+		printf("SystemInformationGetPerformanceInfoError:%lu\n", error);
+		ExitProcess(error);
+
+	}
+
+	systemInformationPrint(memoryStatus, performanceInformation);
+
+}
+
+CONSOLE_DATA consoleDataPreparing(){
+    HANDLE console;
+    CONSOLE_SCREEN_BUFFER_INFO screen;
+    DWORD error;
+
+    if((console = GetStdHandle(STD_OUTPUT_HANDLE)) == INVALID_HANDLE_VALUE){
+        error = GetLastError();
+        printf("ClearrGetStdHandleError:%lu\n",error);
+        ExitProcess(error);
+
+    }
+
+    if(GetConsoleScreenBufferInfo(console,&screen) == 0){
+        error = GetLastError();
+        printf("ClearrGetConsoleScreenBufferError:%lu\n",error);
+        ExitProcess(error);
+
+    }
+
+    CONSOLE_DATA consoleData;
+    consoleData.consoleHandle = console;
+    consoleData.currentCursorPosition =screen.dwCursorPosition;
+    consoleData.screen = screen;
+
+    return consoleData;
+
+}
+
+void liveSystemInformation(){
+    PERFORMACE_INFORMATION performanceInformation;
+    CONSOLE_DATA consoleData = consoleDataPreparing();
+    DWORD error;
+
+    CONSOLE_CURSOR_INFO consoleCursorInfo;
+    if(GetConsoleCursorInfo(consoleData.consoleHandle, &consoleCursorInfo) == 0){
+        error = GetLastError();
+        printf("LiveSystemInformationGetConsoleCursorInfoError:%lu\n", error);
+        ExitProcess(error);
+
+    }
+
+    consoleCursorInfo.bVisible = FALSE;
+
+    if(SetConsoleCursorInfo(consoleData.consoleHandle, &consoleCursorInfo) == 0){
+        error = GetLastError();
+        printf("LiveSystemInformationSetConsoleCursorInfoError:%lu\n", error);
+        ExitProcess(error);
+
+    }
+
+    while(1){
+       if (GetPerformanceInfo(&performanceInformation,sizeof(PERFORMACE_INFORMATION)) == 0){
+            error = GetLastError();
+            printf("LiveSystemInformationGetPerformanceInfoError:%lu\n", error);
+            ExitProcess(error);
+
+        }
+
+
+        ULONGLONG avaiblePhysicalBytes = performanceInformation.PhysicalAvailable * performanceInformation.PageSize;
+        double memoryLoadPercentage = 100 - ((double) avaiblePhysicalBytes / (performanceInformation.PhysicalTotal * performanceInformation.PageSize))* 100 ;
+        double avaiblePhysicalGB = (double)avaiblePhysicalBytes / 1073741824;
+
+        printf("MemoryLoad: %.2f%%\n", memoryLoadPercentage);
+        printf("AvailablePhys: %.2f GB\n", avaiblePhysicalGB);
+        printf("Number of processess: %lu\n", performanceInformation.ProcessCount);
+        printf("Number of threads: %lu\n", performanceInformation.ThreadCount);
+
+        if(SetConsoleCursorPosition(consoleData.consoleHandle,consoleData.currentCursorPosition) == 0){
+            error = GetLastError();
+            printf("ClearrSetConsoleCursorPositionError:%lu\n",error);
+            ExitProcess(error);
+
+        }
+
+        if(_kbhit()){
+            consoleCursorInfo.bVisible = TRUE;
+            if(SetConsoleCursorInfo(consoleData.consoleHandle, &consoleCursorInfo) == 0){
+                error = GetLastError();
+                printf("LiveSystemInformationGlobalMemoryStatusExError:%lu\n", error);
+                ExitProcess(error);
+
+            }
+
+            consoleData.currentCursorPosition.Y = consoleData.currentCursorPosition.Y + 5;
+            if(SetConsoleCursorPosition(consoleData.consoleHandle,consoleData.currentCursorPosition) == 0){
+                error = GetLastError();
+                printf("ClearrSetConsoleCursorPositionError:%lu\n",error);
+                ExitProcess(error);
+
+            }
+
+            printf("\n");
+            break;
+
+        }
+
+    }
+
+}
+

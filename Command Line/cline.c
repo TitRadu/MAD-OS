@@ -477,6 +477,18 @@ int main(){
 
         }
 
+        if(strcmp(command,"sinfo") == 0){
+            systemInformation();
+            continue;
+
+        }
+
+        if(strcmp(command,"liveinfo") == 0){
+            liveSystemInformation();
+            continue;
+
+        }
+
         printf("Incorrect command!\n");
 
     }

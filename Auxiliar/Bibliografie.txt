@@ -15,3 +15,5 @@ https://www.youtube.com/watch?v=2jHhSsDAA6k -> afisarea partitiilor.
 https://stackoverflow.com/questions/9217908/how-to-disable-echo-in-windows-console -> hidden input.
 https://stackoverflow.com/questions/21294713/non-blocking-i-o-in-c-windows -> _kbhit() function for keyboard listening in timer implementation.
 https://stackoverflow.com/questions/10905892/equivalent-of-gettimeday-for-windows -> GetTickCount() function.
+https://stackoverflow.com/questions/30126490/how-to-hide-console-cursor-in-c -> SetConsoleCursorInfo().
+https://stackoverflow.com/questions/35800020/how-do-i-find-the-coordinates-of-the-cursor-in-a-console-window -> GetConsoleScreenBufferInfo().
