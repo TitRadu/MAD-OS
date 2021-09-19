@@ -489,6 +489,18 @@ int main(){
 
         }
 
+        if(strcmp(command,"iwlan") == 0){
+            enumWlanInterfaces();
+            continue;
+
+        }
+
+        if(strcmp(command,"nwlan") == 0){
+            enumAvaibleNetworksWraper();
+            continue;
+
+        }
+
         printf("Incorrect command!\n");
 
     }

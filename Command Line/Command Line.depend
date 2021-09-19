@@ -17,10 +17,10 @@
 1603240068 source:c:\users\radut\desktop\aplicatii in c\aplicatii\mad os command line\command line\mados.c
 	"mados.h"
 
-1631574699 source:d:\codeblocks programs\mad-os\command line\cline.c
+1631979996 source:d:\codeblocks programs\mad-os\command line\cline.c
 	"mados.h"
 
-1631843380 d:\codeblocks programs\mad-os\command line\mados.h
+1631922292 d:\codeblocks programs\mad-os\command line\mados.h
 	<stdio.h>
 	<stdlib.h>
 	<Windows.h>
@@ -30,8 +30,9 @@
 	<psapi.h>
 	<intsafe.h>
 	<shlwapi.h>
+	<wlanapi.h>
 	<errno.h>
 
-1631841704 source:d:\codeblocks programs\mad-os\command line\mados.c
+1632089092 source:d:\codeblocks programs\mad-os\command line\mados.c
 	"mados.h"
 

@@ -3289,3 +3289,192 @@ void liveSystemInformation(){
 
 }
 
+void enumWlanInterfaces(){
+    HANDLE wlanHandle;
+    DWORD clientVersion = 1;
+    DWORD negotiatedVersion = 0;
+    PWLAN_INTERFACE_INFO_LIST pwlanInterfaceInfoList = NULL;
+    PWLAN_INTERFACE_INFO pwlanInterfaceInfo = NULL;
+    wchar_t stringGUID[40] = {0};
+    DWORD error = 0;
+
+
+
+    if((error = WlanOpenHandle(clientVersion, NULL, &negotiatedVersion, &wlanHandle)) != ERROR_SUCCESS){
+        printf("EnumWlanInterfacesWlanOpenHandleError:%lu",error);
+        ExitProcess(error);
+
+    }
+
+    if((error = WlanEnumInterfaces(wlanHandle, NULL, &pwlanInterfaceInfoList)) != ERROR_SUCCESS){
+        printf("EnumWlanInterfacesWlanEnumInterfacesError:%lu",error);
+        ExitProcess(error);
+
+    }else{
+        wprintf(L"Number of interfaces: %lu\n\n", pwlanInterfaceInfoList->dwNumberOfItems);
+        for(int i = 0; i < (int)pwlanInterfaceInfoList->dwNumberOfItems; i++){
+            pwlanInterfaceInfo = &pwlanInterfaceInfoList->InterfaceInfo[i];
+            wprintf(L" Interface index:%lu\n",i);
+            error = StringFromGUID2(&pwlanInterfaceInfo->InterfaceGuid, (LPOLESTR) &stringGUID, 39);
+            if(error == 0 ){
+                wprintf(L"EnumWirelessInterfacesStringFromGUID2Error!");
+                ExitProcess(-1);
+
+            }else{
+                wprintf(L" Interface GUID: %ls\n", stringGUID);
+
+            }
+            wprintf(L" Interface description: %ls\n", pwlanInterfaceInfo->strInterfaceDescription);
+            wprintf(L" Interface state:\t");
+            switch (pwlanInterfaceInfo->isState) {
+            case wlan_interface_state_not_ready:
+                wprintf(L"Not ready\n");
+                break;
+            case wlan_interface_state_connected:
+                wprintf(L"Connected\n");
+                break;
+            case wlan_interface_state_ad_hoc_network_formed:
+                wprintf(L"First node in a ad hoc network\n");
+                break;
+            case wlan_interface_state_disconnecting:
+                wprintf(L"Disconnecting\n");
+                break;
+            case wlan_interface_state_disconnected:
+                wprintf(L"Not connected\n");
+                break;
+            case wlan_interface_state_associating:
+                wprintf(L"Attempting to associate with a network\n");
+                break;
+            case wlan_interface_state_discovering:
+                wprintf(L"Auto configuration is discovering settings for the network\n");
+                break;
+            case wlan_interface_state_authenticating:
+                wprintf(L"In process of authenticating\n");
+                break;
+            default:
+                wprintf(L"Unknown state %ld\n", pwlanInterfaceInfo->isState);
+                break;
+            }
+            wprintf(L"\n");
+
+        }
+
+    }
+
+    if (pwlanInterfaceInfoList != NULL) {
+        WlanFreeMemory(pwlanInterfaceInfoList);
+        pwlanInterfaceInfo = NULL;
+
+    }
+
+}
+
+void enumAvaibleNetworksWraper(){
+    wchar_t stringGUID[40] = {0};
+    printf("GUID:");
+    fgetws(stringGUID,40,stdin);
+    if(stringGUID[wcslen(stringGUID)-1] == '\n'){
+        stringGUID[wcslen(stringGUID)-1] = '\0';
+
+    }
+
+    if(wStringCheck(stringGUID) == 1){
+        return;
+
+    }
+
+    CLSID clsid;
+
+    if(CLSIDFromString((LPCOLESTR) stringGUID, &clsid) == E_INVALIDARG){
+        printf("EnumAvaibleNetworkWraperError\n");
+        ExitProcess(-1);
+
+    }
+
+
+    enumAvaibleNetworks((GUID) clsid);
+}
+
+
+void enumAvaibleNetworks(GUID guid){
+    HANDLE wlanHandle;
+    DWORD clientVersion = 1;
+    DWORD negotiatedVersion = 0;
+    PWLAN_AVAILABLE_NETWORK_LIST pwlanAvaibleNewtworkList = NULL;
+    PWLAN_AVAILABLE_NETWORK pwlanAvaibleNetwork = NULL;
+    int semnalQuality;
+    DWORD error = 0;
+
+    if((error = WlanOpenHandle(clientVersion, NULL, &negotiatedVersion, &wlanHandle)) != ERROR_SUCCESS){
+        printf("EnumAvaibleNetworksWlanOpenHandleError:%lu",error);
+        ExitProcess(error);
+
+    }
+
+    if((error = WlanGetAvailableNetworkList(wlanHandle, &guid, 3, NULL, &pwlanAvaibleNewtworkList)) !=  ERROR_SUCCESS){
+
+        if(error == ERROR_NOT_FOUND){
+            printf("Interface not found!\n");
+            return;
+        }
+        printf("EnumAvaibleNetworksWlanGetAvaibleNetworkListError:%lu",error);
+        ExitProcess(error);
+
+    }else{
+        wprintf(L"Number of networks: %lu\n\n", pwlanAvaibleNewtworkList->dwNumberOfItems);
+
+        for(int i = 0; i < pwlanAvaibleNewtworkList->dwNumberOfItems; i++){
+            pwlanAvaibleNetwork = &pwlanAvaibleNewtworkList->Network[i];
+            if(pwlanAvaibleNetwork->dot11Ssid.uSSIDLength == 0){
+                wprintf(L"SSID:None\n");
+
+            }else{
+                wprintf(L"SSID[%d]:",i);
+                for(int j = 0; j < pwlanAvaibleNetwork->dot11Ssid.uSSIDLength; j++){
+                    wprintf(L"%c",pwlanAvaibleNetwork->dot11Ssid.ucSSID[j]);
+
+
+                }
+                wprintf(L"\n");
+                wprintf(L"Security Enabled[%d]:\t ", i);
+                if (pwlanAvaibleNetwork->bSecurityEnabled){
+                    wprintf(L"Yes\n");
+
+                }else{
+                    wprintf(L"No\n");
+
+                }
+                 if (pwlanAvaibleNetwork->wlanSignalQuality == 0){
+                    semnalQuality = -100;
+                } else if (pwlanAvaibleNetwork->wlanSignalQuality == 100){
+                    semnalQuality = -50;
+                } else{
+                    semnalQuality = -100 + (pwlanAvaibleNetwork->wlanSignalQuality/2);
+                }
+
+                wprintf(L"Signal Quality[%d]:\t %d (RSSI Strength: %d dBm)\n", i,
+                    pwlanAvaibleNetwork->wlanSignalQuality, semnalQuality);
+
+                wprintf(L"Connectable[%d]:\t ", i);
+                if (pwlanAvaibleNetwork->bNetworkConnectable){
+                    wprintf(L"Yes\n");
+                }else {
+                    wprintf(L"No\n");
+
+                }
+
+
+            }
+            wprintf(L"\n");
+
+        }
+
+    }
+
+    if (pwlanAvaibleNewtworkList != NULL) {
+        WlanFreeMemory(pwlanAvaibleNewtworkList);
+        pwlanAvaibleNewtworkList = NULL;
+    }
+
+}
+

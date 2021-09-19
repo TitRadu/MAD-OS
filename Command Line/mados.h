@@ -15,6 +15,7 @@
 #include <psapi.h>
 #include <intsafe.h>
 #include <shlwapi.h>
+#include <wlanapi.h>
 #include <errno.h>
 
 typedef struct command{
