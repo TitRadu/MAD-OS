@@ -496,7 +496,19 @@ int main(){
         }
 
         if(strcmp(command,"nwlan") == 0){
-            enumAvaibleNetworksWraper();
+            sendGUIDAsParameter("networks");
+            continue;
+
+        }
+
+        if(strcmp(command,"disconnect") == 0){
+            sendGUIDAsParameter("disconnect");
+            continue;
+
+        }
+
+        if(strcmp(command,"connect") == 0){
+            connectWlanInterfaceWraper();
             continue;
 
         }

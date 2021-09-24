@@ -98,6 +98,17 @@ int wExist(wchar_t* path,wchar_t *name){
 
 }
 
+int allSpaces(char* string){
+    for(int i = 0;i < strlen(string);i++){
+        if(string[i] != 32){
+            return 0;
+
+        }
+    }
+
+    return 1;
+}
+
 int wAllSpaces(wchar_t* string){
     for(int i = 0;i < wcslen(string);i++){
         if(string[i] != 32){
@@ -107,6 +118,17 @@ int wAllSpaces(wchar_t* string){
     }
 
     return 1;
+}
+
+int stringCheck(char* string){
+    if(strcmp(string,"") == 0 || allSpaces(string) == 1){
+        printf("Argument is empty or contains only spaces!\n");
+        return 1;
+
+    }
+
+    return 0;
+
 }
 
 int wStringCheck(wchar_t* string){
@@ -3253,8 +3275,8 @@ void liveSystemInformation(){
 
         printf("MemoryLoad: %.2f%%\n", memoryLoadPercentage);
         printf("AvailablePhys: %.2f GB\n", avaiblePhysicalGB);
-        printf("Number of processess: %lu\n", performanceInformation.ProcessCount);
-        printf("Number of threads: %lu\n", performanceInformation.ThreadCount);
+        printf("Number of processess: %lu \n", performanceInformation.ProcessCount);
+        printf("Number of threads: %lu \n", performanceInformation.ThreadCount);
 
         if(SetConsoleCursorPosition(consoleData.consoleHandle,consoleData.currentCursorPosition) == 0){
             error = GetLastError();
@@ -3367,9 +3389,15 @@ void enumWlanInterfaces(){
 
     }
 
+    if((error = WlanCloseHandle(wlanHandle, NULL)) != ERROR_SUCCESS){
+        printf("EnumWlanInterfacesWlanCloseHandleError:%lu",error);
+        ExitProcess(error);
+
+    }
+
 }
 
-void enumAvaibleNetworksWraper(){
+GUID obtainGUIDFromString(){
     wchar_t stringGUID[40] = {0};
     printf("GUID:");
     fgetws(stringGUID,40,stdin);
@@ -3391,8 +3419,24 @@ void enumAvaibleNetworksWraper(){
 
     }
 
+    return (GUID) clsid;
 
-    enumAvaibleNetworks((GUID) clsid);
+}
+
+void sendGUIDAsParameter(char* control){
+    GUID guid = obtainGUIDFromString();
+
+
+    if(strcmp(control, "networks") == 0){
+        enumAvaibleNetworks(guid);
+
+    }
+
+    if(strcmp(control, "disconnect") == 0){
+        disconnectWlanInterface(guid);
+
+    }
+
 }
 
 
@@ -3436,6 +3480,7 @@ void enumAvaibleNetworks(GUID guid){
 
                 }
                 wprintf(L"\n");
+                wprintf(L"Profile: %ls\n", pwlanAvaibleNetwork->strProfileName);
                 wprintf(L"Security Enabled[%d]:\t ", i);
                 if (pwlanAvaibleNetwork->bSecurityEnabled){
                     wprintf(L"Yes\n");
@@ -3474,6 +3519,181 @@ void enumAvaibleNetworks(GUID guid){
     if (pwlanAvaibleNewtworkList != NULL) {
         WlanFreeMemory(pwlanAvaibleNewtworkList);
         pwlanAvaibleNewtworkList = NULL;
+    }
+
+    if((error = WlanCloseHandle(wlanHandle, NULL)) != ERROR_SUCCESS){
+        printf("EnumAvaibleNetworksWlanCloseHandleError:%lu",error);
+        ExitProcess(error);
+
+    }
+
+}
+
+void disconnectWlanInterface(GUID guid){
+    HANDLE wlanHandle;
+    DWORD clientVersion = 1;
+    DWORD negotiatedVersion = 0;
+    DWORD error = 0;
+
+    if((error = WlanOpenHandle(clientVersion, NULL, &negotiatedVersion, &wlanHandle)) != ERROR_SUCCESS){
+        printf("DisconnectWlanInterfaceWlanOpenHandleError:%lu",error);
+        ExitProcess(error);
+
+    }
+
+    if((error = WlanDisconnect(wlanHandle, &guid, NULL)) !=  ERROR_SUCCESS){
+
+        if(error == ERROR_NOT_FOUND){
+            printf("Interface not found!\n");
+            return;
+        }
+
+        printf("DisconnectWlanInterfaceWlanDisconnectError:%lu",error);
+        ExitProcess(error);
+
+    }
+
+    if((error = WlanCloseHandle(wlanHandle, NULL)) != ERROR_SUCCESS){
+        printf("DisconnectWlanInterfaceWlanCloseHandleError:%lu",error);
+        ExitProcess(error);
+
+    }
+
+}
+
+WLAN_AVAILABLE_NETWORK getNetworkProprierties(HANDLE wlanHandle, GUID guid, char* ssidString, LPCWSTR profile){
+    PWLAN_AVAILABLE_NETWORK_LIST pwlanAvaibleNewtworkList = NULL;
+    WLAN_AVAILABLE_NETWORK wlanAvaibleNetwork;
+    DWORD error = 0;
+
+
+    if((error = WlanGetAvailableNetworkList(wlanHandle, &guid, 3, NULL, &pwlanAvaibleNewtworkList)) !=  ERROR_SUCCESS){
+        if(error == ERROR_NOT_FOUND){
+            printf("Interface not found!\n");
+            return;
+        }
+        printf("EnumAvaibleNetworksWlanGetAvaibleNetworkListError:%lu",error);
+        ExitProcess(error);
+
+    }else{
+        for(int i = 0; i < pwlanAvaibleNewtworkList->dwNumberOfItems; i++){
+                char currentSSID[100];
+                for(int j =0; j<pwlanAvaibleNewtworkList->Network[i].dot11Ssid.uSSIDLength; j++){
+                    currentSSID[j] = pwlanAvaibleNewtworkList->Network[i].dot11Ssid.ucSSID[j];
+
+                }
+
+                currentSSID[pwlanAvaibleNewtworkList->Network[i].dot11Ssid.uSSIDLength] = '\0';
+
+
+                if(strcmp(currentSSID, ssidString) == 0){
+                //if(wcscmp(pwlanAvaibleNewtworkList->Network[i].strProfileName,profile) == 0){
+                wlanAvaibleNetwork = pwlanAvaibleNewtworkList->Network[i];
+                /*wlanAvaibleNetwork.bMorePhyTypes = pwlanAvaibleNewtworkList->Network[i].bMorePhyTypes;
+                wlanAvaibleNetwork.bNetworkConnectable = pwlanAvaibleNewtworkList->Network[i].bNetworkConnectable;
+                wlanAvaibleNetwork.bSecurityEnabled = pwlanAvaibleNewtworkList->Network[i].bSecurityEnabled;
+                wlanAvaibleNetwork.dot11BssType = pwlanAvaibleNewtworkList->Network[i].dot11BssType;
+                wlanAvaibleNetwork.dot11DefaultAuthAlgorithm = pwlanAvaibleNewtworkList->Network[i].dot11DefaultAuthAlgorithm;
+                wlanAvaibleNetwork.dot11DefaultCipherAlgorithm = pwlanAvaibleNewtworkList->Network[i].dot11DefaultCipherAlgorithm;
+                wlanAvaibleNetwork.dot11PhyTypes = pwlanAvaibleNewtworkList->Network[i].dot11PhyTypes;
+                wlanAvaibleNetwork.dot11Ssid = pwlanAvaibleNewtworkList->Network[i].dot11Ssid;
+                wlanAvaibleNetwork.dwFlags = pwlanAvaibleNewtworkList->Network[i].dwFlags;
+                wlanAvaibleNetwork.dwReserved = pwlanAvaibleNewtworkList->Network[i].dwReserved;
+                wcscpy(wlanAvaibleNetwork.strProfileName, sizeof(wchar_t) * WLAN_MAX_NAME_LENGTH, pwlanAvaibleNewtworkList->Network[i].strProfileName);
+                wlanAvaibleNetwork.uNumberOfBssids = pwlanAvaibleNewtworkList->Network[i].uNumberOfBssids;
+                wlanAvaibleNetwork.uNumberOfPhyTypes = pwlanAvaibleNewtworkList->Network[i].uNumberOfPhyTypes;
+                wlanAvaibleNetwork.wlanNotConnectableReason = pwlanAvaibleNewtworkList->Network[i].wlanNotConnectableReason;
+                wlanAvaibleNetwork.wlanSignalQuality = pwlanAvaibleNewtworkList->Network[i].wlanSignalQuality;
+*/                   printf("BSS:%d---%d\n", wlanAvaibleNetwork.dot11BssType,pwlanAvaibleNewtworkList->Network[i].dot11BssType);
+                printf("salut\n");
+                break;
+            }
+
+        }
+
+    }
+
+    if (pwlanAvaibleNewtworkList != NULL) {
+        WlanFreeMemory(pwlanAvaibleNewtworkList);
+        pwlanAvaibleNewtworkList = NULL;
+    }
+
+    return wlanAvaibleNetwork;
+
+}
+
+void connectWlanInterfaceWraper(){
+    GUID guid = obtainGUIDFromString();
+
+    DOT11_SSID dot11ssid;
+    printf("SSID:");
+    fgets(dot11ssid.ucSSID, WLAN_MAX_NAME_LENGTH,stdin);
+    if(dot11ssid.ucSSID[strlen(dot11ssid.ucSSID)-1] == '\n'){
+        dot11ssid.ucSSID[strlen(dot11ssid.ucSSID)-1] = '\0';
+
+    }
+    if(stringCheck(dot11ssid.ucSSID) == 1){
+        return;
+
+    }
+    dot11ssid.uSSIDLength = strlen(dot11ssid.ucSSID);
+
+    wchar_t profile[WLAN_MAX_NAME_LENGTH] = {0};
+    printf("Profile:");
+    fgetws(profile,WLAN_MAX_NAME_LENGTH,stdin);
+    if(profile[wcslen(profile)-1] == '\n'){
+        profile[wcslen(profile)-1] = '\0';
+
+    }
+    if(wStringCheck(profile) == 1){
+        return;
+
+    }
+
+    connectWlanInterface(guid, dot11ssid, profile);
+
+}
+
+void connectWlanInterface(GUID guid, DOT11_SSID ssid, LPCWSTR profile){
+    HANDLE wlanHandle;
+    DWORD clientVersion = 1;
+    DWORD negotiatedVersion = 0;
+    DWORD error = 0;
+
+    if((error = WlanOpenHandle(clientVersion, NULL, &negotiatedVersion, &wlanHandle)) != ERROR_SUCCESS){
+        printf("ConnectWlanInterfaceWlanOpenHandleError:%lu",error);
+        ExitProcess(error);
+
+    }
+
+    WLAN_AVAILABLE_NETWORK connectionNetworkData = getNetworkProprierties(wlanHandle, guid, ssid.ucSSID, profile);
+    WLAN_CONNECTION_PARAMETERS wlanConnectionParameters;
+    wlanConnectionParameters.wlanConnectionMode = wlan_connection_mode_discovery_secure;
+    //wcscpy_s(wlanConnectionParameters.strProfile, sizeof(wchar_t) * WLAN_MAX_NAME_LENGTH, profile);
+    wlanConnectionParameters.strProfile = NULL;
+    wprintf(L"%ls---%ls---%ls---\n", wlanConnectionParameters.strProfile, connectionNetworkData.strProfileName, profile);
+    wlanConnectionParameters.pDot11Ssid = &ssid;
+    printf("SSID:%s\n", wlanConnectionParameters.pDot11Ssid->ucSSID);
+    wlanConnectionParameters.pDesiredBssidList = NULL;
+    wlanConnectionParameters.dot11BssType = connectionNetworkData.dot11BssType;
+    printf("BSS:%d\n", wlanConnectionParameters.dot11BssType);
+
+    if((error = WlanConnect(wlanHandle, &guid, &wlanConnectionParameters, 0)) !=  ERROR_SUCCESS){
+
+        if(error == ERROR_NOT_FOUND){
+            printf("Interface not found!\n");
+            return;
+        }
+
+        printf("ConnectWlanInterfaceWlanDisconnectError:%lu",error);
+        ExitProcess(error);
+
+    }
+
+    if((error = WlanCloseHandle(wlanHandle, NULL)) != ERROR_SUCCESS){
+        printf("ConnectWlanInterfaceWlanCloseHandleError:%lu",error);
+        ExitProcess(error);
+
     }
 
 }
