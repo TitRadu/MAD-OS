@@ -3507,6 +3507,7 @@ void enumAvaibleNetworks(GUID guid){
                     wprintf(L"No\n");
 
                 }
+                printf("BSS:%d\n",pwlanAvaibleNetwork->dot11BssType);
 
 
             }
@@ -3561,9 +3562,11 @@ void disconnectWlanInterface(GUID guid){
 
 }
 
-WLAN_AVAILABLE_NETWORK getNetworkProprierties(HANDLE wlanHandle, GUID guid, char* ssidString, LPCWSTR profile){
+PWLAN_AVAILABLE_NETWORK getNetworkProprierties(HANDLE wlanHandle, GUID guid, char* ssidString, LPCWSTR profile){
     PWLAN_AVAILABLE_NETWORK_LIST pwlanAvaibleNewtworkList = NULL;
-    WLAN_AVAILABLE_NETWORK wlanAvaibleNetwork;
+    WLAN_AVAILABLE_NETWORK currentAvaibleNetwork;
+    PWLAN_AVAILABLE_NETWORK pwlanAvaibleNetwork;
+    int networkExist = 1;
     DWORD error = 0;
 
 
@@ -3577,6 +3580,12 @@ WLAN_AVAILABLE_NETWORK getNetworkProprierties(HANDLE wlanHandle, GUID guid, char
 
     }else{
         for(int i = 0; i < pwlanAvaibleNewtworkList->dwNumberOfItems; i++){
+                currentAvaibleNetwork = pwlanAvaibleNewtworkList->Network[i];
+                if((currentAvaibleNetwork.strProfileName == NULL) || (wcslen(currentAvaibleNetwork.strProfileName) == 0)){
+                    continue;
+
+                }
+
                 char currentSSID[100];
                 for(int j =0; j<pwlanAvaibleNewtworkList->Network[i].dot11Ssid.uSSIDLength; j++){
                     currentSSID[j] = pwlanAvaibleNewtworkList->Network[i].dot11Ssid.ucSSID[j];
@@ -3585,28 +3594,17 @@ WLAN_AVAILABLE_NETWORK getNetworkProprierties(HANDLE wlanHandle, GUID guid, char
 
                 currentSSID[pwlanAvaibleNewtworkList->Network[i].dot11Ssid.uSSIDLength] = '\0';
 
+                if((strcmp(currentSSID, ssidString) == 0) && (wcscmp(currentAvaibleNetwork.strProfileName, profile) == 0)){
+                    if((pwlanAvaibleNetwork = (PWLAN_AVAILABLE_NETWORK)HeapAlloc(processHeap,HEAP_ZERO_MEMORY,sizeof(WLAN_AVAILABLE_NETWORK))) == NULL){
+                        printf("GetNetworkPropriertiesHeapAllocError!\n");
+                        ExitProcess(-1);
 
-                if(strcmp(currentSSID, ssidString) == 0){
-                //if(wcscmp(pwlanAvaibleNewtworkList->Network[i].strProfileName,profile) == 0){
-                wlanAvaibleNetwork = pwlanAvaibleNewtworkList->Network[i];
-                /*wlanAvaibleNetwork.bMorePhyTypes = pwlanAvaibleNewtworkList->Network[i].bMorePhyTypes;
-                wlanAvaibleNetwork.bNetworkConnectable = pwlanAvaibleNewtworkList->Network[i].bNetworkConnectable;
-                wlanAvaibleNetwork.bSecurityEnabled = pwlanAvaibleNewtworkList->Network[i].bSecurityEnabled;
-                wlanAvaibleNetwork.dot11BssType = pwlanAvaibleNewtworkList->Network[i].dot11BssType;
-                wlanAvaibleNetwork.dot11DefaultAuthAlgorithm = pwlanAvaibleNewtworkList->Network[i].dot11DefaultAuthAlgorithm;
-                wlanAvaibleNetwork.dot11DefaultCipherAlgorithm = pwlanAvaibleNewtworkList->Network[i].dot11DefaultCipherAlgorithm;
-                wlanAvaibleNetwork.dot11PhyTypes = pwlanAvaibleNewtworkList->Network[i].dot11PhyTypes;
-                wlanAvaibleNetwork.dot11Ssid = pwlanAvaibleNewtworkList->Network[i].dot11Ssid;
-                wlanAvaibleNetwork.dwFlags = pwlanAvaibleNewtworkList->Network[i].dwFlags;
-                wlanAvaibleNetwork.dwReserved = pwlanAvaibleNewtworkList->Network[i].dwReserved;
-                wcscpy(wlanAvaibleNetwork.strProfileName, sizeof(wchar_t) * WLAN_MAX_NAME_LENGTH, pwlanAvaibleNewtworkList->Network[i].strProfileName);
-                wlanAvaibleNetwork.uNumberOfBssids = pwlanAvaibleNewtworkList->Network[i].uNumberOfBssids;
-                wlanAvaibleNetwork.uNumberOfPhyTypes = pwlanAvaibleNewtworkList->Network[i].uNumberOfPhyTypes;
-                wlanAvaibleNetwork.wlanNotConnectableReason = pwlanAvaibleNewtworkList->Network[i].wlanNotConnectableReason;
-                wlanAvaibleNetwork.wlanSignalQuality = pwlanAvaibleNewtworkList->Network[i].wlanSignalQuality;
-*/                   printf("BSS:%d---%d\n", wlanAvaibleNetwork.dot11BssType,pwlanAvaibleNewtworkList->Network[i].dot11BssType);
-                printf("salut\n");
-                break;
+                    }
+
+                    CopyMemory(pwlanAvaibleNetwork, pwlanAvaibleNewtworkList->Network + i, sizeof(WLAN_AVAILABLE_NETWORK));
+                    networkExist = 0;
+                    break;
+
             }
 
         }
@@ -3618,7 +3616,14 @@ WLAN_AVAILABLE_NETWORK getNetworkProprierties(HANDLE wlanHandle, GUID guid, char
         pwlanAvaibleNewtworkList = NULL;
     }
 
-    return wlanAvaibleNetwork;
+    if(pwlanAvaibleNetwork == NULL){
+    printf("RESULT:%d\n",pwlanAvaibleNetwork->dot11BssType);}
+    if(networkExist){
+        return NULL;
+
+    }
+    printf("adress:%p\n",pwlanAvaibleNetwork);
+    return pwlanAvaibleNetwork;
 
 }
 
@@ -3666,17 +3671,20 @@ void connectWlanInterface(GUID guid, DOT11_SSID ssid, LPCWSTR profile){
 
     }
 
-    WLAN_AVAILABLE_NETWORK connectionNetworkData = getNetworkProprierties(wlanHandle, guid, ssid.ucSSID, profile);
+    PWLAN_AVAILABLE_NETWORK connectionNetworkData = getNetworkProprierties(wlanHandle, guid, ssid.ucSSID, profile);
+    printf("adress:%p\n",connectionNetworkData);
+    if(connectionNetworkData == NULL){
+        printf("A network with this parameters doesn't exist!\n\n");
+        return;
+
+    }
     WLAN_CONNECTION_PARAMETERS wlanConnectionParameters;
-    wlanConnectionParameters.wlanConnectionMode = wlan_connection_mode_discovery_secure;
+    wlanConnectionParameters.wlanConnectionMode = wlan_connection_mode_profile;
     //wcscpy_s(wlanConnectionParameters.strProfile, sizeof(wchar_t) * WLAN_MAX_NAME_LENGTH, profile);
-    wlanConnectionParameters.strProfile = NULL;
-    wprintf(L"%ls---%ls---%ls---\n", wlanConnectionParameters.strProfile, connectionNetworkData.strProfileName, profile);
+    wlanConnectionParameters.strProfile = profile;
     wlanConnectionParameters.pDot11Ssid = &ssid;
-    printf("SSID:%s\n", wlanConnectionParameters.pDot11Ssid->ucSSID);
     wlanConnectionParameters.pDesiredBssidList = NULL;
-    wlanConnectionParameters.dot11BssType = connectionNetworkData.dot11BssType;
-    printf("BSS:%d\n", wlanConnectionParameters.dot11BssType);
+    wlanConnectionParameters.dot11BssType = connectionNetworkData->dot11BssType;
 
     if((error = WlanConnect(wlanHandle, &guid, &wlanConnectionParameters, 0)) !=  ERROR_SUCCESS){
 
@@ -3689,6 +3697,7 @@ void connectWlanInterface(GUID guid, DOT11_SSID ssid, LPCWSTR profile){
         ExitProcess(error);
 
     }
+
 
     if((error = WlanCloseHandle(wlanHandle, NULL)) != ERROR_SUCCESS){
         printf("ConnectWlanInterfaceWlanCloseHandleError:%lu",error);

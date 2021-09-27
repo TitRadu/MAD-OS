@@ -36,10 +36,10 @@
 1632089092 source:d:\codeblocks programs\mad-os\command line\mados.c
 	"mados.h"
 
-1632441579 source:d:\aa-pc\utilizator w7\desktop\mad-os\command line\cline.c
+1632576180 source:d:\aa-pc\utilizator w7\desktop\mad-os\command line\cline.c
 	"mados.h"
 
-1632421140 d:\aa-pc\utilizator w7\desktop\mad-os\command line\mados.h
+1632576180 d:\aa-pc\utilizator w7\desktop\mad-os\command line\mados.h
 	<stdio.h>
 	<stdlib.h>
 	<Windows.h>
@@ -52,6 +52,6 @@
 	<wlanapi.h>
 	<errno.h>
 
-1632451658 source:d:\aa-pc\utilizator w7\desktop\mad-os\command line\mados.c
+1632714456 source:d:\aa-pc\utilizator w7\desktop\mad-os\command line\mados.c
 	"mados.h"
 
