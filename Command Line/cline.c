@@ -477,6 +477,19 @@ int main(){
 
         }
 
+        if(strcmp(command,"pcname") == 0){
+            displayComputerName();
+            continue;
+
+        }
+
+
+        if(strcmp(command,"cpcname") == 0){
+            setComputerNameWraper();
+            continue;
+
+        }
+
         if(strcmp(command,"sinfo") == 0){
             systemInformation();
             continue;

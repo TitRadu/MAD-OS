@@ -1366,7 +1366,7 @@ void timerDown(){
     int timerTimeValueInSeconds;
     ULONGLONG startTime;
     ULONGLONG currentTime;
-    ULONGLONG remainingTimerTime;
+    UINT remainingTimerTime;
 
     printf("Counter time:");
     scanf("%d",&timerTimeValueInSeconds);
@@ -1383,7 +1383,7 @@ void timerDown(){
 
         }
 
-        printf("\rCountdown:%llu ",remainingTimerTime);
+        printf("\rCountdown:%u ",remainingTimerTime);
 
         if(_kbhit()){
             printf("\n");
@@ -3167,6 +3167,52 @@ void getPartitions(){
 
 }
 
+void displayComputerName(){
+    DWORD PCsize = THIRTY;
+    wchar_t PCname[THIRTY];
+    DWORD error = 0;
+
+    if(!GetComputerNameExW(ComputerNamePhysicalDnsHostname, PCname,&PCsize)){
+        error = GetLastError();
+        printf("DisplayComputerNameGetComputerNameError:%lu\n",error);
+        ExitProcess(-1);
+
+    }
+
+    wprintf(L"%ls\n",PCname);
+
+}
+
+void setComputerNameWraper(){
+    wchar_t newComputerName[THIRTY];
+    fgetws(newComputerName,THIRTY,stdin);
+    if(newComputerName[wcslen(newComputerName)-1] == '\n'){
+        newComputerName[wcslen(newComputerName)-1] = '\0';
+
+    }
+
+    if(wStringCheck(newComputerName) == 1){
+        return;
+
+    }
+
+    setComputerName(newComputerName);
+
+}
+void setComputerName(wchar_t* newComputerName){
+    DWORD error = 0;
+
+    if(!SetComputerNameExW(ComputerNamePhysicalDnsHostname, newComputerName)){
+        error = GetLastError();
+        printf("SetComputerNameSetComputerNameError:%lu\n",error);
+        ExitProcess(-1);
+
+    }
+
+    printf("To see changes you need to restart the computer!\n\n");
+
+}
+
 void systemInformationPrint(MEMORYSTATUSEX memoryStatus, PERFORMANCE_INFORMATION performanceInformation){
     double memoryLoadPercentage = 100 - ((double)memoryStatus.ullAvailPhys / memoryStatus.ullTotalPhys)* 100 ;
     double totalPhysicalGB = (double)memoryStatus.ullTotalPhys / 1073741824;
@@ -3175,7 +3221,7 @@ void systemInformationPrint(MEMORYSTATUSEX memoryStatus, PERFORMANCE_INFORMATION
 	double avaibleVirtualGB = (double)memoryStatus.ullAvailVirtual / 1073741824;
 
 
-    printf("MemoryLoad: %d%%\n", memoryStatus.dwMemoryLoad);
+    printf("MemoryLoad: %lu%%\n", memoryStatus.dwMemoryLoad);
     printf("MemoryLoad: %.2f%%\n", memoryLoadPercentage);
 	printf("TotalPhys: %.2f GB\n", totalPhysicalGB);
 	printf("AvailablePhys: %.2f GB\n", avaiblePhysicalGB);
@@ -3397,7 +3443,7 @@ void enumWlanInterfaces(){
 
 }
 
-GUID obtainGUIDFromString(){
+GUID* obtainGUIDFromStringWraper(){
     wchar_t stringGUID[40] = {0};
     printf("GUID:");
     fgetws(stringGUID,40,stdin);
@@ -3406,26 +3452,38 @@ GUID obtainGUIDFromString(){
 
     }
 
+    return obtainGUIDFromString(stringGUID);
+
+}
+
+GUID* obtainGUIDFromString(wchar_t* stringGUID){
     if(wStringCheck(stringGUID) == 1){
-        return;
+        return NULL;
 
     }
 
-    CLSID clsid;
-
-    if(CLSIDFromString((LPCOLESTR) stringGUID, &clsid) == E_INVALIDARG){
-        printf("EnumAvaibleNetworkWraperError\n");
+    LPCLSID clsid;
+    if((clsid = (LPCLSID)HeapAlloc(processHeap,HEAP_ZERO_MEMORY,sizeof(CLSID))) == NULL){
+        printf("ObtainGUIDFromStringHeapAllocError!\n");
         ExitProcess(-1);
 
     }
 
-    return (GUID) clsid;
+    if(CLSIDFromString((LPCOLESTR) stringGUID, clsid) == E_INVALIDARG){
+        printf("ObtainGUIDFromStringCLSIDFromStringError\n");
+        ExitProcess(-1);
+
+    }
+    return (GUID*) clsid;
 
 }
 
 void sendGUIDAsParameter(char* control){
-    GUID guid = obtainGUIDFromString();
+    GUID* guid;
+    if((guid = obtainGUIDFromStringWraper()) == NULL){
+        return;
 
+    }
 
     if(strcmp(control, "networks") == 0){
         enumAvaibleNetworks(guid);
@@ -3437,10 +3495,15 @@ void sendGUIDAsParameter(char* control){
 
     }
 
+    if(heapFreeChecker(processHeap,0,guid) == FALSE){
+        return;
+
+    }
+
 }
 
 
-void enumAvaibleNetworks(GUID guid){
+void enumAvaibleNetworks(GUID* guid){
     HANDLE wlanHandle;
     DWORD clientVersion = 1;
     DWORD negotiatedVersion = 0;
@@ -3455,7 +3518,7 @@ void enumAvaibleNetworks(GUID guid){
 
     }
 
-    if((error = WlanGetAvailableNetworkList(wlanHandle, &guid, 3, NULL, &pwlanAvaibleNewtworkList)) !=  ERROR_SUCCESS){
+    if((error = WlanGetAvailableNetworkList(wlanHandle, guid, 3, NULL, &pwlanAvaibleNewtworkList)) !=  ERROR_SUCCESS){
 
         if(error == ERROR_NOT_FOUND){
             printf("Interface not found!\n");
@@ -3530,7 +3593,7 @@ void enumAvaibleNetworks(GUID guid){
 
 }
 
-void disconnectWlanInterface(GUID guid){
+void disconnectWlanInterface(GUID* guid){
     HANDLE wlanHandle;
     DWORD clientVersion = 1;
     DWORD negotiatedVersion = 0;
@@ -3542,7 +3605,7 @@ void disconnectWlanInterface(GUID guid){
 
     }
 
-    if((error = WlanDisconnect(wlanHandle, &guid, NULL)) !=  ERROR_SUCCESS){
+    if((error = WlanDisconnect(wlanHandle, guid, NULL)) !=  ERROR_SUCCESS){
 
         if(error == ERROR_NOT_FOUND){
             printf("Interface not found!\n");
@@ -3562,18 +3625,18 @@ void disconnectWlanInterface(GUID guid){
 
 }
 
-PWLAN_AVAILABLE_NETWORK getNetworkProprierties(HANDLE wlanHandle, GUID guid, char* ssidString, LPCWSTR profile){
+PWLAN_AVAILABLE_NETWORK getNetworkProprierties(HANDLE wlanHandle, GUID* guid, char* ssidString, LPCWSTR profile){
     PWLAN_AVAILABLE_NETWORK_LIST pwlanAvaibleNewtworkList = NULL;
     WLAN_AVAILABLE_NETWORK currentAvaibleNetwork;
     PWLAN_AVAILABLE_NETWORK pwlanAvaibleNetwork;
-    int networkExist = 1;
+    int networkExist = 0;
     DWORD error = 0;
 
 
-    if((error = WlanGetAvailableNetworkList(wlanHandle, &guid, 3, NULL, &pwlanAvaibleNewtworkList)) !=  ERROR_SUCCESS){
+    if((error = WlanGetAvailableNetworkList(wlanHandle, guid, 3, NULL, &pwlanAvaibleNewtworkList)) !=  ERROR_SUCCESS){
         if(error == ERROR_NOT_FOUND){
             printf("Interface not found!\n");
-            return;
+            return NULL;
         }
         printf("EnumAvaibleNetworksWlanGetAvaibleNetworkListError:%lu",error);
         ExitProcess(error);
@@ -3602,7 +3665,7 @@ PWLAN_AVAILABLE_NETWORK getNetworkProprierties(HANDLE wlanHandle, GUID guid, cha
                     }
 
                     CopyMemory(pwlanAvaibleNetwork, pwlanAvaibleNewtworkList->Network + i, sizeof(WLAN_AVAILABLE_NETWORK));
-                    networkExist = 0;
+                    networkExist = 1;
                     break;
 
             }
@@ -3616,19 +3679,17 @@ PWLAN_AVAILABLE_NETWORK getNetworkProprierties(HANDLE wlanHandle, GUID guid, cha
         pwlanAvaibleNewtworkList = NULL;
     }
 
-    if(pwlanAvaibleNetwork == NULL){
-    printf("RESULT:%d\n",pwlanAvaibleNetwork->dot11BssType);}
-    if(networkExist){
+    if(!networkExist){
+        printf("A network with this parameters doesn't exist!\n\n");
         return NULL;
 
     }
-    printf("adress:%p\n",pwlanAvaibleNetwork);
     return pwlanAvaibleNetwork;
 
 }
 
 void connectWlanInterfaceWraper(){
-    GUID guid = obtainGUIDFromString();
+    GUID* guid = obtainGUIDFromStringWraper();
 
     DOT11_SSID dot11ssid;
     printf("SSID:");
@@ -3657,9 +3718,14 @@ void connectWlanInterfaceWraper(){
 
     connectWlanInterface(guid, dot11ssid, profile);
 
+    if(heapFreeChecker(processHeap,0,guid) == FALSE){
+        return;
+
+    }
+
 }
 
-void connectWlanInterface(GUID guid, DOT11_SSID ssid, LPCWSTR profile){
+void connectWlanInterface(GUID* guid, DOT11_SSID ssid, LPCWSTR profile){
     HANDLE wlanHandle;
     DWORD clientVersion = 1;
     DWORD negotiatedVersion = 0;
@@ -3672,9 +3738,7 @@ void connectWlanInterface(GUID guid, DOT11_SSID ssid, LPCWSTR profile){
     }
 
     PWLAN_AVAILABLE_NETWORK connectionNetworkData = getNetworkProprierties(wlanHandle, guid, ssid.ucSSID, profile);
-    printf("adress:%p\n",connectionNetworkData);
     if(connectionNetworkData == NULL){
-        printf("A network with this parameters doesn't exist!\n\n");
         return;
 
     }
@@ -3686,7 +3750,7 @@ void connectWlanInterface(GUID guid, DOT11_SSID ssid, LPCWSTR profile){
     wlanConnectionParameters.pDesiredBssidList = NULL;
     wlanConnectionParameters.dot11BssType = connectionNetworkData->dot11BssType;
 
-    if((error = WlanConnect(wlanHandle, &guid, &wlanConnectionParameters, 0)) !=  ERROR_SUCCESS){
+    if((error = WlanConnect(wlanHandle, guid, &wlanConnectionParameters, 0)) !=  ERROR_SUCCESS){
 
         if(error == ERROR_NOT_FOUND){
             printf("Interface not found!\n");

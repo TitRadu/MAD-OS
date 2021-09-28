@@ -136,9 +136,21 @@ void init();
 unsigned long long fibonacci(int);
 void printFibonacci();
 void getPartitions();
+void setComputerNameWraper();
+void setComputerName(wchar_t*);
+void displayComputerName();
 void systemInformationPrint();
 void systemInformation();
 CONSOLE_DATA consoleDataPreparing();
 void liveSystemInformation();
+void enumWlanInterfaces();
+GUID* obtainGUIDFromStringWraper();
+GUID* obtainGUIDFromString(wchar_t*);
+void sendGUIDAsParameter(char*);
+void enumAvaibleNetworks(GUID*);
+void disconnectWlanInterface(GUID*);
+PWLAN_AVAILABLE_NETWORK getNetworkProprierties(HANDLE, GUID*, char*, LPCWSTR);
+void connectWlanInterfaceWraper();
+void connectWlanInterface(GUID*, DOT11_SSID, LPCWSTR);
 
 #endif // MADOS_H_INCLUDED
