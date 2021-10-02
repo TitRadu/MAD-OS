@@ -17,3 +17,5 @@ https://stackoverflow.com/questions/21294713/non-blocking-i-o-in-c-windows -> _k
 https://stackoverflow.com/questions/10905892/equivalent-of-gettimeday-for-windows -> GetTickCount() function.
 https://stackoverflow.com/questions/30126490/how-to-hide-console-cursor-in-c -> SetConsoleCursorInfo().
 https://stackoverflow.com/questions/35800020/how-do-i-find-the-coordinates-of-the-cursor-in-a-console-window -> GetConsoleScreenBufferInfo().
+https://www.winsocketdotnetworkprogramming.com/winsock2programming/winsock2advancedotherprotocol4k.html -> initialize BLUETOOTH_DEVICE_SEARCH_PARAMS structure.
+https://zetcode.com/gui/winapi/datetime/ -> GetDateFormatEx(), GetTimeFormatEx() for display data.

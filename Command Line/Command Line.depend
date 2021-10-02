@@ -55,3 +55,24 @@
 1632792846 source:d:\aa-pc\utilizator w7\desktop\mad-os\command line\mados.c
 	"mados.h"
 
+1633181665 source:d:\proiecte c\mad-os\command line\cline.c
+	"mados.h"
+
+1633182652 d:\proiecte c\mad-os\command line\mados.h
+	<stdio.h>
+	<stdlib.h>
+	<Windows.h>
+	<time.h>
+	<ctype.h>
+	<lm.h>
+	<psapi.h>
+	<intsafe.h>
+	<shlwapi.h>
+	<wlanapi.h>
+	<bthsdpdef.h>
+	<bluetoothapis.h>
+	<errno.h>
+
+1633182736 source:d:\proiecte c\mad-os\command line\mados.c
+	"mados.h"
+

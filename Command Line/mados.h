@@ -16,6 +16,8 @@
 #include <intsafe.h>
 #include <shlwapi.h>
 #include <wlanapi.h>
+#include <bthsdpdef.h>
+#include <bluetoothapis.h>
 #include <errno.h>
 
 typedef struct command{
@@ -152,5 +154,8 @@ void disconnectWlanInterface(GUID*);
 PWLAN_AVAILABLE_NETWORK getNetworkProprierties(HANDLE, GUID*, char*, LPCWSTR);
 void connectWlanInterfaceWraper();
 void connectWlanInterface(GUID*, DOT11_SSID, LPCWSTR);
+void enumerateBluetoothRadios();
+void printBluetoothDeviceInformations(BLUETOOTH_DEVICE_INFO);
+void enumerateBluetoothDevices();
 
 #endif // MADOS_H_INCLUDED

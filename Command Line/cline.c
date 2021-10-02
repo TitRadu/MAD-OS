@@ -526,6 +526,20 @@ int main(){
 
         }
 
+
+        if(strcmp(command,"bthrad") == 0){
+            enumerateBluetoothRadios();
+            continue;
+
+        }
+
+        if(strcmp(command,"bthdev") == 0){
+            enumerateBluetoothDevices();
+            continue;
+
+        }
+
+
         printf("Incorrect command!\n");
 
     }
