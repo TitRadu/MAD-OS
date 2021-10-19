@@ -1378,18 +1378,27 @@ void timerDown(){
         remainingTimerTime = (timerTimeValueInSeconds) - ((currentTime - startTime)/1000);
 
         if(remainingTimerTime == 0){
+
             printf("\rCountdown:0\n");
-            break;
+            while(1){
+                Beep(750, 1000);
+                if(_kbhit()){
+                    printf("\n");
+                    return;
+
+                }
+
+            }
 
         }
+
+          if(_kbhit()){
+                    printf("\n");
+                    return;
+
+                }
 
         printf("\rCountdown:%u ",remainingTimerTime);
-
-        if(_kbhit()){
-            printf("\n");
-            break;
-
-        }
 
     }
 
