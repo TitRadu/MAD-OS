@@ -551,7 +551,7 @@ void createFile(wchar_t* absolutePath){
 
     DWORD error = 0;
     HANDLE createFileHandler = NULL;
-    if((createFileHandler = CreateFileW(absolutePath,GENERIC_WRITE,0,NULL,CREATE_NEW,FILE_ATTRIBUTE_NORMAL,NULL)) == INVALID_HANDLE_VALUE){
+    if((createFileHandler = CreateFileW(absolutePath, GENERIC_WRITE, 0, NULL,CREATE_NEW,FILE_ATTRIBUTE_NORMAL, NULL)) == INVALID_HANDLE_VALUE){
         error = GetLastError();
         if(error == ERROR_INVALID_NAME){
             printf("Invalid argument or file name is too long!\n");
@@ -1245,6 +1245,16 @@ void myCopyFile(char* control){
 
 void generateFile(){
     forkk(L"fileGeneratorCL.exe",L"");
+
+}
+
+void cryptFile(){
+    forkk(L"cryptFileCL.exe",L"");
+
+}
+
+void decryptFile(){
+    forkk(L"decryptFileCL.exe",L"");
 
 }
 

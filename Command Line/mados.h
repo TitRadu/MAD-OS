@@ -18,6 +18,7 @@
 #include <wlanapi.h>
 #include <bthsdpdef.h>
 #include <bluetoothapis.h>
+#include <bcrypt.h>
 #include <errno.h>
 
 typedef struct command{
@@ -77,6 +78,8 @@ void help();//
 void copyFile(wchar_t*,wchar_t*);
 void myCopyFile(char*);//
 void generateFile();//
+void cryptFile();
+void decryptFile();
 void connectToURLWraper();
 void connectToURL(wchar_t*);///
 void displayTime();//

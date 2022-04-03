@@ -218,6 +218,19 @@ int main(){
 
         }
 
+        if(strcmp(command,"crypt") == 0){
+            cryptFile();
+            continue;
+
+        }
+
+        if(strcmp(command,"decrypt") == 0){
+            decryptFile();
+            continue;
+
+        }
+        printf("Incorrect command!\n");
+
         if(strcmp(command,"url") == 0){
             connectToURLWraper();
             continue;
@@ -526,7 +539,6 @@ int main(){
 
         }
 
-
         if(strcmp(command,"bthrad") == 0){
             enumerateBluetoothRadios();
             continue;
@@ -538,9 +550,6 @@ int main(){
             continue;
 
         }
-
-
-        printf("Incorrect command!\n");
 
     }
 

@@ -55,10 +55,10 @@
 1632792846 source:d:\aa-pc\utilizator w7\desktop\mad-os\command line\mados.c
 	"mados.h"
 
-1634430124 source:d:\proiecte c\mad-os\command line\cline.c
+1648933011 source:d:\proiecte c\mad-os\command line\cline.c
 	"mados.h"
 
-1633182652 d:\proiecte c\mad-os\command line\mados.h
+1648932429 d:\proiecte c\mad-os\command line\mados.h
 	<stdio.h>
 	<stdlib.h>
 	<Windows.h>
@@ -71,8 +71,9 @@
 	<wlanapi.h>
 	<bthsdpdef.h>
 	<bluetoothapis.h>
+	<bcrypt.h>
 	<errno.h>
 
-1633390578 source:d:\proiecte c\mad-os\command line\mados.c
+1648932368 source:d:\proiecte c\mad-os\command line\mados.c
 	"mados.h"
 
