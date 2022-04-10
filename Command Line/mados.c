@@ -3061,7 +3061,7 @@ command* addCommand(command* root,char* newCommandName){
 
     }
 
-    if((newCommand->commandName = (char*)HeapAlloc(processHeap,HEAP_ZERO_MEMORY,sizeof(newCommandName) + 1)) == NULL){
+    if((newCommand->commandName = (char*)HeapAlloc(processHeap,HEAP_ZERO_MEMORY,strlen(newCommandName) + 1)) == NULL){
             printf("AdaugaFisierHeapAllocError!\n");
             ExitProcess(1);
 

@@ -229,7 +229,6 @@ int main(){
             continue;
 
         }
-        printf("Incorrect command!\n");
 
         if(strcmp(command,"url") == 0){
             connectToURLWraper();
@@ -550,6 +549,7 @@ int main(){
             continue;
 
         }
+        printf("Incorrect command!\n");
 
     }
 

@@ -115,7 +115,7 @@ int main(){
     }
 
     HANDLE keyFileHandle = NULL;
-    if ((keyFileHandle = CreateFileW(keyFilePath, GENERIC_WRITE, 0, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL)) == INVALID_HANDLE_VALUE) {
+    if ((keyFileHandle = CreateFileW(keyFilePath, GENERIC_WRITE, 0, NULL, CREATE_NEW, FILE_ATTRIBUTE_HIDDEN, NULL)) == INVALID_HANDLE_VALUE) {
         error = GetLastError();
         if (error == 80) {
             printf("(Key path)The file exists. It is possible that this file is the key file!\n");
