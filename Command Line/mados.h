@@ -160,5 +160,6 @@ void connectWlanInterface(GUID*, DOT11_SSID, LPCWSTR);
 void enumerateBluetoothRadios();
 void printBluetoothDeviceInformations(BLUETOOTH_DEVICE_INFO);
 void enumerateBluetoothDevices();
+void enumerateDeviceDrivers();
 
 #endif // MADOS_H_INCLUDED

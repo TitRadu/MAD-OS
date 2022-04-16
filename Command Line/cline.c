@@ -549,6 +549,12 @@ int main(){
             continue;
 
         }
+
+        if(strcmp(command,"drivers") == 0){
+            enumerateDeviceDrivers();
+            continue;
+
+        }
         printf("Incorrect command!\n");
 
     }

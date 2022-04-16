@@ -3940,3 +3940,55 @@ void enumerateBluetoothDevices(){
 
 }
 
+void enumerateDeviceDrivers(){
+    LPVOID drivers[1024];
+    DWORD numberOfBytesNeeded;
+    int numberOfDrivers, i;
+    DWORD error = 0;
+
+    if(EnumDeviceDrivers(drivers, sizeof(drivers), &numberOfBytesNeeded) == TRUE){
+        numberOfDrivers =  numberOfBytesNeeded / sizeof(drivers[0]);
+
+        printf("Drivers are:(base name -> file name)\n");
+
+        WCHAR driverName[1024];
+        for(i=0; i<numberOfDrivers; i++){
+            if(GetDeviceDriverBaseNameW(drivers[i], driverName, sizeof(driverName)) == TRUE){
+                wprintf(L"Application need some changes. Contact the development engineer!\n");
+                ExitProcess(-1);
+
+            }else{
+                error = GetLastError();
+                if(error == ERROR_ENVVAR_NOT_FOUND){
+                    wprintf(L"%d:%s", i+1, driverName);
+                    if(GetDeviceDriverFileNameW(drivers[i], driverName, sizeof(driverName)) == TRUE){
+                        wprintf(L"Application need some changes. Contact the development engineer!\n");
+                        ExitProcess(-1);
+
+                    }else{
+                        error = GetLastError();
+                        if(error == ERROR_ENVVAR_NOT_FOUND){
+                            wprintf(L" \t-> \t%s\n",driverName);
+                            continue;
+
+                        }
+                        printf("EnumerateDeviceDriversGetDeviceDriverFileNameWError:%lu\nl", error);
+                        ExitProcess(error);
+
+                    }
+
+                }
+                printf("EnumerateDeviceDriversGetDeviceDriverBaseNameWError:%lu\nl", error);
+                ExitProcess(error);
+            }
+
+        }
+
+    }else{
+        error = GetLastError();
+        printf("EnumerateDeviceDriversEnumDeviceDriversError:%lu", error);
+        ExitProcess(error);
+    }
+    printf("\n");
+
+}
