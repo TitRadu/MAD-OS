@@ -3992,3 +3992,28 @@ void enumerateDeviceDrivers(){
     printf("\n");
 
 }
+
+void imdbAdvancedSearchWrapper(){
+    WCHAR title[1024];
+
+    printf("Title:");
+    fgetws(title,MAX_PATH,stdin);
+    if(title[wcslen(title)-1] == '\n'){
+        title[wcslen(title)-1] = '\0';
+
+    }
+
+    if(wStringCheck(title) == 1){
+        return;
+
+    }
+
+    wchar_t url[41+wcslen(title)+36+1];
+    url[0] = '\0';
+    wcscat_s(url,sizeof(url),L"https://www.imdb.com/search/title/?title=");
+    wcscat_s(url,sizeof(url),title);
+    wcscat_s(url,sizeof(url),L"&title_type=feature&num_votes=10000,");
+
+    connectToURL(url);
+
+}

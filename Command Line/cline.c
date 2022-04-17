@@ -555,6 +555,12 @@ int main(){
             continue;
 
         }
+
+        if(strcmp(command,"film") == 0){
+            imdbAdvancedSearchWrapper();
+            continue;
+
+        }
         printf("Incorrect command!\n");
 
     }
