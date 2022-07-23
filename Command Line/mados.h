@@ -49,14 +49,17 @@ void changePath(wchar_t*);
 void parse(wchar_t*,wchar_t);
 void chooseFileOperation(wchar_t*,char*);
 void fileOperationWraper(wchar_t*,char*);
-void createDirectory(wchar_t*);//
+BOOL createDirectory(wchar_t*);
+void createHiddenDirectory(wchar_t*);//
 int removeDirectory(wchar_t*);//
 void removeDirectoryRecursive(wchar_t*);//
-void createFile(wchar_t*);//
+void createFile(wchar_t*, unsigned int);//
 void removeFileWraper(wchar_t*);
 void removeFile(wchar_t*);//
 void renameFileWraper(wchar_t*);
 void renameFile(wchar_t*,wchar_t*);
+BOOL changeFileAttributtes(PDWORD, char*);
+void setFileProperties(wchar_t*, char*);
 void openDefault();//
 void openFileWithProgramWraper(wchar_t*);
 void openFileWithProgram(wchar_t*,wchar_t*);///

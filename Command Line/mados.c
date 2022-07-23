@@ -344,34 +344,58 @@ wchar_t* preparePathDependingOnType(wchar_t* path,wchar_t* checkPath){
 
 void chooseFileOperation(wchar_t* absolutePath,char* control){
     if(strcmp(control,"cdir") == 0){
-            createDirectory(absolutePath);
-            return;
+        createDirectory(absolutePath);
+        return;
 
-        }
+    }
+
+    if(strcmp(control,"chdir") == 0){
+        createHiddenDirectory(absolutePath);
+        return;
+
+    }
 
     if(strcmp(control,"rdir") == 0){
-            removeDirectory(absolutePath);
-            return;
+        removeDirectory(absolutePath);
+        return;
 
-        }
+    }
 
     if(strcmp(control,"Rdir") == 0){
-            removeDirectoryRecursive(absolutePath);
-            return;
+        removeDirectoryRecursive(absolutePath);
+        return;
 
-        }
+    }
 
     if(strcmp(control,"cfile") == 0){
-            createFile(absolutePath);
-            return;
+        createFile(absolutePath, FILE_ATTRIBUTE_NORMAL);
+        return;
 
-        }
+    }
+
+    if(strcmp(control,"chfile") == 0){
+        createFile(absolutePath, FILE_ATTRIBUTE_HIDDEN);
+        return;
+
+    }
 
     if(strcmp(control,"rfile") == 0){
-            removeFile(absolutePath);
-            return;
+        removeFile(absolutePath);
+        return;
 
-        }
+    }
+
+    if(strcmp(control,"hide") == 0){
+        setFileProperties(absolutePath, "hide");
+        return;
+
+    }
+
+    if(strcmp(control,"show") == 0){
+        setFileProperties(absolutePath, "show");
+        return;
+
+    }
 
 }
 
@@ -402,10 +426,10 @@ void fileOperationWraper(wchar_t* path, char* control){
 
 }
 
-void createDirectory(wchar_t* absolutePath){
+BOOL createDirectory(wchar_t* absolutePath){
     if(wcslen(absolutePath) > 247){
         printf("File name is too long!\n");
-        return;
+        return FALSE;
 
     }
 
@@ -414,40 +438,48 @@ void createDirectory(wchar_t* absolutePath){
         error = GetLastError();
         if(error == ERROR_INVALID_NAME){
             printf("Invalid argument!\n");
-            return;
+            return FALSE;
 
         }
 
         if(error == ERROR_ALREADY_EXISTS){
             printf("The file already exists!\n");
-            return;
+            return FALSE;
 
         }
 
         if(error == ERROR_PATH_NOT_FOUND){
             printf("A component from argument doesn't exist!\n");
-            return;
+            return FALSE;
 
         }
 
         if(error == ERROR_ACCESS_DENIED){
             printf("Permission denied!\n");
-            return;
+            return FALSE;
 
         }
 
         if(error == ERROR_FILENAME_EXCED_RANGE){
             printf("File name is too long!\n");
-            return;
+            return FALSE;
 
         }
 
         printf("CreateDirectoryCreateDirectoryError:%lu\n",error);
+        return FALSE;
+
+    }
+
+}
+
+void createHiddenDirectory(wchar_t* absolutePath){
+    if(!createDirectory(absolutePath)){
         return;
 
     }
 
-
+    setFileProperties(absolutePath, "hide");
 
 }
 
@@ -542,7 +574,7 @@ void removeDirectoryRecursive(wchar_t* absolutePath){
 
 }
 
-void createFile(wchar_t* absolutePath){
+void createFile(wchar_t* absolutePath, unsigned int fileVisibility){
     if(wcslen(absolutePath) >= MAX_PATH -1){
         printf("File name is too long!\n");
         return;
@@ -551,7 +583,7 @@ void createFile(wchar_t* absolutePath){
 
     DWORD error = 0;
     HANDLE createFileHandler = NULL;
-    if((createFileHandler = CreateFileW(absolutePath, GENERIC_WRITE, 0, NULL,CREATE_NEW,FILE_ATTRIBUTE_NORMAL, NULL)) == INVALID_HANDLE_VALUE){
+    if((createFileHandler = CreateFileW(absolutePath, GENERIC_WRITE, 0, NULL,CREATE_NEW, fileVisibility, NULL)) == INVALID_HANDLE_VALUE){
         error = GetLastError();
         if(error == ERROR_INVALID_NAME){
             printf("Invalid argument or file name is too long!\n");
@@ -760,6 +792,92 @@ void renameFile(wchar_t* oldName,wchar_t* newName){
         }
 
         printf("renameFileMoveFileError:%lu\n",error);
+        return;
+
+    }
+
+}
+
+BOOL changeFileAttributtes(PDWORD attributes, char* operation){
+    if(strcmp(operation,"hide") == 0){
+        if((*attributes & 0x02) == 0){
+            *attributes += 0x02;
+            return TRUE;
+
+        }else{
+            printf("File is already invisible!\n\n");
+            return FALSE;
+
+        }
+
+    }
+
+    if(strcmp(operation,"show") == 0){
+        if((*attributes & 0x02) == 0x02){
+            *attributes -= 0x02;
+            return TRUE;
+
+        }else{
+            printf("File is already visible!\n\n");
+            return FALSE;
+
+        }
+
+    }
+
+    printf("Invalid operation!\n");
+    return FALSE;
+
+}
+
+void setFileProperties(wchar_t* absolutePath, char* operation){
+    if(wcslen(absolutePath) >= MAX_PATH -1){
+        printf("File name is too long!\n");
+        return;
+
+    }
+
+    DWORD attributes = 0;
+    DWORD error = 0;
+
+    if((attributes = GetFileAttributesW(absolutePath)) == INVALID_FILE_ATTRIBUTES){
+        error = GetLastError();
+        if(error == ERROR_INVALID_NAME){
+            printf("Invalid argument!\n");
+            return;
+
+        }
+
+        if(error == ERROR_FILE_NOT_FOUND){
+            printf("This path doesn't exist as file!\n");
+            return;
+        }
+
+        if(error == ERROR_PATH_NOT_FOUND){
+            printf("A component from argument doesn't exist!\n");
+            return;
+        }
+
+        if(error == ERROR_ACCESS_DENIED){
+            printf("Access is denied!\n");
+            return;
+        }
+
+        printf("GetFilePropertiesGetFileAttributesWError:%lu\n",error);
+        return;
+
+    }
+
+    printf("Current proprieties value: %lu\n", attributes);
+
+    if(changeFileAttributtes(&attributes, operation) == FALSE){
+        return;
+
+    }
+
+    if(SetFileAttributesW(absolutePath, attributes) == FALSE){
+        error = GetLastError();
+        printf("SetFilePropertiesSetFileAttributesWError:%lu\n",error);
         return;
 
     }

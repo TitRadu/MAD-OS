@@ -134,6 +134,12 @@ int main(){
 
         }
 
+        if(strcmp(command,"chdir") == 0){
+            fileOperationWraper(path,command);
+            continue;
+
+        }
+
         if(strcmp(command,"rdir") == 0){
             fileOperationWraper(path,command);
             continue;
@@ -158,7 +164,25 @@ int main(){
 
         }
 
+        if(strcmp(command,"chfile") == 0){
+            fileOperationWraper(path,command);
+            continue;
+
+        }
+
         if(strcmp(command,"rfile") == 0){
+            fileOperationWraper(path,command);
+            continue;
+
+        }
+
+        if(strcmp(command,"hide") == 0){
+            fileOperationWraper(path,command);
+            continue;
+
+        }
+
+        if(strcmp(command,"show") == 0){
             fileOperationWraper(path,command);
             continue;
 
