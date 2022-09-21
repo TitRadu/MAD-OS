@@ -164,5 +164,7 @@ void enumerateBluetoothRadios();
 void printBluetoothDeviceInformations(BLUETOOTH_DEVICE_INFO);
 void enumerateBluetoothDevices();
 void enumerateDeviceDrivers();
+void imdbAdvancedSearchWrapper();
+void youTubeSearchWrapper();
 
 #endif // MADOS_H_INCLUDED

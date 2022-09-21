@@ -585,6 +585,12 @@ int main(){
             continue;
 
         }
+
+        if(strcmp(command,"youtube") == 0){
+            youTubeSearchWrapper();
+            continue;
+
+        }
         printf("Incorrect command!\n");
 
     }

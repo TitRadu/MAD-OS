@@ -471,6 +471,7 @@ BOOL createDirectory(wchar_t* absolutePath){
 
     }
 
+    return TRUE;
 }
 
 void createHiddenDirectory(wchar_t* absolutePath){
@@ -3274,7 +3275,7 @@ void printFibonacci(){
         return;
 
     }
-    printf("Result:%llu\n\n",result);
+    printf("Result:%I64u\n\n",result);
 
 }
 
@@ -4052,7 +4053,7 @@ void enumerateBluetoothDevices(){
     if(BluetoothFindDeviceClose(bluetoothDeviceFindHandle) == FALSE){
         error = GetLastError();
         printf("EnumerateBluetoothDevicesBluetoothFindDeviceCloseError:%lu", error);
-        ExitProcces(error);
+        ExitProcess(error);
 
     }
 
@@ -4135,3 +4136,27 @@ void imdbAdvancedSearchWrapper(){
     connectToURL(url);
 
 }
+
+void youTubeSearchWrapper(){
+    WCHAR searched[1024];
+
+    printf("Search:");
+    fgetws(searched,MAX_PATH,stdin);
+    if(searched[wcslen(searched)-1] == '\n'){
+        searched[wcslen(searched)-1] = '\0';
+
+    }
+
+    if(wStringCheck(searched) == 1){
+        return;
+
+    }
+
+    wchar_t url[45+wcslen(searched)+1];
+    url[0] = '\0';
+    wcscat_s(url,sizeof(url),L"https://www.youtube.com/results?search_query=");
+    wcscat_s(url,sizeof(url),searched);
+
+    connectToURL(url);
+}
+
