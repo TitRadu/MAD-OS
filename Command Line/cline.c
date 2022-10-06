@@ -68,7 +68,13 @@ int main(){
         }
 
         if(strcmp(command,"cline") == 0){
-            cline();
+            cline(FALSE);
+            continue;
+
+        }
+
+        if(strcmp(command,"lcline") == 0){
+            cline(TRUE);
             continue;
 
         }
@@ -188,26 +194,32 @@ int main(){
 
         }
 
-        if(strcmp(command,"openD") == 0){
+        if(strcmp(command,"open") == 0){
             openDefault();
             continue;
 
         }
 
-        if(strcmp(command,"openPF") == 0){
+        if(strcmp(command,"openF") == 0){
+            openFileWraper(path);
+            continue;
+
+        }
+
+        if(strcmp(command,"openFP") == 0){
             openFileWithProgramWraper(path);
             continue;
 
         }
 
         if(strcmp(command,"run") == 0){
-            run(path);
+            runWraper(path, TRUE);
             continue;
 
         }
 
-        if(strcmp(command,"openP") == 0){
-            openPathWraper(path);
+        if(strcmp(command,"runP") == 0){
+            runWraper(path, FALSE);
             continue;
 
         }

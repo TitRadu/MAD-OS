@@ -209,6 +209,12 @@ applicationDirectory,
     DWORD error = 0;
     if(createProccesCheck == FALSE){
         error = GetLastError();
+        if(error == ERROR_BAD_EXE_FORMAT){
+            printf("First argument is a non-executable file!\n\n");
+            return;
+
+        }        
+
         if(error == 740){
             printf("You don't have permission to do this operation.Please run command line as administrator!\n\n");
             return;
@@ -906,21 +912,84 @@ void openDefault(){
 
     }
 
-    if(existCheck != 0){
+    if(existCheck){
         printf("First argument is a file(regular file or directory)!\n");
         return;
 
     }
 
-    HINSTANCE shellCheck = 0;
-    if((shellCheck=ShellExecuteW(NULL,L"open",program,NULL,NULL,1)) <= (HINSTANCE)32){
-        if(shellCheck == (HINSTANCE)2){
+    HINSTANCE error = 0;
+    if((error = ShellExecuteW(NULL,L"open",program,NULL,NULL,1)) <= (HINSTANCE)32){
+        if(error == (HINSTANCE)2){
             printf("Program not found!\n");
             return;
 
         }
 
-        printf("Start1ShellExecuteError:%p!\n",shellCheck);
+        printf("Start1ShellExecuteError:%p!\n", error);
+        return;
+
+    }
+
+}
+
+void openFileWraper(wchar_t* path){
+    wchar_t openFileName[MAX_PATH];
+    fgetws(openFileName,MAX_PATH,stdin);
+    if(openFileName[wcslen(openFileName)-1] == '\n'){
+        openFileName[wcslen(openFileName)-1] = '\0';
+
+    }
+
+    openFile(path,openFileName);
+
+}
+
+void openFile(wchar_t* path, wchar_t *openFileName){
+    if(wStringCheck(openFileName) == 1){
+        return;
+
+    }
+
+    wchar_t* absolutePath;
+    if((absolutePath = preparePathDependingOnType(path,openFileName)) == NULL){
+        return;
+
+    }
+
+    if(wcslen(absolutePath) >= MAX_PATH -1){
+        printf("File name is too long!\n");
+        return;
+
+   }
+
+    int existCheck = 0;
+    if((existCheck=wExist(absolutePath,L"")) == 3){
+        printf("Invalid argument!\n");
+        return;
+
+    }
+
+    if(!existCheck){
+        printf("This path doesn't exist as file!\n");
+        return;
+
+    }
+
+    HINSTANCE error = 0;
+    if((error = ShellExecuteW(NULL,L"open",absolutePath,NULL,NULL,1)) <= (HINSTANCE)32){
+        if(error == (HINSTANCE)5){
+            printf("The operating system denied access to the specified file!\n");
+            return;
+
+        }
+
+        printf("OpenPathShellExecuteError:%p!\n", error);
+        return;
+
+    }
+
+    if(heapFreeChecker(processHeap,0,absolutePath) == FALSE){
         return;
 
     }
@@ -953,7 +1022,7 @@ void openFileWithProgramWraper(wchar_t* path){
 
     }
 
-    if(existCheck == 1 || existCheck == 2){
+    if(existCheck){
         printf("First argument is a file(regular file or directory)!\n");
         return;
     }
@@ -988,7 +1057,7 @@ void openFileWithProgramWraper(wchar_t* path){
 
     }
 
-    if(existCheck == 0){
+    if(!existCheck){
         printf("Second argument doesn't exist as file!\n");
         return;
 
@@ -1000,6 +1069,8 @@ void openFileWithProgramWraper(wchar_t* path){
 
     }
 
+    wStringInQuatationMarks(absolutePath);
+
     openFileWithProgram(program,absolutePath);
 
     if(heapFreeChecker(processHeap,0,absolutePath) == FALSE){
@@ -1010,14 +1081,14 @@ void openFileWithProgramWraper(wchar_t* path){
 }
 
 void openFileWithProgram(wchar_t* program,wchar_t* absolutePath){
-    HINSTANCE shellCheck = 0;
-    if((shellCheck=ShellExecuteW(NULL,L"open",program,absolutePath,NULL,1)) <= (HINSTANCE)32){
-        if(shellCheck == (HINSTANCE)2){
+    HINSTANCE error = 0;
+    if((error = ShellExecuteW(NULL,L"open",program,absolutePath,NULL,1)) <= (HINSTANCE)32){
+        if(error == (HINSTANCE)2){
             printf("Program not found!\n");
             return;
 
         }
-        printf("OpenFileWithProgramShellExecuteError:%p!\n",shellCheck);
+        printf("OpenFileWithProgramShellExecuteError:%p!\n", error);
         return;
 
     }
@@ -1025,7 +1096,7 @@ void openFileWithProgram(wchar_t* program,wchar_t* absolutePath){
 
 }
 
-void run(wchar_t* path){
+void runWraper(wchar_t* path, BOOL isLocalMode){
     wchar_t executable[MAX_PATH];
     printf("Executable:");
     fgetws(executable,MAX_PATH,stdin);
@@ -1070,24 +1141,15 @@ void run(wchar_t* path){
     }
 
     if(existCheck == 1){
-        if(wcscmp(executable+wcslen(executable)-4,L".exe") == 0){
-            wchar_t argumentList[MAX_PATH];
-            printf("List of arguments:");
-            fgetws(argumentList,MAX_PATH,stdin);
-            if(argumentList[wcslen(argumentList)-1] == '\n'){
-                argumentList[wcslen(argumentList)-1] = '\0';
-
-            }
-            forkk(executableAbsolutePath,argumentList);
-
-
-        }else{
-
-            printf("First argument is a non-executable file!\n\n");
-            return;
+        wchar_t argumentList[MAX_PATH];
+        printf("List of arguments:");
+        fgetws(argumentList,MAX_PATH,stdin);
+        if(argumentList[wcslen(argumentList)-1] == '\n'){
+            argumentList[wcslen(argumentList)-1] = '\0';
 
         }
 
+        run(executableAbsolutePath, argumentList, isLocalMode);
     }
 
     if(heapFreeChecker(processHeap,0,executableAbsolutePath) == FALSE){
@@ -1095,6 +1157,20 @@ void run(wchar_t* path){
 
     }
 
+}
+
+void run(wchar_t* executable, wchar_t* arguments , BOOL isLocalMode){
+    if(isLocalMode && wcscmp(executable+wcslen(executable)-4,L".msi") != 0){
+        forkk(executable, arguments);
+    }else
+    {
+        SetConsoleCtrlHandler(NULL,FALSE);
+        if((ShellExecuteW(NULL, L"open", executable, arguments, NULL, 1)) <= (HINSTANCE)32){
+            printf("ClineShellExecuteError:Error!\n");
+            return;
+        }
+        SetConsoleCtrlHandler(NULL,TRUE);
+    }
 }
 
 int wNumberOfAparition(wchar_t* string,wchar_t c){
@@ -1140,11 +1216,17 @@ void back(wchar_t* path){
 
 }
 
-void cline(){
-    if((ShellExecuteW(NULL,L"open",L"Command Line.exe",NULL,NULL,1)) <= (HINSTANCE)32){
-        printf("ClineShellExecuteError:Error!\n");
-        return;
+void cline(BOOL isLocalMode){
+    if(isLocalMode){
+        forkk(L"Command Line.exe",L"");  
+    }else
+    {
+        HINSTANCE error; 
+        if((error = ShellExecuteW(NULL,L"open",L"Command Line.exe",NULL,NULL,1)) <= (HINSTANCE)32){
+            printf("ClineShellExecuteError:%p\n", error);
+            return;
 
+        }
     }
 
 }
@@ -1212,69 +1294,6 @@ void ipc(){
 
 void ipca(){
     forkk(CMD,L"/c ipconfig /all");
-
-}
-
-void openPathWraper(wchar_t* path){
-    wchar_t openFileName[MAX_PATH];
-    fgetws(openFileName,MAX_PATH,stdin);
-    if(openFileName[wcslen(openFileName)-1] == '\n'){
-        openFileName[wcslen(openFileName)-1] = '\0';
-
-    }
-
-    openPath(path,openFileName);
-
-}
-
-void openPath(wchar_t* path, wchar_t *openFileName){
-    if(wStringCheck(openFileName) == 1){
-        return;
-
-    }
-
-    wchar_t* absolutePath;
-    if((absolutePath = preparePathDependingOnType(path,openFileName)) == NULL){
-        return;
-
-    }
-
-    if(wcslen(absolutePath) >= MAX_PATH -1){
-        printf("File name is too long!\n");
-        return;
-
-   }
-
-    int existCheck = 0;
-    if((existCheck=wExist(absolutePath,L"")) == 3){
-        printf("Invalid argument!\n");
-        return;
-
-    }
-
-    if(existCheck == 0){
-        printf("This path doesn't exist as file!\n");
-        return;
-
-    }
-
-    HINSTANCE shellCheck = 0;
-    if((shellCheck = ShellExecuteW(NULL,L"open",absolutePath,NULL,NULL,1)) <= (HINSTANCE)32){
-        if(shellCheck == (HINSTANCE)5){
-            printf("The operating system denied access to the specified file!\n");
-            return;
-
-        }
-
-        printf("OpenPathShellExecuteError:%p!\n",shellCheck);
-        return;
-
-    }
-
-    if(heapFreeChecker(processHeap,0,absolutePath) == FALSE){
-        return;
-
-    }
 
 }
 
@@ -1857,7 +1876,7 @@ void netshPassword(wchar_t* ssid){
     wcscat_s(command,sizeof(command),ssid);
     wcscat_s(command,sizeof(command),L" ");
     wcscat_s(command,sizeof(command),L"key=clear");
-    forkk(CMD,command);
+    forkk(CMD, command);
 
 }
 

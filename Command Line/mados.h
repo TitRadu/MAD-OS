@@ -63,17 +63,18 @@ void setFileProperties(wchar_t*, char*);
 void openDefault();//
 void openFileWithProgramWraper(wchar_t*);
 void openFileWithProgram(wchar_t*,wchar_t*);///
-void run(wchar_t*);
+void runWraper(wchar_t*, BOOL);
+void run(wchar_t*, wchar_t*, BOOL);
 int wNumberOfAparition(wchar_t*,wchar_t);
 int wLastAparition(wchar_t*,wchar_t);
 void back(wchar_t*);//
-void cline();//
+void cline(BOOL);//
 void clearr();//
 void newCline();//
 void ipc();//
 void ipca();//
-void openPathWraper(wchar_t*);
-void openPath(wchar_t*,wchar_t*);//
+void openFileWraper(wchar_t*);
+void openFile(wchar_t*,wchar_t*);//
 void sortFilesWraper(wchar_t*);
 void sortFiles(wchar_t*);
 void sortDirectory();//
