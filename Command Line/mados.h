@@ -1,11 +1,14 @@
 #ifndef MADOS_H_INCLUDED
 #define MADOS_H_INCLUDED
+#define EMPTY_STRING L""
 #define THIRTY 30
 #define OH 100
 #define PATH 1024
 #define BLOCK 4096
 #define ABSOLUTE_PATH 0
 #define RELATIVE_PATH 1
+#define CMD_COMMAND_NOT_CONFIGURED "Error in CMD directly related commands configuration.\n\
+Check if COMSPEC system environment variable contains CMD absolute path.\n\n"
 #include <stdio.h>
 #include <stdlib.h>
 #include <Windows.h>
@@ -20,6 +23,8 @@
 #include <bluetoothapis.h>
 #include <bcrypt.h>
 #include <errno.h>
+
+WCHAR cmdPath[256];
 
 typedef struct command{
 char* commandName;
@@ -69,6 +74,8 @@ int wNumberOfAparition(wchar_t*,wchar_t);
 int wLastAparition(wchar_t*,wchar_t);
 void back(wchar_t*);//
 void cline(BOOL);//
+void cmdRunnerWrapper(BOOL, BOOL);
+void cmdRunner(PWCHAR, BOOL);
 void clearr();//
 void newCline();//
 void ipc();//

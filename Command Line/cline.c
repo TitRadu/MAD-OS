@@ -10,6 +10,13 @@ int main(){
     extern unsigned long long values[];
     init(values);
 
+    DWORD cmdCommandsAreNotCofigured = 0;
+    if(GetEnvironmentVariableW(L"COMSPEC", cmdPath, sizeof(wchar_t)*MAX_PATH) == 0){
+        cmdCommandsAreNotCofigured = GetLastError();
+        printf(CMD_COMMAND_NOT_CONFIGURED);
+        printf("MainError:%lu\n", cmdCommandsAreNotCofigured);
+    }
+
     printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~MAD OS Command Line Version 1.0~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
     printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~(c) 2020 MAD OS Software. All rights reserved!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
 
@@ -79,6 +86,46 @@ int main(){
 
         }
 
+        if(strcmp(command,"cmd") == 0){
+            if(cmdCommandsAreNotCofigured){
+                printf(CMD_COMMAND_NOT_CONFIGURED);
+            }
+            else{
+                cmdRunnerWrapper(FALSE, FALSE);
+            }
+            continue;
+        }
+
+        if(strcmp(command,"lcmd") == 0){
+            if(cmdCommandsAreNotCofigured){
+                printf(CMD_COMMAND_NOT_CONFIGURED);
+            }
+            else{
+                cmdRunnerWrapper(TRUE, FALSE);
+            }
+            continue;
+        }
+
+        if(strcmp(command,"runcmd") == 0){
+            if(cmdCommandsAreNotCofigured){
+                printf(CMD_COMMAND_NOT_CONFIGURED);
+            }
+            else{
+                cmdRunnerWrapper(FALSE, TRUE);
+            }
+            continue;
+        }
+
+        if(strcmp(command,"lruncmd") == 0){
+            if(cmdCommandsAreNotCofigured){
+                printf(CMD_COMMAND_NOT_CONFIGURED);
+            }
+            else{
+                cmdRunnerWrapper(TRUE, TRUE);
+            }
+            continue;
+        }
+
         if(strcmp(command,"clear") == 0){
             clearr();
             continue;
@@ -91,12 +138,22 @@ int main(){
         }
 
         if(strcmp(command,"ipc") == 0){
-            ipc();
+            if(cmdCommandsAreNotCofigured){
+                printf(CMD_COMMAND_NOT_CONFIGURED);
+            }
+            else{
+                ipc();
+            }
             continue;
         }
 
         if(strcmp(command,"ipca") == 0){
-            ipca();
+            if(cmdCommandsAreNotCofigured){
+                printf(CMD_COMMAND_NOT_CONFIGURED);
+            }
+            else{
+                ipca();
+            }
             continue;
         }
 
@@ -327,15 +384,23 @@ int main(){
         }
 
         if(strcmp(command,"wifi") == 0){
-            netshProfiles();
+            if(cmdCommandsAreNotCofigured){
+                printf(CMD_COMMAND_NOT_CONFIGURED);
+            }
+            else{
+                netshProfiles();
+            }
             continue;
-
         }
 
         if(strcmp(command,"wifip") == 0){
-            netshPasswordWraper();
+           if(cmdCommandsAreNotCofigured){
+                printf(CMD_COMMAND_NOT_CONFIGURED);
+            }
+            else{
+                netshPasswordWraper();
+            }
             continue;
-
         }
 
         if(strcmp(compute(command),"Match") == 0){

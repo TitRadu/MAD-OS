@@ -1,5 +1,4 @@
 #include "mados.h"
-#define CMD L"C:\\Windows\\System32\\cmd.exe"
 
 void pause(){
     printf("Press enter or any key+enter to continue...\n");
@@ -1093,7 +1092,6 @@ void openFileWithProgram(wchar_t* program,wchar_t* absolutePath){
 
     }
 
-
 }
 
 void runWraper(wchar_t* path, BOOL isLocalMode){
@@ -1231,6 +1229,35 @@ void cline(BOOL isLocalMode){
 
 }
 
+void cmdRunnerWrapper(BOOL isLocalMode, BOOL isCommandRun){
+    WCHAR command[1024] = EMPTY_STRING;
+    
+    if(isCommandRun){
+        printf("Command:");
+        fgetws(command,MAX_PATH,stdin);
+    }
+
+    cmdRunner(command, isLocalMode);
+
+}
+
+void cmdRunner(PWCHAR command, BOOL isLocalMode){
+    if(isLocalMode){
+        forkk(cmdPath, command);
+
+    }
+    else{
+        HINSTANCE error = 0;
+        if((error = ShellExecuteW(NULL,L"open",cmdPath,command,NULL,1)) <= (HINSTANCE)32){
+        printf("CmdRunnerShellExecuteError:%p!\n", error);
+        return;
+
+        }
+
+    }
+
+}
+
 void clearr(){
     COORD point = { 0, 0};
     HANDLE console;
@@ -1288,12 +1315,12 @@ void newCline(){
 }
 
 void ipc(){
-    forkk(CMD,L"/c ipconfig");
+    forkk(cmdPath,L"/c ipconfig");
 
 }
 
 void ipca(){
-    forkk(CMD,L"/c ipconfig /all");
+    forkk(cmdPath,L"/c ipconfig /all");
 
 }
 
@@ -1852,7 +1879,7 @@ void calc(){
 }
 
 void netshProfiles(){
-    forkk(CMD,L"/c netsh wlan show profiles");
+    forkk(cmdPath,L"/c netsh wlan show profiles");
 
 }
 
@@ -1876,7 +1903,7 @@ void netshPassword(wchar_t* ssid){
     wcscat_s(command,sizeof(command),ssid);
     wcscat_s(command,sizeof(command),L" ");
     wcscat_s(command,sizeof(command),L"key=clear");
-    forkk(CMD, command);
+    forkk(cmdPath, command);
 
 }
 
@@ -4147,8 +4174,7 @@ void imdbAdvancedSearchWrapper(){
     }
 
     wchar_t url[41+wcslen(title)+36+1];
-    url[0] = '\0';
-    wcscat_s(url,sizeof(url),L"https://www.imdb.com/search/title/?title=");
+    wcscpy_s(url,sizeof(url),L"https://www.imdb.com/search/title/?title=");
     wcscat_s(url,sizeof(url),title);
     wcscat_s(url,sizeof(url),L"&title_type=feature&num_votes=10000,");
 
@@ -4172,10 +4198,8 @@ void youTubeSearchWrapper(){
     }
 
     wchar_t url[45+wcslen(searched)+1];
-    url[0] = '\0';
-    wcscat_s(url,sizeof(url),L"https://www.youtube.com/results?search_query=");
+    wcscpy_s(url,sizeof(url),L"https://www.youtube.com/results?search_query=");
     wcscat_s(url,sizeof(url),searched);
 
     connectToURL(url);
 }
-
