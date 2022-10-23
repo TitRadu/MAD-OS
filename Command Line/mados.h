@@ -171,6 +171,8 @@ void connectWlanInterface(GUID*, DOT11_SSID, LPCWSTR);
 void enumerateBluetoothRadios();
 void printBluetoothDeviceInformations(BLUETOOTH_DEVICE_INFO);
 void enumerateBluetoothDevices();
+void printEnvironmentVariableValueWrapper();
+void printEnvironmentVariableValue(PWCHAR);
 void enumerateDeviceDrivers();
 void imdbAdvancedSearchWrapper();
 void youTubeSearchWrapper();

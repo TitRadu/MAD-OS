@@ -1821,7 +1821,7 @@ void backup(wchar_t* absolutePath){
 
     }
 
-    GetEnvironmentVariableW(L"USERPROFILE",variableValue,sizeof(wchar_t)*MAX_PATH);
+    GetEnvironmentVariableW(L"USERPROFILE", variableValue, MAX_PATH);
     wcscat_s(backupPath,sizeof(backupPath),variableValue);
     printf("BACKUP:");
     wcscat_s(backupPath,sizeof(backupPath),L"\\BACKUP");
@@ -4103,6 +4103,41 @@ void enumerateBluetoothDevices(){
 
     }
 
+}
+
+void printEnvironmentVariableValueWrapper()
+{
+    WCHAR environmentVariable[1024];
+    
+    printf("Variable:");
+    fgetws(environmentVariable, 1024, stdin);
+    if(environmentVariable[wcslen(environmentVariable)-1] == '\n'){
+        environmentVariable[wcslen(environmentVariable)-1] = '\0';
+
+    }
+
+    printEnvironmentVariableValue(environmentVariable);
+}
+
+void printEnvironmentVariableValue(PWCHAR environmentVariable){
+    if(wStringCheck(environmentVariable) == 1){
+        return;
+
+    }
+
+    WCHAR environmentVariableValue[1024];
+    DWORD error = 0;
+    if(GetEnvironmentVariableW(environmentVariable, environmentVariableValue, 1024) == 0){
+        error = GetLastError();
+        if(error == ERROR_ENVVAR_NOT_FOUND){
+            printf("The system could not find the environment option that was entered.\n\n");
+            return;
+        }
+        printf("PrintEnvironmentVariableValueError:%lu\n", error);
+        ExitProcess(error);
+    }
+
+    wprintf(L"%s\n\n", environmentVariableValue);
 }
 
 void enumerateDeviceDrivers(){

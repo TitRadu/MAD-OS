@@ -11,7 +11,7 @@ int main(){
     init(values);
 
     DWORD cmdCommandsAreNotCofigured = 0;
-    if(GetEnvironmentVariableW(L"COMSPEC", cmdPath, sizeof(wchar_t)*MAX_PATH) == 0){
+    if(GetEnvironmentVariableW(L"COMSPEC", cmdPath, MAX_PATH) == 0){
         cmdCommandsAreNotCofigured = GetLastError();
         printf(CMD_COMMAND_NOT_CONFIGURED);
         printf("MainError:%lu\n", cmdCommandsAreNotCofigured);
@@ -41,7 +41,7 @@ int main(){
     char command[MAX_PATH];
     wchar_t path[MAX_PATH];
 
-    GetEnvironmentVariableW(L"USERPROFILE",path,sizeof(wchar_t)*MAX_PATH);
+    GetEnvironmentVariableW(L"USERPROFILE", path, MAX_PATH);
     wcscat_s(path,sizeof(path),L"\\");
 
     while(1){
@@ -647,6 +647,12 @@ int main(){
 
         if(strcmp(command,"bthdev") == 0){
             enumerateBluetoothDevices();
+            continue;
+
+        }
+
+        if(strcmp(command,"env") == 0){
+            printEnvironmentVariableValueWrapper();
             continue;
 
         }
