@@ -10,6 +10,8 @@ int main(){
     extern unsigned long long values[];
     init(values);
 
+    initializePathDirectory();
+
     DWORD cmdCommandsAreNotCofigured = 0;
     if(GetEnvironmentVariableW(L"COMSPEC", cmdPath, MAX_PATH) == 0){
         cmdCommandsAreNotCofigured = GetLastError();
@@ -177,7 +179,7 @@ int main(){
 
         if(strcmp(command,"list") == 0){
             printf("\n");
-            parse(path,'-');
+            parse(path, L"-");
             printf("\n");
             continue;
 
@@ -185,7 +187,7 @@ int main(){
 
         if(strcmp(command,"Rlist") == 0){
             printf("\n");
-            parse(path,'r');
+            parse(path, L"r");
             printf("\n");
             continue;
 
@@ -671,6 +673,41 @@ int main(){
 
         if(strcmp(command,"youtube") == 0){
             youTubeSearchWrapper();
+            continue;
+
+        }
+
+        if(strcmp(command,"listpath") == 0){
+            pathCommandSelector(command, path);
+            continue;
+
+        }
+
+        if(strcmp(command,"addpath") == 0){
+            pathCommandSelector(command, path);
+            continue;
+
+        }
+
+        if(strcmp(command,"rpath") == 0){
+            pathCommandSelector(command, path);
+            continue;
+
+        }
+
+        if(strcmp(command,"Rpath") == 0){
+            pathCommandSelector(command, path);
+            continue;
+
+        }
+
+        if(strcmp(command,"lrunpath") == 0){
+            pathCommandSelector(command, path);
+            continue;
+
+        }
+        if(strcmp(command,"runpath") == 0){
+            pathCommandSelector(command, path);
             continue;
 
         }

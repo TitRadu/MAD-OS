@@ -307,20 +307,20 @@ void changePath(wchar_t *path){
 
 }
 
-void parse(wchar_t* path,wchar_t control){
-    wchar_t args[8+wcslen(path)+1];
+void parse(wchar_t* path, PWCHAR control){
+    wchar_t args[8+wcslen(path)+wcslen(control)+1];
     args[0] = '\0';
     wcscat_s(args,sizeof(args),L"\"");
     wcscat_s(args,sizeof(args),path);
     wcscat_s(args,sizeof(args),L"\\");
-    if(control == 'R'){
+    if((wcscmp(control, L"R") == 0) || (wcscmp(control, L"path") == 0) || (wcscmp(control, L"Rpath") == 0))
+    {
         wcscat_s(args,sizeof(args),L"\\");
-
     }
     wcscat_s(args,sizeof(args),L"\"");
     wcscat_s(args,sizeof(args),L" ");
     wcscat_s(args,sizeof(args),L"\"");
-    wcsncat(args,&control,1);
+    wcscat_s(args, sizeof(args), control);
     wcscat_s(args,sizeof(args),L"\"");
     forkk(L"parseCL.exe",args);
 
@@ -367,7 +367,7 @@ void chooseFileOperation(wchar_t* absolutePath,char* control){
     }
 
     if(strcmp(control,"Rdir") == 0){
-        removeDirectoryRecursive(absolutePath);
+        removeDirectoryRecursive(absolutePath, L"R");
         return;
 
     }
@@ -543,7 +543,7 @@ int removeDirectory(wchar_t* absolutePath){
     return 0;
 }
 
-void removeDirectoryRecursive(wchar_t* absolutePath){
+void removeDirectoryRecursive(wchar_t* absolutePath, PWCHAR control){
     if(wcslen(absolutePath) > 247){
         printf("File name is too long!\n");
         return;
@@ -571,10 +571,10 @@ void removeDirectoryRecursive(wchar_t* absolutePath){
 
 
     printf("\nList of deleted files:\n");
-    parse(absolutePath,'R');
+    parse(absolutePath, control);
     printf("\n");
     if(removeDirectory(absolutePath) == 0){
-        printf("The source directory was deleted successfully!\n");
+        printf("The directory was deleted successfully!\n");
 
     }
 
@@ -625,10 +625,10 @@ void createFile(wchar_t* absolutePath, unsigned int fileVisibility){
 
 }
 
-void removeFile(wchar_t* absolutePath){
+DWORD removeFile(wchar_t* absolutePath){
     if(wcslen(absolutePath) >= MAX_PATH -1){
         printf("File name is too long!\n");
-        return;
+        return 1;
 
    }
 
@@ -638,30 +638,31 @@ void removeFile(wchar_t* absolutePath){
 
         if(error == ERROR_INVALID_NAME){
             printf("Invalid argument!\n");
-            return;
+            return error;
 
         }
 
         if(error == ERROR_FILE_NOT_FOUND){
             printf("This path doesn't exist as file!\n");
-            return;
+            return error;
         }
 
         if(error == ERROR_PATH_NOT_FOUND){
             printf("A component from argument doesn't exist!\n");
-            return;
+            return error;
         }
 
         if(error == ERROR_ACCESS_DENIED){
             printf("Path is a directory or access is denied!\n");
-            return;
+            return error;
         }
 
         printf("RemoveFileDeleteFileError:%lu\n",error);
-        return;
+        return error;
 
     }
 
+    return 0;
 }
 
 void renameFileWraper(wchar_t* path){
@@ -1230,7 +1231,7 @@ void cline(BOOL isLocalMode){
 }
 
 void cmdRunnerWrapper(BOOL isLocalMode, BOOL isCommandRun){
-    WCHAR command[1024] = EMPTY_STRING;
+    WCHAR command[1024] = WCHAR_EMPTY_STRING;
     
     if(isCommandRun){
         printf("Command:");
@@ -1380,6 +1381,11 @@ void copyFile(wchar_t* sourceAbsolutePath,wchar_t* destinationAbsolutePath){
     DWORD error = 0;
     if(CopyFileW(sourceAbsolutePath,destinationAbsolutePath,TRUE) == FALSE){
         error = GetLastError();
+        if(error == 2){
+            printf("File doesn't exist!\n");
+            return;
+
+        }
         if(error == 3){
             printf("DestinationPath doesn't exist!\n");
             return;
@@ -1713,7 +1719,7 @@ void copyDirectoryWraper(wchar_t* path,char* control){
     copyDirectory(absoluteSourcePath,absoluteDestinationPath);
 
     if(strcmp(control,"cut") == 0){
-        removeDirectoryRecursive(absoluteSourcePath);
+        removeDirectoryRecursive(absoluteSourcePath, L"R");
 
     }
 
@@ -1755,6 +1761,8 @@ void copyDirectory(wchar_t* sourcePath,wchar_t* destinationPath){
         return;
 
     }
+
+    printf("Directory was copied successfully!\n\n");
 
 }
 
@@ -4237,4 +4245,267 @@ void youTubeSearchWrapper(){
     wcscat_s(url,sizeof(url),searched);
 
     connectToURL(url);
+}
+
+void setPathDirectoryConfigurationState()
+{
+    if(wExist(pathDirectory,L"") == 2){
+        pathDirectoryConfigurationState = TRUE;
+
+    }else
+    {
+        pathDirectoryConfigurationState = FALSE;
+    }
+}
+
+void createPathDirectory()
+{
+    if(pathDirectoryConfigurationState == FALSE){
+        if(createDirectory(pathDirectory) == TRUE)
+        {
+            pathDirectoryConfigurationState = TRUE;
+            printf("PATH directory was created succesfully!\n");
+        }
+        
+    }
+}
+
+void initializePathDirectory(){
+    DWORD error = 0;
+    char charPathDirectory[256] = CHAR_EMPTY_STRING;
+    if(GetCurrentDirectory(sizeof(charPathDirectory), charPathDirectory) == 0)
+    {
+        error = GetLastError();
+        printf("InitializePathDirectoryError:%lu", error);
+        ExitProcess(error);
+    }
+
+    strcat_s(charPathDirectory, sizeof(charPathDirectory), "\\PATH");
+
+    if(MultiByteToWideChar(CP_UTF8, 0, charPathDirectory, -1, pathDirectory, 256) == 0){
+        error = GetLastError();
+        printf("InitializePathDirectoryError:%lu", error);
+    }
+
+    if(PathIsDirectoryEmptyW(pathDirectory) == TRUE) 
+    {
+        removeDirectory(pathDirectory);
+        return;
+    }
+
+}
+
+void pathCommandSelector(PCHAR command, PWCHAR path)
+{
+    setPathDirectoryConfigurationState();
+
+    if(strcmp(command, "addpath") != 0){
+        if(!pathDirectoryConfigurationState)
+        {
+            printf("PATH commands are not configured!\n\n");
+            return;
+        }else
+        {
+            if(PathIsDirectoryEmptyW(pathDirectory) == TRUE) 
+            {
+                printf("PATH directory is empty and will be removed!\n");
+                removeDirectory(pathDirectory);
+                return;
+            }
+        }
+    }
+
+    if(strcmp(command, "listpath") == 0)
+    {
+        listPathDirectory();
+    }
+    if(strcmp(command, "addpath") == 0)
+    {
+        addFileInPathDirectory(path);
+    }
+    if(strcmp(command, "rpath") == 0)
+    {
+        removeFileFromPathDirectory();
+    }
+    if(strcmp(command, "Rpath") == 0)
+    {
+        removePathDirectory();
+    }
+    if(strcmp(command, "lrunpath") == 0)
+    {
+        runFileFromPathDirectory(TRUE);
+    }
+    if(strcmp(command, "runpath") == 0)
+    {
+        runFileFromPathDirectory(FALSE);
+    }
+}
+
+void listPathDirectory()
+{
+    printf("\n");
+    parse(pathDirectory, L"path");
+    printf("\n");
+}
+
+void addFileInPathDirectory(PWCHAR path)
+{
+    wchar_t filePath[MAX_PATH];
+    fgetws(filePath,MAX_PATH,stdin);
+    if(filePath[wcslen(filePath)-1] == '\n'){
+        filePath[wcslen(filePath)-1] = '\0';
+    }
+
+    if(wStringCheck(filePath) == 1){
+        return;
+
+    }
+
+    wchar_t* fileAbsolutePath;
+    if((fileAbsolutePath = preparePathDependingOnType(path, filePath)) == NULL){
+        return;
+
+    }
+
+    int existCheck = 0;
+    if((existCheck=wExist(fileAbsolutePath,L"")) == 3){
+        printf("Invalid argument!\n\n");
+
+    }
+
+    if(existCheck == 2){
+        printf("The argument is a directory!\n\n");
+
+    }
+
+    if(existCheck == 0){
+        printf("The argument doesn't exist as file!\n\n");
+
+    }
+
+    if(existCheck == 1){
+        createPathDirectory();
+
+        wStringLastPart(filePath,'\\');
+        wchar_t pathDirectoryFile[1000];
+        wcscpy_s(pathDirectoryFile, sizeof(pathDirectoryFile), pathDirectory);
+        wcscat_s(pathDirectoryFile, sizeof(pathDirectoryFile), L"\\");
+        wcscat_s(pathDirectoryFile, sizeof(pathDirectoryFile), filePath);
+
+        copyFile(fileAbsolutePath, pathDirectoryFile);
+    }
+
+    if(heapFreeChecker(processHeap,0, fileAbsolutePath) == FALSE){
+        return;
+
+    }
+}
+
+void removeFileFromPathDirectory()
+{
+    wchar_t filePath[MAX_PATH];
+    fgetws(filePath,MAX_PATH,stdin);
+    if(filePath[wcslen(filePath)-1] == '\n'){
+        filePath[wcslen(filePath)-1] = '\0';
+    }
+
+    if(wStringCheck(filePath) == 1){
+        return;
+
+    }
+
+    if(pathType(filePath) == ABSOLUTE_PATH){
+        printf("Please insert a relativ path!\n\n");
+        return;
+    }
+
+    wchar_t fileAbsolutePath[wcslen(pathDirectory) + 1 + wcslen(filePath) + 1];
+    wcscpy_s(fileAbsolutePath, sizeof(fileAbsolutePath), pathDirectory);
+    wcscat_s(fileAbsolutePath, sizeof(fileAbsolutePath), L"\\");
+    wcscat_s(fileAbsolutePath, sizeof(fileAbsolutePath), filePath);
+
+    if(removeFile(fileAbsolutePath) == 0){
+        printf("PATH file was removed succesfully!\n\n");
+
+    }else{
+        return;
+
+    }
+
+    if(PathIsDirectoryEmptyW(pathDirectory) == TRUE) 
+    {
+        printf("PATH directory is empty and will be removed!\n");
+        removeDirectory(pathDirectory);
+        return;
+    }
+
+}
+
+void removePathDirectory()
+{
+    if(pathDirectoryConfigurationState == TRUE){
+        removeDirectoryRecursive(pathDirectory, L"Rpath");
+        pathDirectoryConfigurationState = FALSE;
+    }
+
+}
+
+void runFileFromPathDirectory(BOOL isLocalMode)
+{
+    wchar_t filePath[MAX_PATH];
+    fgetws(filePath,MAX_PATH,stdin);
+    if(filePath[wcslen(filePath)-1] == '\n'){
+        filePath[wcslen(filePath)-1] = '\0';
+    }
+
+    if(wStringCheck(filePath) == 1){
+        return;
+
+    }
+
+    if(pathType(filePath) == ABSOLUTE_PATH){
+        printf("Please insert a relativ path!\n\n");
+        return;
+    }
+
+    wchar_t fileAbsolutePath[wcslen(pathDirectory) + 1 + wcslen(filePath) + 1];
+    wcscpy_s(fileAbsolutePath, sizeof(fileAbsolutePath), pathDirectory);
+    wcscat_s(fileAbsolutePath, sizeof(fileAbsolutePath), L"\\");
+    wcscat_s(fileAbsolutePath, sizeof(fileAbsolutePath), filePath);
+
+    if(wcslen(fileAbsolutePath) >= MAX_PATH -1){
+        printf("Executable name is too long!\n");
+        return;
+    }
+
+    int existCheck = 0;
+    if((existCheck=wExist(fileAbsolutePath,L"")) == 3){
+        printf("Invalid argument!\n");
+        return;
+
+    }
+
+    if(existCheck == 2){
+        printf("The argument is a directory!\n\n");
+        return;
+
+    }
+
+    if(existCheck == 0){
+        printf("The argument doesn't exist as file!\n\n");
+        return;
+
+    }
+
+
+    wchar_t argumentList[MAX_PATH];
+    printf("List of arguments:");
+    fgetws(argumentList,MAX_PATH,stdin);
+    if(argumentList[wcslen(argumentList)-1] == '\n'){
+        argumentList[wcslen(argumentList)-1] = '\0';
+
+    }
+
+    run(fileAbsolutePath, argumentList, isLocalMode);
+  
 }

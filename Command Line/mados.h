@@ -1,6 +1,7 @@
 #ifndef MADOS_H_INCLUDED
 #define MADOS_H_INCLUDED
-#define EMPTY_STRING L""
+#define WCHAR_EMPTY_STRING L""
+#define CHAR_EMPTY_STRING ""
 #define THIRTY 30
 #define OH 100
 #define PATH 1024
@@ -25,6 +26,8 @@ Check if COMSPEC system environment variable contains CMD absolute path.\n\n"
 #include <errno.h>
 
 WCHAR cmdPath[256];
+WCHAR pathDirectory[256];
+BOOL pathDirectoryConfigurationState;
 
 typedef struct command{
 char* commandName;
@@ -51,16 +54,16 @@ wchar_t* wStringWithoutLast(wchar_t*,wchar_t);
 wchar_t* wStringLastPart(wchar_t*,wchar_t);
 void forkk(wchar_t*,wchar_t*);
 void changePath(wchar_t*);
-void parse(wchar_t*,wchar_t);
+void parse(wchar_t*, PWCHAR);
 void chooseFileOperation(wchar_t*,char*);
 void fileOperationWraper(wchar_t*,char*);
 BOOL createDirectory(wchar_t*);
 void createHiddenDirectory(wchar_t*);//
 int removeDirectory(wchar_t*);//
-void removeDirectoryRecursive(wchar_t*);//
+void removeDirectoryRecursive(wchar_t*, PWCHAR);//
 void createFile(wchar_t*, unsigned int);//
 void removeFileWraper(wchar_t*);
-void removeFile(wchar_t*);//
+DWORD removeFile(wchar_t*);//
 void renameFileWraper(wchar_t*);
 void renameFile(wchar_t*,wchar_t*);
 BOOL changeFileAttributtes(PDWORD, char*);
@@ -176,5 +179,14 @@ void printEnvironmentVariableValue(PWCHAR);
 void enumerateDeviceDrivers();
 void imdbAdvancedSearchWrapper();
 void youTubeSearchWrapper();
+void setPathDirectoryConfigurationState();
+void createPathDirectory();
+void initializePathDirectory();
+void pathCommandSelector(PCHAR, PWCHAR);
+void listPathDirectory();
+void addFileInPathDirectory(PWCHAR);
+void removeFileFromPathDirectory();
+void removePathDirectory();
+void runFileFromPathDirectory(BOOL);
 
 #endif // MADOS_H_INCLUDED
