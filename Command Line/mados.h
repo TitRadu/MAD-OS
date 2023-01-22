@@ -10,6 +10,7 @@
 #define RELATIVE_PATH 1
 #define CMD_COMMAND_NOT_CONFIGURED "Error in CMD directly related commands configuration.\n\
 Check if COMSPEC system environment variable contains CMD absolute path.\n\n"
+#define _WIN32_WINNT _WIN32_WINNT_WIN10
 #include <stdio.h>
 #include <stdlib.h>
 #include <Windows.h>
@@ -43,15 +44,22 @@ typedef struct CONSOLE_DATA{
 }CONSOLE_DATA;
 
 void pause();
+size_t ucslen(const UCHAR*);
+int ucscmp(const UCHAR*, const UCHAR*);
 int pathType(wchar_t*);
 void wStringInQuatationMarks(wchar_t*);
 HANDLE getProcessHeapChecker();
 int heapFreeChecker(HANDLE,DWORD,LPVOID);
 int wExist(wchar_t*,wchar_t*);
+int allSpaces(char*);
 int wAllSpaces(wchar_t*);
+int uAllSpaces(const UCHAR*);
+int stringCheck(char*);
 int wStringCheck(wchar_t*);
-wchar_t* wStringWithoutLast(wchar_t*,wchar_t);
-wchar_t* wStringLastPart(wchar_t*,wchar_t);
+int uStringCheck(const UCHAR*);
+wchar_t* wStringWithoutLast(wchar_t*, wchar_t);
+wchar_t* wStringLastPart(wchar_t*, wchar_t);
+UCHAR* fgetus(UCHAR*, int, FILE*);
 void forkk(wchar_t*,wchar_t*);
 void changePath(wchar_t*);
 void parse(wchar_t*, PWCHAR);
@@ -168,7 +176,7 @@ GUID* obtainGUIDFromString(wchar_t*);
 void sendGUIDAsParameter(char*);
 void enumAvaibleNetworks(GUID*);
 void disconnectWlanInterface(GUID*);
-PWLAN_AVAILABLE_NETWORK getNetworkProprierties(HANDLE, GUID*, char*, LPCWSTR);
+PWLAN_AVAILABLE_NETWORK getNetworkProprierties(HANDLE, GUID*, UCHAR*, LPCWSTR);
 void connectWlanInterfaceWraper();
 void connectWlanInterface(GUID*, DOT11_SSID, LPCWSTR);
 void enumerateBluetoothRadios();

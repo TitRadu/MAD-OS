@@ -6,6 +6,35 @@ void pause(){
 
 }
 
+size_t ucslen(const UCHAR* ustring)
+{
+    int length = 0;
+    while(ustring[length] != '\0')
+    {
+        length++;
+    }
+
+    return length;
+}
+
+int ucscmp(const UCHAR* string1, const UCHAR* string2)
+{
+    if(ucslen(string1) != ucslen(string2))
+    {
+        return 1;
+    }
+
+    for(int i = 0; i < ucslen(string1); i++)
+    {
+        if(string1[i] != string2[i])
+        {
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
 int pathType(wchar_t* path){
     if(wcslen(path) >= 2){
         if(IsCharAlphaW(path[0]) != 0){
@@ -119,6 +148,17 @@ int wAllSpaces(wchar_t* string){
     return 1;
 }
 
+int uAllSpaces(const UCHAR* string){
+    for(int i = 0;i < ucslen(string);i++){
+        if(string[i] != 32){
+            return 0;
+
+        }
+    }
+
+    return 1;
+}
+
 int stringCheck(char* string){
     if(strcmp(string,"") == 0 || allSpaces(string) == 1){
         printf("Argument is empty or contains only spaces!\n");
@@ -132,6 +172,17 @@ int stringCheck(char* string){
 
 int wStringCheck(wchar_t* string){
     if(wcscmp(string,L"") == 0 || wAllSpaces(string) == 1){
+        printf("Argument is empty or contains only spaces!\n");
+        return 1;
+
+    }
+
+    return 0;
+
+}
+
+int uStringCheck(const UCHAR* string){
+    if(ucscmp(string, (UCHAR*)"") == 0 || uAllSpaces(string) == 1){
         printf("Argument is empty or contains only spaces!\n");
         return 1;
 
@@ -170,6 +221,19 @@ wchar_t* wStringLastPart(wchar_t* string,wchar_t c){
 
     return string;
 
+}
+
+UCHAR* fgetus(UCHAR* str,  int numChars, FILE* stream)
+{
+    char auxStr[numChars];
+    fgets(auxStr, numChars, stream);
+
+    for(int i = 0; i <= strlen(auxStr); i++)
+    {
+        str[i] = auxStr[i];
+    }
+
+    return str;
 }
 
 void forkk(wchar_t *application,wchar_t *args){
@@ -1462,15 +1526,15 @@ void connectToURL(wchar_t* url){
 void displayTime(){
     time_t t = 0;
     if((t = time(NULL)) == ((time_t)-1)){
-        printf("Time error1!\n");
+        printf("Time error0!\n");
         return;
 
     }
 
     char* date;
     if((date = ctime(&t)) == NULL){
-            printf("Time error!\n");
-            return;
+        printf("Time error1!\n");
+        return;
 
     }
     date[strlen(date) - 1] = '\0';
@@ -1499,7 +1563,6 @@ void timerUp(){
     startTime = GetTickCount64();
     while(1){
         currentTime = GetTickCount64();
-
 
         timerTime = currentTime-startTime;
         seconds = (timerTime/1000) % 60;
@@ -1533,14 +1596,12 @@ void timerUp(){
         }
 
         printf("\r%s%d:%s%d:%s%d",oneDigitHours,hours,oneDigitMinutes,minutes,oneDigitSeconds,seconds);
-        if(_kbhit()){
+        if(GetKeyState('S') & 0x8000)
+        {
             printf("\n");
             break;
-
         }
-
     }
-
 }
 
 void timerDown(){
@@ -1563,21 +1624,21 @@ void timerDown(){
             printf("\rCountdown:0\n");
             while(1){
                 Beep(750, 1000);
-                if(_kbhit()){
+                if(GetKeyState('S') & 0x8000)
+                {
                     printf("\n");
-                    return;
-
+                    break;
                 }
 
             }
 
         }
 
-          if(_kbhit()){
-                    printf("\n");
-                    return;
-
-                }
+        if(GetKeyState('S') & 0x8000)
+        {
+            printf("\n");
+            break;
+        }
 
         printf("\rCountdown:%u ",remainingTimerTime);
 
@@ -3523,7 +3584,7 @@ void liveSystemInformation(){
 
         }
 
-        if(_kbhit()){
+        if(GetKeyState('S') & 0x8000){
             consoleCursorInfo.bVisible = TRUE;
             if(SetConsoleCursorInfo(consoleData.consoleHandle, &consoleCursorInfo) == 0){
                 error = GetLastError();
@@ -3817,7 +3878,7 @@ void disconnectWlanInterface(GUID* guid){
 
 }
 
-PWLAN_AVAILABLE_NETWORK getNetworkProprierties(HANDLE wlanHandle, GUID* guid, char* ssidString, LPCWSTR profile){
+PWLAN_AVAILABLE_NETWORK getNetworkProprierties(HANDLE wlanHandle, GUID* guid, UCHAR* ssidString, LPCWSTR profile){
     PWLAN_AVAILABLE_NETWORK_LIST pwlanAvaibleNewtworkList = NULL;
     WLAN_AVAILABLE_NETWORK currentAvaibleNetwork;
     PWLAN_AVAILABLE_NETWORK pwlanAvaibleNetwork;
@@ -3841,7 +3902,7 @@ PWLAN_AVAILABLE_NETWORK getNetworkProprierties(HANDLE wlanHandle, GUID* guid, ch
 
                 }
 
-                char currentSSID[100];
+                UCHAR currentSSID[100];
                 for(int j =0; j<pwlanAvaibleNewtworkList->Network[i].dot11Ssid.uSSIDLength; j++){
                     currentSSID[j] = pwlanAvaibleNewtworkList->Network[i].dot11Ssid.ucSSID[j];
 
@@ -3849,7 +3910,7 @@ PWLAN_AVAILABLE_NETWORK getNetworkProprierties(HANDLE wlanHandle, GUID* guid, ch
 
                 currentSSID[pwlanAvaibleNewtworkList->Network[i].dot11Ssid.uSSIDLength] = '\0';
 
-                if((strcmp(currentSSID, ssidString) == 0) && (wcscmp(currentAvaibleNetwork.strProfileName, profile) == 0)){
+                if((ucscmp(currentSSID, ssidString) == 0) && (wcscmp(currentAvaibleNetwork.strProfileName, profile) == 0)){
                     if((pwlanAvaibleNetwork = (PWLAN_AVAILABLE_NETWORK)HeapAlloc(processHeap,HEAP_ZERO_MEMORY,sizeof(WLAN_AVAILABLE_NETWORK))) == NULL){
                         printf("GetNetworkPropriertiesHeapAllocError!\n");
                         ExitProcess(-1);
@@ -3885,16 +3946,16 @@ void connectWlanInterfaceWraper(){
 
     DOT11_SSID dot11ssid;
     printf("SSID:");
-    fgets(dot11ssid.ucSSID, WLAN_MAX_NAME_LENGTH,stdin);
-    if(dot11ssid.ucSSID[strlen(dot11ssid.ucSSID)-1] == '\n'){
-        dot11ssid.ucSSID[strlen(dot11ssid.ucSSID)-1] = '\0';
+    fgetus(dot11ssid.ucSSID, WLAN_MAX_NAME_LENGTH, stdin);
+    if(dot11ssid.ucSSID[ucslen(dot11ssid.ucSSID)-1] == '\n'){
+        dot11ssid.ucSSID[ucslen(dot11ssid.ucSSID)-1] = '\0';
 
     }
-    if(stringCheck(dot11ssid.ucSSID) == 1){
+    if(uStringCheck(dot11ssid.ucSSID) == 1){
         return;
 
     }
-    dot11ssid.uSSIDLength = strlen(dot11ssid.ucSSID);
+    dot11ssid.uSSIDLength = ucslen(dot11ssid.ucSSID);
 
     wchar_t profile[WLAN_MAX_NAME_LENGTH] = {0};
     printf("Profile:");
