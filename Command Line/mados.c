@@ -236,6 +236,26 @@ UCHAR* fgetus(UCHAR* str,  int numChars, FILE* stream)
     return str;
 }
 
+void initializeCmdCommandsConfigurationInfo()
+{
+    configurationInfo.cmdCommands.state = FALSE;
+    DWORD error = 0;
+    if(GetEnvironmentVariableW(L"COMSPEC", configurationInfo.cmdCommands.path, MAX_PATH) == 0){
+        error = GetLastError();
+        printf(CMD_COMMAND_NOT_CONFIGURED);
+        printf("MainError:%lu\n", error);
+        return;
+    }
+
+    configurationInfo.cmdCommands.state = TRUE;
+}
+
+void initializeMadOsConfigurationInfo()
+{
+    initializePathDirectory();
+    initializeCmdCommandsConfigurationInfo();
+}
+
 void forkk(wchar_t *application,wchar_t *args){
     STARTUPINFOW s;
     PROCESS_INFORMATION p;
@@ -1308,12 +1328,12 @@ void cmdRunnerWrapper(BOOL isLocalMode, BOOL isCommandRun){
 
 void cmdRunner(PWCHAR command, BOOL isLocalMode){
     if(isLocalMode){
-        forkk(cmdPath, command);
+        forkk(configurationInfo.cmdCommands.path, command);
 
     }
     else{
         HINSTANCE error = 0;
-        if((error = ShellExecuteW(NULL,L"open",cmdPath,command,NULL,1)) <= (HINSTANCE)32){
+        if((error = ShellExecuteW(NULL,L"open",configurationInfo.cmdCommands.path,command,NULL,1)) <= (HINSTANCE)32){
         printf("CmdRunnerShellExecuteError:%p!\n", error);
         return;
 
@@ -1380,12 +1400,12 @@ void newCline(){
 }
 
 void ipc(){
-    forkk(cmdPath,L"/c ipconfig");
+    forkk(configurationInfo.cmdCommands.path,L"/c ipconfig");
 
 }
 
 void ipca(){
-    forkk(cmdPath,L"/c ipconfig /all");
+    forkk(configurationInfo.cmdCommands.path,L"/c ipconfig /all");
 
 }
 
@@ -1948,7 +1968,7 @@ void calc(){
 }
 
 void netshProfiles(){
-    forkk(cmdPath,L"/c netsh wlan show profiles");
+    forkk(configurationInfo.cmdCommands.path,L"/c netsh wlan show profiles");
 
 }
 
@@ -1972,7 +1992,7 @@ void netshPassword(wchar_t* ssid){
     wcscat_s(command,sizeof(command),ssid);
     wcscat_s(command,sizeof(command),L" ");
     wcscat_s(command,sizeof(command),L"key=clear");
-    forkk(cmdPath, command);
+    forkk(configurationInfo.cmdCommands.path, command);
 
 }
 
@@ -4310,21 +4330,21 @@ void youTubeSearchWrapper(){
 
 void setPathDirectoryConfigurationState()
 {
-    if(wExist(pathDirectory,L"") == 2){
-        pathDirectoryConfigurationState = TRUE;
+    if(wExist(configurationInfo.pathDirectory.path,L"") == 2){
+        configurationInfo.pathDirectory.state = TRUE;
 
     }else
     {
-        pathDirectoryConfigurationState = FALSE;
+        configurationInfo.pathDirectory.state = FALSE;
     }
 }
 
 void createPathDirectory()
 {
-    if(pathDirectoryConfigurationState == FALSE){
-        if(createDirectory(pathDirectory) == TRUE)
+    if(configurationInfo.pathDirectory.state == FALSE){
+        if(createDirectory(configurationInfo.pathDirectory.path) == TRUE)
         {
-            pathDirectoryConfigurationState = TRUE;
+            configurationInfo.pathDirectory.state = TRUE;
             printf("PATH directory was created succesfully!\n");
         }
         
@@ -4343,14 +4363,14 @@ void initializePathDirectory(){
 
     strcat_s(charPathDirectory, sizeof(charPathDirectory), "\\PATH");
 
-    if(MultiByteToWideChar(CP_UTF8, 0, charPathDirectory, -1, pathDirectory, 256) == 0){
+    if(MultiByteToWideChar(CP_UTF8, 0, charPathDirectory, -1, configurationInfo.pathDirectory.path, 256) == 0){
         error = GetLastError();
         printf("InitializePathDirectoryError:%lu", error);
     }
 
-    if(PathIsDirectoryEmptyW(pathDirectory) == TRUE) 
+    if(PathIsDirectoryEmptyW(configurationInfo.pathDirectory.path) == TRUE) 
     {
-        removeDirectory(pathDirectory);
+        removeDirectory(configurationInfo.pathDirectory.path);
         return;
     }
 
@@ -4361,16 +4381,16 @@ void pathCommandSelector(PCHAR command, PWCHAR path)
     setPathDirectoryConfigurationState();
 
     if(strcmp(command, "addpath") != 0){
-        if(!pathDirectoryConfigurationState)
+        if(!configurationInfo.pathDirectory.state)
         {
             printf("PATH commands are not configured!\n\n");
             return;
         }else
         {
-            if(PathIsDirectoryEmptyW(pathDirectory) == TRUE) 
+            if(PathIsDirectoryEmptyW(configurationInfo.pathDirectory.path) == TRUE) 
             {
                 printf("PATH directory is empty and will be removed!\n");
-                removeDirectory(pathDirectory);
+                removeDirectory(configurationInfo.pathDirectory.path);
                 return;
             }
         }
@@ -4405,7 +4425,7 @@ void pathCommandSelector(PCHAR command, PWCHAR path)
 void listPathDirectory()
 {
     printf("\n");
-    parse(pathDirectory, L"path");
+    parse(configurationInfo.pathDirectory.path, L"path");
     printf("\n");
 }
 
@@ -4449,7 +4469,7 @@ void addFileInPathDirectory(PWCHAR path)
 
         wStringLastPart(filePath,'\\');
         wchar_t pathDirectoryFile[1000];
-        wcscpy_s(pathDirectoryFile, sizeof(pathDirectoryFile), pathDirectory);
+        wcscpy_s(pathDirectoryFile, sizeof(pathDirectoryFile), configurationInfo.pathDirectory.path);
         wcscat_s(pathDirectoryFile, sizeof(pathDirectoryFile), L"\\");
         wcscat_s(pathDirectoryFile, sizeof(pathDirectoryFile), filePath);
 
@@ -4480,8 +4500,8 @@ void removeFileFromPathDirectory()
         return;
     }
 
-    wchar_t fileAbsolutePath[wcslen(pathDirectory) + 1 + wcslen(filePath) + 1];
-    wcscpy_s(fileAbsolutePath, sizeof(fileAbsolutePath), pathDirectory);
+    wchar_t fileAbsolutePath[wcslen(configurationInfo.pathDirectory.path) + 1 + wcslen(filePath) + 1];
+    wcscpy_s(fileAbsolutePath, sizeof(fileAbsolutePath), configurationInfo.pathDirectory.path);
     wcscat_s(fileAbsolutePath, sizeof(fileAbsolutePath), L"\\");
     wcscat_s(fileAbsolutePath, sizeof(fileAbsolutePath), filePath);
 
@@ -4493,10 +4513,10 @@ void removeFileFromPathDirectory()
 
     }
 
-    if(PathIsDirectoryEmptyW(pathDirectory) == TRUE) 
+    if(PathIsDirectoryEmptyW(configurationInfo.pathDirectory.path) == TRUE) 
     {
         printf("PATH directory is empty and will be removed!\n");
-        removeDirectory(pathDirectory);
+        removeDirectory(configurationInfo.pathDirectory.path);
         return;
     }
 
@@ -4504,9 +4524,9 @@ void removeFileFromPathDirectory()
 
 void removePathDirectory()
 {
-    if(pathDirectoryConfigurationState == TRUE){
-        removeDirectoryRecursive(pathDirectory, L"Rpath");
-        pathDirectoryConfigurationState = FALSE;
+    if(configurationInfo.pathDirectory.state == TRUE){
+        removeDirectoryRecursive(configurationInfo.pathDirectory.path, L"Rpath");
+        configurationInfo.pathDirectory.state = FALSE;
     }
 
 }
@@ -4529,8 +4549,8 @@ void runFileFromPathDirectory(BOOL isLocalMode)
         return;
     }
 
-    wchar_t fileAbsolutePath[wcslen(pathDirectory) + 1 + wcslen(filePath) + 1];
-    wcscpy_s(fileAbsolutePath, sizeof(fileAbsolutePath), pathDirectory);
+    wchar_t fileAbsolutePath[wcslen(configurationInfo.pathDirectory.path) + 1 + wcslen(filePath) + 1];
+    wcscpy_s(fileAbsolutePath, sizeof(fileAbsolutePath), configurationInfo.pathDirectory.path);
     wcscat_s(fileAbsolutePath, sizeof(fileAbsolutePath), L"\\");
     wcscat_s(fileAbsolutePath, sizeof(fileAbsolutePath), filePath);
 

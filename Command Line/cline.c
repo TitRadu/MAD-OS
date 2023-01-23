@@ -10,14 +10,7 @@ int main(){
     extern unsigned long long values[];
     init(values);
 
-    initializePathDirectory();
-
-    DWORD cmdCommandsAreNotCofigured = 0;
-    if(GetEnvironmentVariableW(L"COMSPEC", cmdPath, MAX_PATH) == 0){
-        cmdCommandsAreNotCofigured = GetLastError();
-        printf(CMD_COMMAND_NOT_CONFIGURED);
-        printf("MainError:%lu\n", cmdCommandsAreNotCofigured);
-    }
+    initializeMadOsConfigurationInfo();
 
     printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~MAD OS Command Line Version 1.0~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
     printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~(c) 2020 MAD OS Software. All rights reserved!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
@@ -89,41 +82,41 @@ int main(){
         }
 
         if(strcmp(command,"cmd") == 0){
-            if(cmdCommandsAreNotCofigured){
-                printf(CMD_COMMAND_NOT_CONFIGURED);
+            if(configurationInfo.cmdCommands.state){
+                cmdRunnerWrapper(FALSE, FALSE);
             }
             else{
-                cmdRunnerWrapper(FALSE, FALSE);
+                printf(CMD_COMMAND_NOT_CONFIGURED);
             }
             continue;
         }
 
         if(strcmp(command,"lcmd") == 0){
-            if(cmdCommandsAreNotCofigured){
-                printf(CMD_COMMAND_NOT_CONFIGURED);
+            if(configurationInfo.cmdCommands.state){
+                cmdRunnerWrapper(TRUE, FALSE);
             }
             else{
-                cmdRunnerWrapper(TRUE, FALSE);
+                printf(CMD_COMMAND_NOT_CONFIGURED);
             }
             continue;
         }
 
         if(strcmp(command,"runcmd") == 0){
-            if(cmdCommandsAreNotCofigured){
-                printf(CMD_COMMAND_NOT_CONFIGURED);
+            if(configurationInfo.cmdCommands.state){
+                cmdRunnerWrapper(FALSE, TRUE);
             }
             else{
-                cmdRunnerWrapper(FALSE, TRUE);
+                printf(CMD_COMMAND_NOT_CONFIGURED);
             }
             continue;
         }
 
         if(strcmp(command,"lruncmd") == 0){
-            if(cmdCommandsAreNotCofigured){
-                printf(CMD_COMMAND_NOT_CONFIGURED);
+            if(configurationInfo.cmdCommands.state){
+                cmdRunnerWrapper(TRUE, TRUE);
             }
             else{
-                cmdRunnerWrapper(TRUE, TRUE);
+                printf(CMD_COMMAND_NOT_CONFIGURED);
             }
             continue;
         }
@@ -140,21 +133,21 @@ int main(){
         }
 
         if(strcmp(command,"ipc") == 0){
-            if(cmdCommandsAreNotCofigured){
-                printf(CMD_COMMAND_NOT_CONFIGURED);
+            if(configurationInfo.cmdCommands.state){
+                ipc();
             }
             else{
-                ipc();
+                printf(CMD_COMMAND_NOT_CONFIGURED);
             }
             continue;
         }
 
         if(strcmp(command,"ipca") == 0){
-            if(cmdCommandsAreNotCofigured){
-                printf(CMD_COMMAND_NOT_CONFIGURED);
+            if(configurationInfo.cmdCommands.state){
+                ipca();
             }
             else{
-                ipca();
+                printf(CMD_COMMAND_NOT_CONFIGURED);
             }
             continue;
         }
@@ -386,21 +379,21 @@ int main(){
         }
 
         if(strcmp(command,"wifi") == 0){
-            if(cmdCommandsAreNotCofigured){
-                printf(CMD_COMMAND_NOT_CONFIGURED);
+            if(configurationInfo.cmdCommands.state){
+                netshProfiles();
             }
             else{
-                netshProfiles();
+                printf(CMD_COMMAND_NOT_CONFIGURED);
             }
             continue;
         }
 
         if(strcmp(command,"wifip") == 0){
-           if(cmdCommandsAreNotCofigured){
-                printf(CMD_COMMAND_NOT_CONFIGURED);
+            if(configurationInfo.cmdCommands.state){
+                netshPasswordWraper();
             }
             else{
-                netshPasswordWraper();
+                printf(CMD_COMMAND_NOT_CONFIGURED);
             }
             continue;
         }

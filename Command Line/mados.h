@@ -26,10 +26,6 @@ Check if COMSPEC system environment variable contains CMD absolute path.\n\n"
 #include <bcrypt.h>
 #include <errno.h>
 
-WCHAR cmdPath[256];
-WCHAR pathDirectory[256];
-BOOL pathDirectoryConfigurationState;
-
 typedef struct command{
 char* commandName;
 struct command* nextCommand;
@@ -42,6 +38,21 @@ typedef struct CONSOLE_DATA{
     CONSOLE_SCREEN_BUFFER_INFO screen;
 
 }CONSOLE_DATA;
+
+typedef struct CmdCommandsStruct{
+    WCHAR path[256];
+    BOOL state;
+} CmdCommands;
+
+typedef struct PathDirectoryStruct{
+    WCHAR path[256];
+    BOOL state;
+} PathDirectory;
+
+struct ConfigurationInfo{
+    CmdCommands cmdCommands;
+    PathDirectory pathDirectory;
+} configurationInfo;
 
 void pause();
 size_t ucslen(const UCHAR*);
@@ -60,6 +71,8 @@ int uStringCheck(const UCHAR*);
 wchar_t* wStringWithoutLast(wchar_t*, wchar_t);
 wchar_t* wStringLastPart(wchar_t*, wchar_t);
 UCHAR* fgetus(UCHAR*, int, FILE*);
+void initializeCmdCommandsConfigurationInfo();
+void initializeMadOsConfigurationInfo();
 void forkk(wchar_t*,wchar_t*);
 void changePath(wchar_t*);
 void parse(wchar_t*, PWCHAR);
