@@ -392,14 +392,13 @@ void changePath(wchar_t *path){
 }
 
 void parse(wchar_t* path, PWCHAR control){
-    wchar_t args[8+wcslen(path)+wcslen(control)+1];
+    wchar_t args[8+wcslen(path)-1+wcslen(control)+1];
     args[0] = '\0';
     wcscat_s(args,sizeof(args),L"\"");
     wcscat_s(args,sizeof(args),path);
-    wcscat_s(args,sizeof(args),L"\\");
-    if((wcscmp(control, L"R") == 0) || (wcscmp(control, L"path") == 0) || (wcscmp(control, L"Rpath") == 0))
+    if(args[wcslen(args) - 1] == '\\')
     {
-        wcscat_s(args,sizeof(args),L"\\");
+        args[wcslen(args) - 1] = '\0';    
     }
     wcscat_s(args,sizeof(args),L"\"");
     wcscat_s(args,sizeof(args),L" ");
@@ -407,7 +406,6 @@ void parse(wchar_t* path, PWCHAR control){
     wcscat_s(args, sizeof(args), control);
     wcscat_s(args,sizeof(args),L"\"");
     forkk(L"parseCL.exe",args);
-
 }
 
 wchar_t* preparePathDependingOnType(wchar_t* path,wchar_t* checkPath){
