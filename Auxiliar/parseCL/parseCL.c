@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <Windows.h>
+#include "D:\Proiecte C\MAD-OS\Command Line\mados.h"
 
-void parseCL(wchar_t* directoryPath, PWCHAR control, int* numberOfFiles, int* numberOfDirectories, int* numberOfDeniedFiles){
+void parseCL(wchar_t* directoryPath, PWCHAR control, int* numberOfFiles, int* numberOfDirectories, int* numberOfDeniedFiles, wchar_t* parameter){
     HANDLE hd;
     WIN32_FIND_DATAW fileInfo;
     SYSTEMTIME fileLastWriteTime;
@@ -43,10 +43,16 @@ void parseCL(wchar_t* directoryPath, PWCHAR control, int* numberOfFiles, int* nu
         {
             wcscpy_s(fileNameForPrint, sizeof(fileNameForPrint), fileInfo.cFileName);
         }else{
-            snwprintf(fileNameForPrint,1024,L"%s\\%s",directoryPath,fileInfo.cFileName);
+            if(parameter){
+                if(StrStrW(fileInfo.cFileName, parameter) != NULL){
+                    snwprintf(fileNameForPrint,1024,L"%s\\%s",directoryPath,fileInfo.cFileName);
+                }
+            }else{
+                snwprintf(fileNameForPrint,1024,L"%s\\%s",directoryPath,fileInfo.cFileName);
+            }
         }
 
-        if(wcscmp(control, L"r") == 0 || wcscmp(control, L"R") == 0 || wcscmp(control, L"Rpath") == 0)
+        if(wcscmp(control, L"r") == 0 || wcscmp(control, L"R") == 0 || wcscmp(control, L"Rpath") == 0 || parameter)
         {
             snwprintf(filePath,1024,L"%s\\%s",directoryPath,fileInfo.cFileName);
         }
@@ -62,10 +68,18 @@ void parseCL(wchar_t* directoryPath, PWCHAR control, int* numberOfFiles, int* nu
         sizeMB = (float)fileSize.QuadPart / ((float)1024*(float)1024);
 
         if(fileInfo.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY){
-            (*numberOfDirectories)++;
-            wprintf(L"D\t%.3f\t\t%02d/%02d %02d:%02d:%02d %04d \t%s\n",sizeMB,fileLastWriteTime.wMonth,fileLastWriteTime.wDay,fileLastWriteTime.wHour,fileLastWriteTime.wMinute,fileLastWriteTime.wSecond,fileLastWriteTime.wYear,fileNameForPrint);
-            if((wcscmp(control, L"r") == 0) || (wcscmp(control, L"R") == 0) || (wcscmp(control, L"Rpath") == 0)){
-                parseCL(filePath,control,numberOfFiles,numberOfDirectories,numberOfDeniedFiles);
+            if(parameter){
+                if(StrStrW(fileInfo.cFileName, parameter) != NULL){
+                    (*numberOfDirectories)++;
+                    wprintf(L"D\t%.3f\t\t%02d/%02d %02d:%02d:%02d %04d \t%s\n",sizeMB,fileLastWriteTime.wMonth,fileLastWriteTime.wDay,fileLastWriteTime.wHour,fileLastWriteTime.wMinute,fileLastWriteTime.wSecond,fileLastWriteTime.wYear,fileNameForPrint);
+                }
+            }else{
+                (*numberOfDirectories)++;
+                wprintf(L"D\t%.3f\t\t%02d/%02d %02d:%02d:%02d %04d \t%s\n",sizeMB,fileLastWriteTime.wMonth,fileLastWriteTime.wDay,fileLastWriteTime.wHour,fileLastWriteTime.wMinute,fileLastWriteTime.wSecond,fileLastWriteTime.wYear,fileNameForPrint);
+            }
+
+            if((wcscmp(control, L"r") == 0) || (wcscmp(control, L"R") == 0) || (wcscmp(control, L"Rpath") == 0) || parameter){
+                parseCL(filePath,control,numberOfFiles,numberOfDirectories,numberOfDeniedFiles, parameter);
             }
             if(wcscmp(control, L"R") == 0 || wcscmp(control, L"Rpath") == 0){
                 if(RemoveDirectoryW(filePath) == 0){
@@ -79,8 +93,17 @@ void parseCL(wchar_t* directoryPath, PWCHAR control, int* numberOfFiles, int* nu
 
             continue;
         }
-        (*numberOfFiles)++;
-        wprintf(L"F\t%.3f\t\t%02d/%02d %02d:%02d:%02d %04d \t%s\n",sizeMB,fileLastWriteTime.wMonth,fileLastWriteTime.wDay,fileLastWriteTime.wHour,fileLastWriteTime.wMinute,fileLastWriteTime.wSecond,fileLastWriteTime.wYear,fileNameForPrint);
+
+        if(parameter){
+            if(StrStrW(fileInfo.cFileName, parameter) != NULL){
+                (*numberOfFiles)++;
+                wprintf(L"F\t%.3f\t\t%02d/%02d %02d:%02d:%02d %04d \t%s\n",sizeMB,fileLastWriteTime.wMonth,fileLastWriteTime.wDay,fileLastWriteTime.wHour,fileLastWriteTime.wMinute,fileLastWriteTime.wSecond,fileLastWriteTime.wYear,fileNameForPrint);
+            }
+        }else{
+            (*numberOfFiles)++;
+            wprintf(L"F\t%.3f\t\t%02d/%02d %02d:%02d:%02d %04d \t%s\n",sizeMB,fileLastWriteTime.wMonth,fileLastWriteTime.wDay,fileLastWriteTime.wHour,fileLastWriteTime.wMinute,fileLastWriteTime.wSecond,fileLastWriteTime.wYear,fileNameForPrint);
+        }
+
         if(wcscmp(control, L"R") == 0 || wcscmp(control, L"Rpath") == 0){
             if(DeleteFileW(filePath) == 0){
                 error = GetLastError();
@@ -109,17 +132,43 @@ void parseCL(wchar_t* directoryPath, PWCHAR control, int* numberOfFiles, int* nu
 int main(int argc,char* argv[]){
     SetConsoleCtrlHandler(NULL,FALSE);
 
+    HANDLE processHeap = NULL;
+    if((processHeap = getProcessHeapChecker()) == NULL){
+        return 1;
+
+    }
+
     DWORD error = 0;
     WCHAR directoryPath[MAX_PATH];
     if(MultiByteToWideChar(CP_UTF8, 0, argv[1], -1, directoryPath, MAX_PATH) == 0){
         error = GetLastError();
         printf("ParseCLMultiByteToWideCharDirectoryPathError:%lu\n", error);
+        return error;
     }
 
     WCHAR control[30];
     if(MultiByteToWideChar(CP_UTF8, 0, argv[2], -1, control, 30) == 0){
         error = GetLastError();
         printf("ParseCLMultiByteToWideCharControlError:%lu\n", error);
+        return error;
+    }
+
+    PWCHAR parameter = NULL;
+    if(argv[3] != NULL){
+        unsigned int sizeOfParameter = sizeof(WCHAR)*(strlen(argv[3]) + 1);
+
+        if((parameter = (PWCHAR)HeapAlloc(processHeap,HEAP_ZERO_MEMORY, sizeOfParameter)) == NULL){
+            printf("ParseCLHeapAllocParameterError!\n");
+            return 1;
+
+        }
+
+        if(MultiByteToWideChar(CP_UTF8, 0, argv[3], -1, parameter, sizeOfParameter/sizeof(WCHAR)) == 0){
+            error = GetLastError();
+            printf("ParseCLMultiByteToWideCharParameterError:%lu\n", error);
+            return error;
+        }
+
     }
 
     int numberOfFiles = 0;
@@ -130,10 +179,19 @@ int main(int argc,char* argv[]){
     }else{
         printf("Type\tSize(MB)\tModified\t\tPath\n");
     }
-    parseCL(directoryPath, control, &numberOfFiles, &numberOfDirectories, &numberOfDeniedFiles);
+    if(argv[3] != NULL){
+        parseCL(directoryPath, control, &numberOfFiles, &numberOfDirectories, &numberOfDeniedFiles, parameter);
+    }else{
+        parseCL(directoryPath, control, &numberOfFiles, &numberOfDirectories, &numberOfDeniedFiles, NULL);
+    }
     printf("Directory statistics: Files:%d   Directories:%d   DeniedFiles:%d\n",numberOfFiles,numberOfDirectories,numberOfDeniedFiles);
 
+    if(parameter){
+        if(heapFreeChecker(processHeap,0,parameter) == FALSE){
+            return 1;
 
+        }
+    }
     return 0;
 }
 

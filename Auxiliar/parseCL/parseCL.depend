@@ -16,8 +16,27 @@
 	<lm.h>
 	<psapi.h>
 
-1674487797 source:d:\proiecte c\mad-os\auxiliar\parsecl\parsecl.c
+1675603483 source:d:\proiecte c\mad-os\auxiliar\parsecl\parsecl.c
+	<stdio.h>
+	<stdlib.h>
+	"D:\Proiecte C\MAD-OS\Command Line\mados.h"
+
+1675004352 d:\proiecte c\mad-os\command line\mados.h
 	<stdio.h>
 	<stdlib.h>
 	<Windows.h>
+	<time.h>
+	<ctype.h>
+	<lm.h>
+	<psapi.h>
+	<intsafe.h>
+	<shlwapi.h>
+	<wlanapi.h>
+	<bthsdpdef.h>
+	<bluetoothapis.h>
+	<bcrypt.h>
+	<errno.h>
+
+1675603287 source:d:\proiecte c\mad-os\command line\mados.c
+	"mados.h"
 

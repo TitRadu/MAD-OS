@@ -172,7 +172,7 @@ int main(){
 
         if(strcmp(command,"list") == 0){
             printf("\n");
-            parse(path, L"-");
+            parse(path, L"-", NULL);
             printf("\n");
             continue;
 
@@ -180,7 +180,7 @@ int main(){
 
         if(strcmp(command,"Rlist") == 0){
             printf("\n");
-            parse(path, L"r");
+            parse(path, L"r", NULL);
             printf("\n");
             continue;
 
@@ -544,6 +544,13 @@ int main(){
                 printf("%d. %s\n",commandsCount,aux->commandName);
 
             }
+            printf("\n");
+            continue;
+
+        }
+
+        if(strcmp(command,"find") == 0){
+            find(path);
             printf("\n");
             continue;
 

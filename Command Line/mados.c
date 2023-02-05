@@ -391,8 +391,14 @@ void changePath(wchar_t *path){
 
 }
 
-void parse(wchar_t* path, PWCHAR control){
-    wchar_t args[8+wcslen(path)-1+wcslen(control)+1];
+void parse(wchar_t* path, PWCHAR control, wchar_t* parameter){
+    unsigned short parameterLength = 0;
+    
+    if(parameter){
+        parameterLength = wcslen(parameter); 
+    }
+
+    wchar_t args[11+wcslen(path)-1+wcslen(control)+parameterLength+1];
     args[0] = '\0';
     wcscat_s(args,sizeof(args),L"\"");
     wcscat_s(args,sizeof(args),path);
@@ -405,6 +411,13 @@ void parse(wchar_t* path, PWCHAR control){
     wcscat_s(args,sizeof(args),L"\"");
     wcscat_s(args, sizeof(args), control);
     wcscat_s(args,sizeof(args),L"\"");
+
+    if(parameter)
+    {
+        wcscat_s(args,sizeof(args),L" \"");
+        wcscat_s(args, sizeof(args), parameter);
+        wcscat_s(args,sizeof(args),L"\"");
+    }
     forkk(L"parseCL.exe",args);
 }
 
@@ -653,7 +666,7 @@ void removeDirectoryRecursive(wchar_t* absolutePath, PWCHAR control){
 
 
     printf("\nList of deleted files:\n");
-    parse(absolutePath, control);
+    parse(absolutePath, control, NULL);
     printf("\n");
     if(removeDirectory(absolutePath) == 0){
         printf("The directory was deleted successfully!\n");
@@ -3340,6 +3353,70 @@ command* addCommand(command* root,char* newCommandName){
     return root;
 }
 
+void find(wchar_t* path)
+{
+    wchar_t searchString[MAX_PATH];
+    wchar_t directoryPath[MAX_PATH];
+
+    printf("Search-String:");
+    fgetws(searchString,MAX_PATH,stdin);
+    if(searchString[wcslen(searchString)-1] == '\n'){
+        searchString[wcslen(searchString)-1] = '\0';
+
+    }
+
+    if(wStringCheck(searchString) == 1){
+        printf("\n");
+        return;
+    }
+
+    printf("Directory:");
+    fgetws(directoryPath,MAX_PATH,stdin);
+    if(directoryPath[wcslen(directoryPath)-1] == '\n'){
+        directoryPath[wcslen(directoryPath)-1] = '\0';
+
+    }
+
+    if(wStringCheck(directoryPath) == 1){
+        printf("\n");
+        return;
+    }
+
+    wchar_t* directoryAbsolutePath;
+    if((directoryAbsolutePath = preparePathDependingOnType(path, directoryPath)) == NULL){
+        return;
+
+    }
+
+    if(wcslen(directoryAbsolutePath) >= MAX_PATH -1){
+        printf("File name is too long!\n");
+        return;
+
+    }
+
+    int existCheck = 0;
+    if((existCheck=wExist(directoryAbsolutePath,L"")) == 3){
+        printf("Invalid argument!\n\n");
+        return;
+
+    }
+
+    if(existCheck == 1){
+        printf("The argument must be a directory!\n\n");
+        return;
+
+    }
+
+    if(existCheck == 0){
+        printf("The argument doesn't exist as file!\n\n");
+        return;
+
+    }
+
+    printf("\n");
+    parse(directoryAbsolutePath, L"find", searchString);
+}
+
 void grep(){
     forkk(L"grepCL.exe",L"");
 
@@ -4423,7 +4500,7 @@ void pathCommandSelector(PCHAR command, PWCHAR path)
 void listPathDirectory()
 {
     printf("\n");
-    parse(configurationInfo.pathDirectory.path, L"path");
+    parse(configurationInfo.pathDirectory.path, L"path", NULL);
     printf("\n");
 }
 
