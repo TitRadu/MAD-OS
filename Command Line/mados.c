@@ -618,6 +618,12 @@ int removeDirectory(wchar_t* absolutePath){
 
         }
 
+        if(error == ERROR_ACCESS_DENIED){
+            printf("You don't have permission to delete this directory!\n");
+            return error;
+
+        }
+
         if(error == ERROR_DIRECTORY){
             printf("The arguments is a regular file, not a directory!\n");
             return error;

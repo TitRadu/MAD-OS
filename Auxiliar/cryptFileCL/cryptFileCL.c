@@ -58,7 +58,7 @@ int main(){
 
         }
         if (error == 5) {
-            printf("Source is a directory,not a regular file!\n\n");
+            printf("Source is a directory or access is denied!\n\n");
             ExitProcess(5);
         }
         if (error == 32) {

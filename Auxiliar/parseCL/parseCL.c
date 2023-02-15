@@ -23,7 +23,7 @@ void parseCL(wchar_t* directoryPath, PWCHAR control, int* numberOfFiles, int* nu
         error = GetLastError();
         if(error == ERROR_ACCESS_DENIED){
             (*numberOfDeniedFiles)++;
-            printf("-\tAcces to this file is denied!\n");
+            printf("-\tYou don't have permission to parse previous directory!\n");
             return;
 
         }

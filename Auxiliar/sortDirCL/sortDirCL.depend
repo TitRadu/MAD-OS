@@ -15,3 +15,25 @@
 1598484729 source:c:\users\radut\desktop\aplicatii in c\aplicatii\mad os command line\auxiliar\sortdircl\sortdircl.c
 	"C:\Users\radut\Desktop\Aplicatii in C\Aplicatii\MAD OS Command Line\Command Line\mados.h"
 
+1675603287 source:d:\proiecte c\mad-os\command line\mados.c
+	"mados.h"
+
+1675004352 d:\proiecte c\mad-os\command line\mados.h
+	<stdio.h>
+	<stdlib.h>
+	<Windows.h>
+	<time.h>
+	<ctype.h>
+	<lm.h>
+	<psapi.h>
+	<intsafe.h>
+	<shlwapi.h>
+	<wlanapi.h>
+	<bthsdpdef.h>
+	<bluetoothapis.h>
+	<bcrypt.h>
+	<errno.h>
+
+1676420945 source:d:\proiecte c\mad-os\auxiliar\sortdircl\sortdircl.c
+	"D:\Proiecte C\MAD-OS\Command Line\mados.h"
+

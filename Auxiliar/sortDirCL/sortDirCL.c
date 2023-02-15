@@ -1,4 +1,4 @@
-#include "C:\Users\radut\Desktop\Aplicatii in C\Aplicatii\MAD OS Command Line\Command Line\mados.h"
+#include "D:\Proiecte C\MAD-OS\Command Line\mados.h"
 #define CMD L"C:\\Windows\\System32\\cmd.exe"
 
 typedef struct fisier{
@@ -144,7 +144,7 @@ void preluareDate(wchar_t *path){
     if((hd = FindFirstFileW(starPath,&fileInfo)) == INVALID_HANDLE_VALUE){
         error = GetLastError();
         if(error == ERROR_ACCESS_DENIED){
-            printf("-\tAcces to this file is denied!\n");
+            printf("You don't have permission to parse the given directory!\n");
             ExitProcess(error);
 
         }

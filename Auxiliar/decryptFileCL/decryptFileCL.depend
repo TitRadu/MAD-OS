@@ -1,8 +1,8 @@
 # depslib dependency file v1.0
-1648932368 source:d:\proiecte c\mad-os\command line\mados.c
+1675603287 source:d:\proiecte c\mad-os\command line\mados.c
 	"mados.h"
 
-1648932429 d:\proiecte c\mad-os\command line\mados.h
+1675004352 d:\proiecte c\mad-os\command line\mados.h
 	<stdio.h>
 	<stdlib.h>
 	<Windows.h>
@@ -18,6 +18,6 @@
 	<bcrypt.h>
 	<errno.h>
 
-1648992074 source:d:\proiecte c\mad-os\auxiliar\decryptfilecl\decryptfilecl.c
+1676420242 source:d:\proiecte c\mad-os\auxiliar\decryptfilecl\decryptfilecl.c
 	"D:\Proiecte C\MAD-OS\Command Line\mados.h"
 

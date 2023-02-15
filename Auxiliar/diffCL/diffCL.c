@@ -1,4 +1,4 @@
-#include "C:\Users\radut\Desktop\Aplicatii in C\Aplicatii\MAD OS Command Line\Command Line\mados.h"
+#include "D:\Proiecte C\MAD-OS\Command Line\mados.h"
 
 int main()
 {
@@ -49,7 +49,7 @@ int main()
         }
 
         if(errno == EACCES){
-            printf("First file is a directory!\n\n");
+            printf("First file is a directory or access is denied!\n\n");
             return errno;
 
         }
@@ -91,7 +91,7 @@ int main()
         }
 
         if(errno == EACCES){
-            printf("Second file is a directory!\n\n");
+            printf("Second file is a directory or access is denied!\n\n");
             return errno;
 
         }

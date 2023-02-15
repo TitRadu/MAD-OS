@@ -1,4 +1,4 @@
-#include "C:\Users\radut\Desktop\Aplicatii in C\Aplicatii\MAD OS Command Line\Command Line\mados.h"
+#include "D:\Proiecte C\MAD-OS\Command Line\mados.h"
 
 int main(int argc,char* argv[]){
     SetConsoleCtrlHandler(NULL,FALSE);
@@ -49,7 +49,7 @@ int main(int argc,char* argv[]){
 
         }
         if(error == 5){
-            printf("Source is a directory,not a regular file!\n\n");
+            printf("Source is a directory or access is denied!\n\n");
             ExitProcess(5);
         }
         if(error == 123){
