@@ -73,9 +73,13 @@ wchar_t* wStringLastPart(wchar_t*, wchar_t);
 UCHAR* fgetus(UCHAR*, int, FILE*);
 void initializeCmdCommandsConfigurationInfo();
 void initializeMadOsConfigurationInfo();
-void forkk(wchar_t*,wchar_t*);
+void forkk(wchar_t*,wchar_t*, HANDLE);
 void changePath(wchar_t*);
-void parse(wchar_t*, PWCHAR, wchar_t*);
+HANDLE getFileHandleWrapper(PWCHAR);
+HANDLE getFileHandle(PWCHAR fileAbsolutePath);
+void parse(wchar_t*, PWCHAR, wchar_t*, HANDLE);
+void closeHandle(HANDLE);
+PWCHAR preparePathDependingOnType(PWCHAR, PWCHAR);
 void chooseFileOperation(wchar_t*,char*);
 void fileOperationWraper(wchar_t*,char*);
 BOOL createDirectory(wchar_t*);
@@ -102,7 +106,7 @@ void cmdRunnerWrapper(BOOL, BOOL);
 void cmdRunner(PWCHAR, BOOL);
 void clearr();//
 void newCline();//
-void ipc();//
+void ipc(HANDLE);//
 void ipca();//
 void openFileWraper(wchar_t*);
 void openFile(wchar_t*,wchar_t*);//

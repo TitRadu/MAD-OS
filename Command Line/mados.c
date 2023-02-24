@@ -256,11 +256,17 @@ void initializeMadOsConfigurationInfo()
     initializeCmdCommandsConfigurationInfo();
 }
 
-void forkk(wchar_t *application,wchar_t *args){
+void forkk(wchar_t *application,wchar_t *args, HANDLE outputFileHandler){
     STARTUPINFOW s;
     PROCESS_INFORMATION p;
     ZeroMemory(&s,sizeof(STARTUPINFOW));
     s.cb = sizeof(STARTUPINFOW);
+    BOOL bInheritHandles = FALSE;
+    if(outputFileHandler != INVALID_HANDLE_VALUE){
+        bInheritHandles = TRUE;
+        s.hStdOutput = outputFileHandler;
+        s.dwFlags |= STARTF_USESTDHANDLES;
+    }
     ZeroMemory(&p,sizeof(PROCESS_INFORMATION));
 
     wchar_t commandLine[MAX_PATH*2];
@@ -281,7 +287,7 @@ application,
 commandLine,
 NULL,
 NULL,
-FALSE,
+bInheritHandles,
 0,
 NULL,
 applicationDirectory,
@@ -391,7 +397,95 @@ void changePath(wchar_t *path){
 
 }
 
-void parse(wchar_t* path, PWCHAR control, wchar_t* parameter){
+HANDLE getFileHandleWrapper(PWCHAR currentPath)
+{
+    wchar_t filePath[MAX_PATH];
+    printf("Output:");
+    fgetws(filePath, MAX_PATH, stdin);
+    if(filePath[wcslen(filePath)-1] == '\n'){
+        filePath[wcslen(filePath)-1] = '\0';
+    }
+
+    if(wStringCheck(filePath) == 1){
+        return INVALID_HANDLE_VALUE;
+
+    }
+
+    PWCHAR fileAbsolutePath;
+    if((fileAbsolutePath = preparePathDependingOnType(currentPath, filePath)) == NULL){
+        return INVALID_HANDLE_VALUE;
+
+    }
+    if(wcslen(fileAbsolutePath) > 247){
+        printf("File name is too long!\n");
+        return INVALID_HANDLE_VALUE;
+
+    }
+
+    HANDLE fileHandle = getFileHandle(fileAbsolutePath);
+
+    if(heapFreeChecker(processHeap,0, fileAbsolutePath) == FALSE){
+        ExitProcess(-1);
+
+    }
+
+    return fileHandle;
+}
+
+HANDLE getFileHandle(PWCHAR fileAbsolutePath)
+{
+    SECURITY_ATTRIBUTES saAttr;
+    saAttr.nLength = sizeof(SECURITY_ATTRIBUTES); 
+    saAttr.bInheritHandle = TRUE; 
+    saAttr.lpSecurityDescriptor = NULL; 
+    
+    HANDLE fileHandle = NULL;
+    DWORD error = 0;
+    if((fileHandle = CreateFileW(fileAbsolutePath,
+                                GENERIC_WRITE,
+                                0,
+                                &saAttr,
+                                CREATE_ALWAYS,
+                                FILE_ATTRIBUTE_NORMAL,
+                                NULL)) 
+    == INVALID_HANDLE_VALUE)
+    {
+        error = GetLastError();
+        if(error == 2){
+            printf("The system cannot find the file specified.\n");
+
+        }
+        else if(error == 3){
+            printf("A part from source path isn't a directory!\n");
+
+        }
+        else if(error == 5){
+            printf("Source is a directory or access is denied!\n");
+
+        }
+        else if(error == 123){
+            printf("SourceFilePath is invalid!\n");
+
+        }
+        else{
+            printf("GetFileHandleCreateFileWRead:%lu\n",error);
+            ExitProcess(error);
+        }
+    }
+
+    return fileHandle;
+}
+
+void closeHandle(HANDLE handle)
+{
+    DWORD error = ERROR_SUCCESS;
+    if(CloseHandle(handle) == FALSE){
+        error = GetLastError();
+        printf("CloseHandleError%lu\n",error);
+    }
+}
+
+void parse(wchar_t* path, PWCHAR control, wchar_t* parameter, HANDLE outputFileHandler){
     unsigned short parameterLength = 0;
     
     if(parameter){
@@ -418,11 +512,11 @@ void parse(wchar_t* path, PWCHAR control, wchar_t* parameter){
         wcscat_s(args, sizeof(args), parameter);
         wcscat_s(args,sizeof(args),L"\"");
     }
-    forkk(L"parseCL.exe",args);
+    forkk(L"parseCL.exe",args, outputFileHandler);
 }
 
-wchar_t* preparePathDependingOnType(wchar_t* path,wchar_t* checkPath){
-    wchar_t* absolutePath;
+PWCHAR preparePathDependingOnType(PWCHAR path, PWCHAR checkPath){
+    PWCHAR absolutePath;
     if((absolutePath = (wchar_t*)HeapAlloc(processHeap,HEAP_ZERO_MEMORY,sizeof(wchar_t)*MAX_PATH)) == NULL){
         printf("PreparePathDepedingOnTypeHeapAllocError!\n");
         return NULL;
@@ -672,7 +766,7 @@ void removeDirectoryRecursive(wchar_t* absolutePath, PWCHAR control){
 
 
     printf("\nList of deleted files:\n");
-    parse(absolutePath, control, NULL);
+    parse(absolutePath, control, NULL, INVALID_HANDLE_VALUE);
     printf("\n");
     if(removeDirectory(absolutePath) == 0){
         printf("The directory was deleted successfully!\n");
@@ -1261,7 +1355,7 @@ void runWraper(wchar_t* path, BOOL isLocalMode){
 
 void run(wchar_t* executable, wchar_t* arguments , BOOL isLocalMode){
     if(isLocalMode && wcscmp(executable+wcslen(executable)-4,L".msi") != 0){
-        forkk(executable, arguments);
+        forkk(executable, arguments, INVALID_HANDLE_VALUE);
     }else
     {
         SetConsoleCtrlHandler(NULL,FALSE);
@@ -1318,7 +1412,7 @@ void back(wchar_t* path){
 
 void cline(BOOL isLocalMode){
     if(isLocalMode){
-        forkk(L"Command Line.exe",L"");  
+        forkk(L"Command Line.exe",L"", INVALID_HANDLE_VALUE);  
     }else
     {
         HINSTANCE error; 
@@ -1345,7 +1439,7 @@ void cmdRunnerWrapper(BOOL isLocalMode, BOOL isCommandRun){
 
 void cmdRunner(PWCHAR command, BOOL isLocalMode){
     if(isLocalMode){
-        forkk(configurationInfo.cmdCommands.path, command);
+        forkk(configurationInfo.cmdCommands.path, command, INVALID_HANDLE_VALUE);
 
     }
     else{
@@ -1416,13 +1510,13 @@ void newCline(){
     ExitProcess(0);
 }
 
-void ipc(){
-    forkk(configurationInfo.cmdCommands.path,L"/c ipconfig");
+void ipc(HANDLE outputFileHandler){
+    forkk(configurationInfo.cmdCommands.path,L"/c ipconfig", outputFileHandler);
 
 }
 
 void ipca(){
-    forkk(configurationInfo.cmdCommands.path,L"/c ipconfig /all");
+    forkk(configurationInfo.cmdCommands.path,L"/c ipconfig /all", INVALID_HANDLE_VALUE);
 
 }
 
@@ -1461,19 +1555,19 @@ void sortFiles(wchar_t* sortDirectoryPath){
     wcscat_s(arguments,8+wcslen(sortDirectoryPath)*sizeof(wchar_t)+2+2,sortDirectoryPath);
     wcscat_s(arguments,8+wcslen(sortDirectoryPath)*sizeof(wchar_t)+2+2,L"\"");
 
-    forkk(L"sortFilesCL.exe",arguments);
+    forkk(L"sortFilesCL.exe",arguments, INVALID_HANDLE_VALUE);
 
 }
 
 
 void sortDirectory(){
-    forkk(L"sortDirCL.exe",L"");
+    forkk(L"sortDirCL.exe",L"", INVALID_HANDLE_VALUE);
 
 }
 
 void help(){
     printf("\n");
-    forkk(L"contentCL.exe",L"\"Manual.txt\"");
+    forkk(L"contentCL.exe",L"\"Manual.txt\"", INVALID_HANDLE_VALUE);
 
 }
 
@@ -1508,25 +1602,25 @@ void copyFile(wchar_t* sourceAbsolutePath,wchar_t* destinationAbsolutePath){
 
 void myCopyFile(char* control){
     if(strcmp(control,"copy") == 0)
-    forkk(L"copyCL.exe",L"");
+    forkk(L"copyCL.exe",L"", INVALID_HANDLE_VALUE);
 
     if(strcmp(control,"cut") == 0)
-    forkk(L"cutCL.exe",L"");
+    forkk(L"cutCL.exe",L"", INVALID_HANDLE_VALUE);
 
 }
 
 void generateFile(){
-    forkk(L"fileGeneratorCL.exe",L"");
+    forkk(L"fileGeneratorCL.exe",L"", INVALID_HANDLE_VALUE);
 
 }
 
 void cryptFile(){
-    forkk(L"cryptFileCL.exe",L"");
+    forkk(L"cryptFileCL.exe",L"", INVALID_HANDLE_VALUE);
 
 }
 
 void decryptFile(){
-    forkk(L"decryptFileCL.exe",L"");
+    forkk(L"decryptFileCL.exe",L"", INVALID_HANDLE_VALUE);
 
 }
 
@@ -1975,17 +2069,17 @@ void fileContentWraper(){
 
 void fileContent(wchar_t* absolutePath){
     wStringInQuatationMarks(absolutePath);
-    forkk(L"contentCL.exe",absolutePath);
+    forkk(L"contentCL.exe",absolutePath, INVALID_HANDLE_VALUE);
 
 }
 
 void calc(){
-    forkk(L"VBCalculator.exe",L"");
+    forkk(L"VBCalculator.exe",L"", INVALID_HANDLE_VALUE);
 
 }
 
 void netshProfiles(){
-    forkk(configurationInfo.cmdCommands.path,L"/c netsh wlan show profiles");
+    forkk(configurationInfo.cmdCommands.path,L"/c netsh wlan show profiles", INVALID_HANDLE_VALUE);
 
 }
 
@@ -2009,7 +2103,7 @@ void netshPassword(wchar_t* ssid){
     wcscat_s(command,sizeof(command),ssid);
     wcscat_s(command,sizeof(command),L" ");
     wcscat_s(command,sizeof(command),L"key=clear");
-    forkk(configurationInfo.cmdCommands.path, command);
+    forkk(configurationInfo.cmdCommands.path, command, INVALID_HANDLE_VALUE);
 
 }
 
@@ -2172,7 +2266,7 @@ char* compute(char* expression){
 }
 
 void editor(){
-    forkk(L"TextEditor.exe",L"");
+    forkk(L"TextEditor.exe",L"", INVALID_HANDLE_VALUE);
 
 }
 
@@ -3420,27 +3514,27 @@ void find(wchar_t* path)
     }
 
     printf("\n");
-    parse(directoryAbsolutePath, L"find", searchString);
+    parse(directoryAbsolutePath, L"find", searchString, INVALID_HANDLE_VALUE);
 }
 
 void grep(){
-    forkk(L"grepCL.exe",L"");
+    forkk(L"grepCL.exe",L"", INVALID_HANDLE_VALUE);
 
 }
 
 
 void mergeFiles(){
-    forkk(L"mergeCL.exe",L"");
+    forkk(L"mergeCL.exe",L"", INVALID_HANDLE_VALUE);
 
 }
 
 void mergePartOfFiles(){
-    forkk(L"mergePCL.exe",L"");
+    forkk(L"mergePCL.exe",L"", INVALID_HANDLE_VALUE);
 
 }
 
 void filesDiferences(){
-    forkk(L"diffCL.exe",L"");
+    forkk(L"diffCL.exe",L"", INVALID_HANDLE_VALUE);
 
 }
 
@@ -4506,7 +4600,7 @@ void pathCommandSelector(PCHAR command, PWCHAR path)
 void listPathDirectory()
 {
     printf("\n");
-    parse(configurationInfo.pathDirectory.path, L"path", NULL);
+    parse(configurationInfo.pathDirectory.path, L"path", NULL, INVALID_HANDLE_VALUE);
     printf("\n");
 }
 

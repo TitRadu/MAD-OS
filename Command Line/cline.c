@@ -132,9 +132,22 @@ int main(){
 
         }
 
+        if(strcmp(command,"ipc>>") == 0){
+            HANDLE newStandardOutputHandler = getFileHandleWrapper(path);
+
+            if(configurationInfo.cmdCommands.state){
+                ipc(newStandardOutputHandler);
+            }
+            else{
+                printf(CMD_COMMAND_NOT_CONFIGURED);
+            }
+            closeHandle(newStandardOutputHandler);
+            continue;
+        }
+
         if(strcmp(command,"ipc") == 0){
             if(configurationInfo.cmdCommands.state){
-                ipc();
+                ipc(INVALID_HANDLE_VALUE);
             }
             else{
                 printf(CMD_COMMAND_NOT_CONFIGURED);
@@ -172,15 +185,27 @@ int main(){
 
         if(strcmp(command,"list") == 0){
             printf("\n");
-            parse(path, L"-", NULL);
+            parse(path, L"-", NULL, INVALID_HANDLE_VALUE);
             printf("\n");
+            continue;
+
+        }
+
+        if(strcmp(command,"Rlist>>") == 0){
+            HANDLE newStandardOutputHandler = getFileHandleWrapper(path);
+
+            printf("\n");
+            parse(path, L"r", NULL, newStandardOutputHandler);
+            printf("\n");
+
+            closeHandle(newStandardOutputHandler);
             continue;
 
         }
 
         if(strcmp(command,"Rlist") == 0){
             printf("\n");
-            parse(path, L"r", NULL);
+            parse(path, L"r", NULL, INVALID_HANDLE_VALUE);
             printf("\n");
             continue;
 
