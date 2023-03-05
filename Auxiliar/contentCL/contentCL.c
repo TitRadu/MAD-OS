@@ -1,4 +1,7 @@
-#include "D:\Proiecte C\MAD-OS\Command Line\mados.h"
+#include <stdio.h>
+#include <Windows.h>
+#include "..\..\Helpers\WcharHelper\WcharHelper.h"
+#include "..\..\Helpers\GeneralHelper\GeneralHelper.h"
 
 int main(int argc,char* argv[]){
     SetConsoleCtrlHandler(NULL,FALSE);

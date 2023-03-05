@@ -1,4 +1,8 @@
-#include "D:\Proiecte C\MAD-OS\Command Line\mados.h"
+#include <stdio.h>
+#include <Windows.h>
+#include "..\..\Helpers\GeneralHelper\GeneralHelper.h"
+#include "..\..\Helpers\WcharHelper\WcharHelper.h"
+#include "..\..\Command Line\Operations\FileOperations\FileOperations.h"
 
 typedef struct extensie{
 
@@ -33,8 +37,8 @@ int cautareExtensie(wchar_t *nume){
 ///Functia adaugaExtensie.
 //Aceasta functie adauga o extensie in lista de extensii.Nu vor exista noduri ce au aceeasi valoarea a numelui.
 void adaugaExtensie(wchar_t *nume){
-    HANDLE processHeap = NULL;
-    if((processHeap = getProcessHeapChecker()) == NULL){
+    HANDLE localProcessHeap = NULL;
+    if((localProcessHeap = getProcessHeapChecker()) == NULL){
         return;
 
     }
@@ -42,13 +46,13 @@ void adaugaExtensie(wchar_t *nume){
     //In cele de mai jos se fac atribuirile necesare adaugarii noului nod in lista,asta in cazul in care nu exista deja o extensie identica
     if(cautareExtensie(nume)==0){//ca valoare a numelui cu cea de mai sus.
         extensie *nou=malloc(sizeof(extensie));
-        if((nou = (extensie*)HeapAlloc(processHeap,HEAP_ZERO_MEMORY,sizeof(extensie))) == NULL){
+        if((nou = (extensie*)HeapAlloc(localProcessHeap,HEAP_ZERO_MEMORY,sizeof(extensie))) == NULL){
             printf("AdaugaExtensieHeapAllocError!\n");
             ExitProcess(1);
 
         }
 
-        if((nou->nume = (wchar_t*)HeapAlloc(processHeap,HEAP_ZERO_MEMORY,20)) == NULL){
+        if((nou->nume = (wchar_t*)HeapAlloc(localProcessHeap,HEAP_ZERO_MEMORY,20)) == NULL){
             printf("AdaugaFisierHeapAllocError!\n");
             ExitProcess(1);
 
@@ -72,8 +76,8 @@ void adaugaExtensie(wchar_t *nume){
 ///Functia preluareDate.
 //Aceasta functie preia datele din directorul dorit a fi sortat(extensiile corespunzatoare).
 void preluareDate(wchar_t *path){
-    HANDLE processHeap = NULL;
-    if((processHeap = getProcessHeapChecker()) == NULL){
+    HANDLE localProcessHeap = NULL;
+    if((localProcessHeap = getProcessHeapChecker()) == NULL){
         return;
 
     }
@@ -129,21 +133,21 @@ void preluareDate(wchar_t *path){
                 extensie* aux;
 
                 wchar_t* oldName;
-                if((oldName = (wchar_t*)HeapAlloc(processHeap,HEAP_ZERO_MEMORY,MAX_PATH*sizeof(wchar_t))) == NULL){
+                if((oldName = (wchar_t*)HeapAlloc(localProcessHeap,HEAP_ZERO_MEMORY,MAX_PATH*sizeof(wchar_t))) == NULL){
                     printf("AdaugaFisierHeapAllocError!\n");
                     ExitProcess(1);
 
                 }
 
                 wchar_t* newName;
-                if((newName = (wchar_t*)HeapAlloc(processHeap,HEAP_ZERO_MEMORY,MAX_PATH*sizeof(wchar_t))) == NULL){
+                if((newName = (wchar_t*)HeapAlloc(localProcessHeap,HEAP_ZERO_MEMORY,MAX_PATH*sizeof(wchar_t))) == NULL){
                     printf("AdaugaFisierHeapAllocError!\n");
                     ExitProcess(1);
 
                 }
 
                 wchar_t* renameNumber;
-                if((renameNumber = (wchar_t*)HeapAlloc(processHeap,HEAP_ZERO_MEMORY,4*sizeof(wchar_t))) == NULL){
+                if((renameNumber = (wchar_t*)HeapAlloc(localProcessHeap,HEAP_ZERO_MEMORY,4*sizeof(wchar_t))) == NULL){
                     printf("AdaugaFisierHeapAllocError!\n");
                     ExitProcess(1);
 
@@ -184,6 +188,7 @@ void preluareDate(wchar_t *path){
 
 }
 
+HANDLE processHeap = NULL;
 int main(int argc, char*argv[]){
     LPWSTR commandLineString;
     commandLineString = GetCommandLineW();

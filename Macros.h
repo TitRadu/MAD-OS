@@ -1,0 +1,12 @@
+#ifndef MACROS_H_INCLUDED
+#define MACROS_H_INCLUDED
+#define WCHAR_EMPTY_STRING L""
+#define CHAR_EMPTY_STRING ""
+#define THIRTY 30
+#define OH 100
+#define PATH 1024
+#define BLOCK 4096
+#define ABSOLUTE_PATH 0
+#define RELATIVE_PATH 1
+
+#endif // MACROS_H_INCLUDED

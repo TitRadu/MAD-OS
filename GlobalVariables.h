@@ -1,0 +1,8 @@
+#ifndef GLOBALVARIABLES_H_INCLUDED
+#define GLOBALVARIABLES_H_INCLUDED
+
+#include <Windows.h>
+
+extern HANDLE processHeap;
+
+#endif // GLOBALVARIABLES_H_INCLUDED

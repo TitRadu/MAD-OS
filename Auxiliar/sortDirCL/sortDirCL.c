@@ -1,5 +1,8 @@
-#include "D:\Proiecte C\MAD-OS\Command Line\mados.h"
-#define CMD L"C:\\Windows\\System32\\cmd.exe"
+#include <stdio.h>
+#include <Windows.h>
+#include "..\..\Helpers\GeneralHelper\GeneralHelper.h"
+#include "..\..\Helpers\WcharHelper\WcharHelper.h"
+#include "..\..\Command Line\Operations\FileOperations\FileOperations.h"
 
 typedef struct fisier{
 
@@ -20,21 +23,21 @@ fisier *rootF=NULL;
 extensie *rootE=NULL;
 
 void adaugaFisier(wchar_t* nume){
-    HANDLE processHeap = NULL;
-    if((processHeap = getProcessHeapChecker()) == NULL){
+    HANDLE localProcessHeap = NULL;
+    if((localProcessHeap = getProcessHeapChecker()) == NULL){
         return;
 
     }
 
     //Alocarea de memorie pentru noul fisier plus copierea datelor necesare in noul fisier(numele fisierului).
     fisier* nou;
-    if((nou = (fisier*)HeapAlloc(processHeap,HEAP_ZERO_MEMORY,sizeof(fisier))) == NULL){
+    if((nou = (fisier*)HeapAlloc(localProcessHeap,HEAP_ZERO_MEMORY,sizeof(fisier))) == NULL){
             printf("AdaugaFisierHeapAllocError!\n");
             ExitProcess(1);
 
     }
 
-    if((nou->nume = (wchar_t*)HeapAlloc(processHeap,HEAP_ZERO_MEMORY,MAX_PATH*2)) == NULL){
+    if((nou->nume = (wchar_t*)HeapAlloc(localProcessHeap,HEAP_ZERO_MEMORY,MAX_PATH*2)) == NULL){
             printf("AdaugaFisierHeapAllocError!\n");
             ExitProcess(1);
 
@@ -76,8 +79,8 @@ int cautareExtensie(wchar_t *nume){
 ///Functia adaugaExtensie.
 //Aceasta functie adauga o extensie in lista de extensii.Nu vor exista noduri ce au aceeasi valoarea a numelui.
 void adaugaExtensie(wchar_t *nume){
-    HANDLE processHeap = NULL;
-    if((processHeap = getProcessHeapChecker()) == NULL){
+    HANDLE localProcessHeap = NULL;
+    if((localProcessHeap = getProcessHeapChecker()) == NULL){
         return;
 
     }
@@ -89,13 +92,13 @@ void adaugaExtensie(wchar_t *nume){
     //In cele de mai jos se fac atribuirile necesare adaugarii noului nod in lista,asta in cazul in care nu exista deja o extensie identica
     if(cautareExtensie(ext)==0){//ca valoare a numelui cu cea de mai sus.
         extensie *nou=malloc(sizeof(extensie));
-        if((nou = (extensie*)HeapAlloc(processHeap,HEAP_ZERO_MEMORY,sizeof(extensie))) == NULL){
+        if((nou = (extensie*)HeapAlloc(localProcessHeap,HEAP_ZERO_MEMORY,sizeof(extensie))) == NULL){
             printf("AdaugaExtensieHeapAllocError!\n");
             ExitProcess(1);
 
         }
 
-        if((nou->nume = (wchar_t*)HeapAlloc(processHeap,HEAP_ZERO_MEMORY,20)) == NULL){
+        if((nou->nume = (wchar_t*)HeapAlloc(localProcessHeap,HEAP_ZERO_MEMORY,20)) == NULL){
             printf("AdaugaFisierHeapAllocError!\n");
             ExitProcess(1);
 
@@ -280,6 +283,7 @@ void mutaFisiere(wchar_t *cale){
 
 }
 
+HANDLE processHeap = NULL;
 int main(int argc, char* argv[]){
     wchar_t sortFullPath[MAX_PATH];
     printf("Sort-Path:");

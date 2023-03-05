@@ -20,3 +20,6 @@ https://stackoverflow.com/questions/35800020/how-do-i-find-the-coordinates-of-th
 https://www.winsocketdotnetworkprogramming.com/winsock2programming/winsock2advancedotherprotocol4k.html -> initialize BLUETOOTH_DEVICE_SEARCH_PARAMS structure.
 https://zetcode.com/gui/winapi/datetime/ -> GetDateFormatEx(), GetTimeFormatEx() for display data.
 https://stackoverflow.com/questions/41600981/how-do-i-check-if-a-key-is-pressed-on-c -> check if a key is pressed for Windows systems.
+https://stackoverflow.com/questions/3627941/global-variable-within-multiple-files
+https://stackoverflow.com/questions/4798879/how-do-i-run-a-batch-script-from-within-a-batch-script -> CALL command
+https://stackoverflow.com/questions/45273707/batch-file-opens-in-wrong-place -> change the current directory when run a script from another script.

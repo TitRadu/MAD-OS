@@ -1,4 +1,8 @@
-#include "D:\Proiecte C\MAD-OS\Command Line\mados.h"
+#include <stdio.h>
+#include <Windows.h>
+#include <bcrypt.h>
+#include "..\..\Helpers\GeneralHelper\GeneralHelper.h"
+#include "..\..\Helpers\WcharHelper\WcharHelper.h"
 
 void getRandomNumber(BCRYPT_ALG_HANDLE algorithmHandle, PUCHAR receiveRandomNumberBuffer, ULONG bufferSize) {
     NTSTATUS error = 0;

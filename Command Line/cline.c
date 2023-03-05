@@ -1,8 +1,22 @@
-#include "mados.h"
+#include "..\GlobalVariables.h"
+#include "Operations\ConsoleOperations\ConsoleProprierties.h"
+#include "Runners/CmdRunner/CmdRunner.h"
+#include "Initialization\Initialization.h"
+#include "Math\Fibonacci\Fibonacci.h"
+#include "Runners\CmdCommandsRunner\CmdCommandsRunner.h"
+#include "Runners\UrlRunner\UrlRunner.h"
+#include "Time\Time.h"
+#include "InternalDirectories\Backup\Backup.h"
+#include "Math\BasicCalculator\BasicCalculator.h"
+#include "User\User.h"
+#include "Operations\ComputerOperations\ComputerOperations.h"
+#include "Operations\RadioOperations\WlanOperations\WlanOperations.h"
+#include "Operations\RadioOperations\BluetoothOperations\BluetoothOperations.h"
+
+HANDLE processHeap = NULL;
 
 int main(){
     SetConsoleCtrlHandler(NULL,TRUE);
-    extern HANDLE processHeap;
     if((processHeap = getProcessHeapChecker()) == NULL){
         return 1;
 

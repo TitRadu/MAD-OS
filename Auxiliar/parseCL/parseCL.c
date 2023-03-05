@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include "D:\Proiecte C\MAD-OS\Command Line\mados.h"
+#include <Windows.h>
+#include "..\..\Helpers\GeneralHelper\GeneralHelper.h"
 
 void parseCL(wchar_t* directoryPath, PWCHAR control, int* numberOfFiles, int* numberOfDirectories, int* numberOfDeniedFiles, wchar_t* parameter){
     HANDLE hd;

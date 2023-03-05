@@ -1,6 +1,9 @@
-#include "C:\Users\radut\Desktop\Aplicatii in C\Aplicatii\MAD OS Command Line\Command Line\mados.h"
 #define lowLimit 32
 #define highLimit 126
+#include <stdio.h>
+#include <Windows.h>
+#include "..\..\Helpers\GeneralHelper\GeneralHelper.h"
+#include "..\..\Helpers\WcharHelper\WcharHelper.h"
 
 int main(){
     SetConsoleCtrlHandler(NULL,FALSE);
