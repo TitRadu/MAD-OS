@@ -2,7 +2,6 @@
 #include <Windows.h>
 #include "..\..\Helpers\GeneralHelper\GeneralHelper.h"
 #include "..\..\Helpers\WcharHelper\WcharHelper.h"
-#include "..\..\Command Line\Operations\FileOperations\FileOperations.h"
 
 typedef struct fisier{
 
@@ -21,6 +20,105 @@ struct extensie* urm;
 
 fisier *rootF=NULL;
 extensie *rootE=NULL;
+
+BOOL createDirectory(wchar_t* absolutePath){
+    if(wcslen(absolutePath) > 247){
+        printf("File name is too long!\n");
+        return FALSE;
+
+    }
+
+    DWORD error = 0;
+    if(CreateDirectoryW(absolutePath,NULL) == 0){
+        error = GetLastError();
+        if(error == ERROR_INVALID_NAME){
+            printf("Invalid argument!\n");
+            return FALSE;
+
+        }
+
+        if(error == ERROR_ALREADY_EXISTS){
+            printf("The file already exists!\n");
+            return FALSE;
+
+        }
+
+        if(error == ERROR_PATH_NOT_FOUND){
+            printf("A component from argument doesn't exist!\n");
+            return FALSE;
+
+        }
+
+        if(error == ERROR_ACCESS_DENIED){
+            printf("Permission denied!\n");
+            return FALSE;
+
+        }
+
+        if(error == ERROR_FILENAME_EXCED_RANGE){
+            printf("File name is too long!\n");
+            return FALSE;
+
+        }
+
+        printf("CreateDirectoryCreateDirectoryError:%lu\n",error);
+        return FALSE;
+
+    }
+
+    return TRUE;
+}
+
+void renameFile(wchar_t* oldName,wchar_t* newName){
+    DWORD error = 0;
+    if(MoveFileW(oldName,newName) == 0){
+        error = GetLastError();
+
+        if(error == ERROR_INVALID_NAME){
+            printf("Invalid argument!\n");
+            return;
+
+        }
+
+        if(error == ERROR_INVALID_PARAMETER){
+            printf("Invalid parameter!\n");
+            return;
+
+        }
+
+        if(error == ERROR_FILE_NOT_FOUND){
+            printf("Old name doesn't exist as file!\n");
+            return;
+
+        }
+
+        if(error == ERROR_ALREADY_EXISTS){
+            printf("The new name already exists!\n");
+            return;
+
+        }
+
+        if(error == ERROR_PATH_NOT_FOUND){
+            printf("A component from argument doesn't exist!\n");
+            return;
+        }
+
+        if(error == ERROR_ACCESS_DENIED){
+            printf("Access is denied!\n");
+            return;
+        }
+
+        if(error == ERROR_SHARING_VIOLATION){
+            printf("The process cannot access the file because it is being used by another process!\n");
+            return;
+        }
+
+        printf("renameFileMoveFileError:%lu\n",error);
+        return;
+
+    }
+
+}
 
 void adaugaFisier(wchar_t* nume){
     HANDLE localProcessHeap = NULL;
@@ -283,7 +381,6 @@ void mutaFisiere(wchar_t *cale){
 
 }
 
-HANDLE processHeap = NULL;
 int main(int argc, char* argv[]){
     wchar_t sortFullPath[MAX_PATH];
     printf("Sort-Path:");
