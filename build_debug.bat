@@ -1,4 +1,4 @@
-CALL "Command Line\build_debug.bat"
+CALL "CommandLine\build_debug.bat"
 @CD /D "%~dp0"
 
 CALL "Auxiliar\contentCL\build_debug.bat"
