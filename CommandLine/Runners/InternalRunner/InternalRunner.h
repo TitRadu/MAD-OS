@@ -2,6 +2,7 @@
 #define INTERNALRUNNER_H_INCLUDED
 #include <stdio.h>
 #include <Windows.h>
+#include "..\..\..\Logger\Logger.h"
 #include "..\..\Operations\ProcessOperations\ProcessOperations.h"
 #include "..\..\Navigator\Navigator.h"
 

@@ -66,6 +66,7 @@ void sortFiles(wchar_t* sortDirectoryPath){
 
 
 void sortDirectory(){
+    LogA("mados", __FILE__, INFOA, __FUNCTION__);
     forkk(L"sortDirCL.exe",L"", INVALID_HANDLE_VALUE);
 
 }

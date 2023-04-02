@@ -2,6 +2,7 @@
 
 void initializeMadOsConfigurationInfo()
 {
+    prepareLogFile();
     initializePathDirectory();
     initializeCmdCommandsConfigurationInfo();
 }

@@ -2,6 +2,7 @@
 #include <Windows.h>
 #include "..\..\Helpers\GeneralHelper\GeneralHelper.h"
 #include "..\..\Helpers\WcharHelper\WcharHelper.h"
+#include "..\..\Logger\Logger.h"
 
 typedef struct fisier{
 
@@ -22,6 +23,8 @@ fisier *rootF=NULL;
 extensie *rootE=NULL;
 
 BOOL createDirectory(wchar_t* absolutePath){
+    LogA("sortDirCL", __FILE__, INFOA, __FUNCTION__);
+
     if(wcslen(absolutePath) > 247){
         printf("File name is too long!\n");
         return FALSE;
@@ -70,6 +73,8 @@ BOOL createDirectory(wchar_t* absolutePath){
 }
 
 void renameFile(wchar_t* oldName,wchar_t* newName){
+    LogA("sortDirCL", __FILE__, INFOA, __FUNCTION__);
+
     DWORD error = 0;
     if(MoveFileW(oldName,newName) == 0){
         error = GetLastError();
@@ -121,6 +126,8 @@ void renameFile(wchar_t* oldName,wchar_t* newName){
 }
 
 void adaugaFisier(wchar_t* nume){
+    LogA("sortDirCL", __FILE__, INFOA, __FUNCTION__);
+
     HANDLE localProcessHeap = NULL;
     if((localProcessHeap = getProcessHeapChecker()) == NULL){
         return;
@@ -157,6 +164,8 @@ void adaugaFisier(wchar_t* nume){
 ///Functia cautareExtensie.
 //Aceasta functie cauta existenta unei extensii in lista de extensii,extensie data prin numele sau.
 int cautareExtensie(wchar_t *nume){
+    LogA("sortDirCL", __FILE__, INFOA, __FUNCTION__);
+
     if(rootE==NULL){//Verificam daca radacina este NULL.
 
         return 0;//Daca este returnam 0.
@@ -177,6 +186,8 @@ int cautareExtensie(wchar_t *nume){
 ///Functia adaugaExtensie.
 //Aceasta functie adauga o extensie in lista de extensii.Nu vor exista noduri ce au aceeasi valoarea a numelui.
 void adaugaExtensie(wchar_t *nume){
+    LogA("sortDirCL", __FILE__, INFOA, __FUNCTION__);
+
     HANDLE localProcessHeap = NULL;
     if((localProcessHeap = getProcessHeapChecker()) == NULL){
         return;
@@ -219,6 +230,8 @@ void adaugaExtensie(wchar_t *nume){
 
 
 int ultimaAparitie(wchar_t* fisier,wchar_t c){
+    LogA("sortDirCL", __FILE__, INFOA, __FUNCTION__);
+
     int index=-1;
     int i;
     for(i=0;i<wcslen(fisier);i++){
@@ -234,6 +247,8 @@ int ultimaAparitie(wchar_t* fisier,wchar_t c){
 ///Functia preluareDate.
 //Aceasta functie preia datele din directorul dorit a fi sortat(fisiere si extensiile corespunzatoare).
 void preluareDate(wchar_t *path){
+    LogA("sortDirCL", __FILE__, INFOA, __FUNCTION__);
+
     HANDLE hd;
     WIN32_FIND_DATAW fileInfo;
     wchar_t starPath[MAX_PATH];
@@ -299,6 +314,8 @@ void preluareDate(wchar_t *path){
 ///Functia listare
 //Listeaza fisierele si extensiile din liste.
 void listare(){
+    LogA("sortDirCL", __FILE__, INFOA, __FUNCTION__);
+
     fisier *auxF;
     extensie *auxE;
 
@@ -324,6 +341,8 @@ void listare(){
 ///Functia creeazaDirectoare.
 //Aceasta functie creeaza directoarele specifice extensiilor.
 void creeazaDirectoare(wchar_t* cale){
+    LogA("sortDirCL", __FILE__, INFOA, __FUNCTION__);
+
     wchar_t directoryFullPath[MAX_PATH];
 
     wchar_t* auxiliar;
@@ -336,6 +355,7 @@ void creeazaDirectoare(wchar_t* cale){
         wcscat_s(directoryFullPath,sizeof(directoryFullPath),L"\\");
         wcscat_s(directoryFullPath,sizeof(directoryFullPath),auxiliar);
         createDirectory(directoryFullPath);
+        LogW(L"sortDirCL", L"sordDirCl.c", INFOW, directoryFullPath);
 
     }
 
@@ -345,7 +365,7 @@ void creeazaDirectoare(wchar_t* cale){
 ///Functia mutaFisiere.
 //Aceasta functie muta un fisier in directorul cu extensia specifica fisierului.
 void mutaFisiere(wchar_t *cale){
-
+    LogA("sortDirCL", __FILE__, INFOA, __FUNCTION__);
 
     fisier *auxF;
     extensie *auxE;
@@ -382,6 +402,8 @@ void mutaFisiere(wchar_t *cale){
 }
 
 int main(int argc, char* argv[]){
+    LogA("sortDirCL", __FILE__, INFOA, "Starting sorting by directories operations!");
+
     wchar_t sortFullPath[MAX_PATH];
     printf("Sort-Path:");
     fgetws(sortFullPath,MAX_PATH,stdin);

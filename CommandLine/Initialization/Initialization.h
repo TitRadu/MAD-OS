@@ -4,6 +4,7 @@
 #include <Windows.h>
 #include "..\InternalDirectories\Path\Path.h"
 #include "..\Runners\CmdRunner\CmdRunner.h"
+#include "..\..\Logger\Logger.h"
 
 void initializeMadOsConfigurationInfo();
 

@@ -12,6 +12,7 @@
 #include "Operations\ComputerOperations\ComputerOperations.h"
 #include "Operations\RadioOperations\WlanOperations\WlanOperations.h"
 #include "Operations\RadioOperations\BluetoothOperations\BluetoothOperations.h"
+#include "..\Logger\Logger.h"
 
 HANDLE processHeap = NULL;
 
@@ -62,16 +63,18 @@ int main(){
             command[strlen(command)-1] = '\0';
         }
 
+        if(strcmp(command,"") == 0){
+            continue;
+
+        }
+
+        LogA("mados", __FILE__, INFOA, "Executing user command!");
+        LogA("mados", __FILE__, INFOA, command);
 
         if(strcmp(command,"exit") == 0){
             printf("Exit from command line!\n");
             pause();
             return 0;
-
-        }
-
-        if(strcmp(command,"") == 0){
-            continue;
 
         }
 
@@ -750,6 +753,7 @@ int main(){
             continue;
 
         }
+        LogA("mados", __FILE__, INFOA, "Incorrect command!");
         printf("Incorrect command!\n");
 
     }

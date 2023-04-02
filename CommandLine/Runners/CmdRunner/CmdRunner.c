@@ -2,15 +2,18 @@
 
 void initializeCmdCommandsConfigurationInfo()
 {
+    LogA("mados", __FILE__, INFOA, __FUNCTION__);
     configurationInfo.cmdCommands.state = FALSE;
     DWORD error = 0;
     if(GetEnvironmentVariableW(L"COMSPEC", configurationInfo.cmdCommands.path, MAX_PATH) == 0){
         error = GetLastError();
         printf(CMD_COMMAND_NOT_CONFIGURED);
         printf("MainError:%lu\n", error);
+        LogA("mados", __FILE__, WRNA, "CmdCommands configuration configuration failed!");
         return;
     }
 
+    LogA("mados", __FILE__, INFOA, "CmdCommands configuration successfully!");
     configurationInfo.cmdCommands.state = TRUE;
 }
 

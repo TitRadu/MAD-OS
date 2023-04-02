@@ -24,6 +24,8 @@ void createPathDirectory()
 }
 
 void initializePathDirectory(){
+    LogA("mados", __FILE__, INFOA, __FUNCTION__);
+
     DWORD error = 0;
     char charPathDirectory[256] = CHAR_EMPTY_STRING;
     if(GetCurrentDirectory(sizeof(charPathDirectory), charPathDirectory) == 0)
@@ -42,10 +44,12 @@ void initializePathDirectory(){
 
     if(PathIsDirectoryEmptyW(configurationInfo.pathDirectory.path) == TRUE) 
     {
+        LogA("mados", __FILE__, DBGA, "PATH directory is empty and will be removed!");
         removeDirectory(configurationInfo.pathDirectory.path);
         return;
     }
 
+    LogA("mados", __FILE__, INFOA, "PathDirectory configuration successfully!");
 }
 
 void pathCommandSelector(PCHAR command, PWCHAR path)

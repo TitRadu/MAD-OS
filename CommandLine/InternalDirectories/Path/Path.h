@@ -10,6 +10,7 @@
 #include "..\..\..\Helpers\GeneralHelper\GeneralHelper.h"
 #include "..\..\Runners\GeneralRunner\GeneralRunner.h"
 #include "..\..\ConfigurationInfo.h"
+#include "..\..\..\Logger\Logger.h"
 
 void setPathDirectoryConfigurationState();
 void createPathDirectory();
