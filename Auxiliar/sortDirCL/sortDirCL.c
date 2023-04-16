@@ -289,10 +289,15 @@ void preluareDate(wchar_t *path){
         if(!(fileInfo.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)){
             if(wcscmp(L"sortDir.exe",fileInfo.cFileName) != 0){
                 adaugaFisier(fileInfo.cFileName);
-                int i;
-                i=ultimaAparitie(fileInfo.cFileName,'.');
-                adaugaExtensie(fileInfo.cFileName+i);
-
+                int i = ultimaAparitie(fileInfo.cFileName,'.');
+                
+                if(i != -1)
+                {
+                    adaugaExtensie(fileInfo.cFileName+i+1);
+                }else
+                {
+                    adaugaExtensie(L"noextension");
+                }
             }
 
         }
@@ -345,15 +350,13 @@ void creeazaDirectoare(wchar_t* cale){
 
     wchar_t directoryFullPath[MAX_PATH];
 
-    wchar_t* auxiliar;
     extensie* auxE;
 
     for(auxE=rootE;auxE!=NULL;auxE=auxE->urm){
-        auxiliar=wcstok(auxE->nume,L".");
         directoryFullPath[0]='\0';
         wcscat_s(directoryFullPath,sizeof(directoryFullPath),cale);
         wcscat_s(directoryFullPath,sizeof(directoryFullPath),L"\\");
-        wcscat_s(directoryFullPath,sizeof(directoryFullPath),auxiliar);
+        wcscat_s(directoryFullPath,sizeof(directoryFullPath),auxE->nume);
         createDirectory(directoryFullPath);
         LogW(L"sortDirCL", L"sordDirCl.c", INFOW, directoryFullPath);
 
@@ -371,14 +374,12 @@ void mutaFisiere(wchar_t *cale){
     extensie *auxE;
     wchar_t cale1[MAX_PATH];
     wchar_t cale2[MAX_PATH];
-    wchar_t* folder;
 
     for(auxF=rootF;auxF!=NULL;auxF=auxF->urm){
         for(auxE=rootE;auxE!=NULL;auxE=auxE->urm){
-
-            if(wcsstr(auxF->nume,auxE->nume)){
-
-                folder=wcstok(auxE->nume,L".");
+            int index = ultimaAparitie(auxF->nume, '.');
+            int auxiliar = index == -1 ? 0 : index; 
+            if(wcscmp(auxF->nume + auxiliar + 1, auxE->nume) == 0 || (wcscmp(auxE->nume, L"noextension") == 0 && index == -1)){
                 cale1[0]='\0';
                 cale2[0]='\0';
                 wcscat_s(cale1,sizeof(cale1),cale);
@@ -387,7 +388,7 @@ void mutaFisiere(wchar_t *cale){
 
                 wcscat_s(cale2,sizeof(cale2),cale);
                 wcscat_s(cale2,sizeof(cale2),L"\\");
-                wcscat_s(cale2,sizeof(cale2),folder);
+                wcscat_s(cale2,sizeof(cale2),auxE->nume);
                 wcscat_s(cale2,sizeof(cale2),L"\\");
                 wcscat_s(cale2,sizeof(cale2),auxF->nume);
                 renameFile(cale1,cale2);
