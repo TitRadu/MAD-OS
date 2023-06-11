@@ -25,7 +25,8 @@ void newCline(){
     ExitProcess(0);
 }
 
-void sortFilesWraper(wchar_t* path){
+void sortWraper(PWCHAR path, PCHAR command){
+    LogA("mados", __FILE__, INFOA, __FUNCTION__);
     wchar_t sortDirectoryPath[MAX_PATH];
     printf("Sort-Path:");
     fgetws(sortDirectoryPath,MAX_PATH,stdin);
@@ -44,11 +45,12 @@ void sortFilesWraper(wchar_t* path){
 
     }
 
-    sortFiles(absolutePath);
+    sort(absolutePath, command);
 
 }
 
-void sortFiles(wchar_t* sortDirectoryPath){
+void sort(PWCHAR sortDirectoryPath, PCHAR command){
+    LogA("mados", __FILE__, INFOA, __FUNCTION__);
     wchar_t* arguments;
     if((arguments = (wchar_t*)HeapAlloc(processHeap,HEAP_ZERO_MEMORY,4+wcslen(sortDirectoryPath)*sizeof(wchar_t)+2+2)) == NULL){
             printf("SortFilesHeapAllocError!\n");
@@ -60,7 +62,13 @@ void sortFiles(wchar_t* sortDirectoryPath){
     wcscat_s(arguments,8+wcslen(sortDirectoryPath)*sizeof(wchar_t)+2+2,sortDirectoryPath);
     wcscat_s(arguments,8+wcslen(sortDirectoryPath)*sizeof(wchar_t)+2+2,L"\"");
 
-    forkk(L"sortFilesCL.exe",arguments, INVALID_HANDLE_VALUE);
+    if(strcmp(command,"sortF") == 0){
+        forkk(L"sortFilesCL.exe", arguments, INVALID_HANDLE_VALUE);
+    }
+
+    if(strcmp(command,"sortD") == 0){
+        forkk(L"sortDirCL.exe", arguments, INVALID_HANDLE_VALUE);
+    }
 
 }
 

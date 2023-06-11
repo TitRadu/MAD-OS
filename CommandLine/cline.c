@@ -319,13 +319,13 @@ int main(){
         }
 
         if(strcmp(command,"sortF") == 0){
-            sortFilesWraper(path);
+            sortWraper(path, command);
             continue;
 
         }
 
         if(strcmp(command,"sortD") == 0){
-            sortDirectory();
+            sortWraper(path, command);
             continue;
 
         }

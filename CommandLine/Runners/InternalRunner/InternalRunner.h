@@ -8,9 +8,8 @@
 
 void cline(BOOL);
 void newCline();
-void sortFilesWraper(wchar_t*);
-void sortFiles(wchar_t*);
-void sortDirectory();//
+void sortWraper(PWCHAR, PCHAR);
+void sort(PWCHAR, PCHAR);
 void myCopyFile(char*);//
 void generateFile();//
 void cryptFile();

@@ -405,41 +405,37 @@ void mutaFisiere(wchar_t *cale){
 int main(int argc, char* argv[]){
     LogA("sortDirCL", __FILE__, INFOA, "Starting sorting by directories operations!");
 
-    wchar_t sortFullPath[MAX_PATH];
-    printf("Sort-Path:");
-    fgetws(sortFullPath,MAX_PATH,stdin);
-    if(sortFullPath[wcslen(sortFullPath)-1] == '\n'){
-        sortFullPath[wcslen(sortFullPath)-1] = '\0';
+    LPWSTR commandLineString;
+    commandLineString = GetCommandLineW();
+    wchar_t separators[2] = L" ";
+    wchar_t* sortPath;
+    sortPath = wcstok(commandLineString, separators);
+    wcscpy(sortPath, commandLineString + wcslen(sortPath) + 1);
+    sortPath[wcslen(sortPath) - 1] = '\0';
+
+    int length = wcslen(sortPath);
+    for(int i = 0; i <= length-1;i++){
+        sortPath[i] = sortPath[i+1];
 
     }
 
-    if(wStringCheck(sortFullPath) == 1){
-        return 1;
-
-    }
-
-    if(pathType(sortFullPath) == 1){
-        printf("You need a absolute path!\n");
-        return 1;
-
-    }
-
-    if(wcslen(sortFullPath) > 247){
+    if(wcslen(sortPath) > 247){
         printf("File name is too long!\n");
         return 1;
 
     }
-    if(wExist(sortFullPath,L"") == 0){
+
+    if(wExist(sortPath, L"") == 0){
         printf("The system cannot find the file specified.\n");
         ExitProcess(ERROR_FILE_NOT_FOUND);
 
     }
 
-    preluareDate(sortFullPath);
+    preluareDate(sortPath);
 
-    creeazaDirectoare(sortFullPath);
+    creeazaDirectoare(sortPath);
 
-    mutaFisiere(sortFullPath);
+    mutaFisiere(sortPath);
 
     return 0;
 }
